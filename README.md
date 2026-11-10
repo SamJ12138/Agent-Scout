@@ -27,21 +27,21 @@ A GitHub Actions workflow runs the tool on a list of real products and scores
 it against a reference profile of each one.
 
 <!-- real-site-results:start (written by scripts/run_corpus.py from docs/real-corpus/scores.md) -->
-Latest run on the real-site corpus: `20261110T141046Z-418b`, finished 2026-11-10T14:12:34Z. Sites read: 10 of 10. This is the first run on real sites. Rules adjusted after it have not been run on the corpus yet.
+Latest run on the real-site corpus: `20261110T143957Z-27a7`, finished 2026-11-10T14:41:44Z. Sites read: 10 of 10. Rules were adjusted after the first run on these sites, so this is not a held-out score (see below).
 
-**30 match, 43 partial, 4 mismatch, 13 missing of 90 site-fields.**
+**37 match, 40 partial, 2 mismatch, 11 missing of 90 site-fields.**
 
 | field | match | partial | mismatch | missing |
 |---|---|---|---|---|
 | one_liner | 6 | 4 | 0 | 0 |
-| categories | 1 | 9 | 0 | 0 |
-| target_user | 0 | 10 | 0 | 0 |
+| categories | 3 | 7 | 0 | 0 |
+| target_user | 1 | 9 | 0 | 0 |
 | tasks | 0 | 10 | 0 | 0 |
-| can_execute | 6 | 0 | 1 | 3 |
+| can_execute | 7 | 0 | 0 | 3 |
 | multi_agent | 7 | 0 | 0 | 3 |
-| integrations | 0 | 5 | 1 | 4 |
-| pricing | 3 | 5 | 2 | 0 |
-| hq_location | 7 | 0 | 0 | 3 |
+| integrations | 0 | 6 | 0 | 4 |
+| pricing | 6 | 3 | 1 | 0 |
+| hq_location | 7 | 1 | 1 | 1 |
 <!-- real-site-results:end -->
 
 What the numbers mean: the reference profiles were written from tool-mediated
