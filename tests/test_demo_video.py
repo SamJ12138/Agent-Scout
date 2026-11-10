@@ -85,7 +85,7 @@ def test_concat_copies_streams_and_gif_uses_a_two_pass_palette(tmp_path, monkeyp
     assert "fps=10" in " ".join(first) and "scale=960:-1" in " ".join(second)
     assert "max_colors=256" in " ".join(first)
     smaller, _ = video.gif_commands(tmp_path / "demo.mp4", tmp_path / "p.png", tmp_path / "demo.gif", colours=128)
-    assert "max_colors=128" in " ".join(smaller) and video.GIF_MAX_BYTES == 8_000_000
+    assert "max_colors=128" in " ".join(smaller) and video.GIF_MAX_BYTES < 8_000_000
 
 
 def test_labels_say_what_is_shown():
@@ -151,3 +151,16 @@ def test_failed_ffmpeg_leaves_no_file(tmp_path):
     with pytest.raises(SystemExit):
         video.run_to_file([sys.executable, "-c", "import sys; sys.exit(3)", str(output)], output)
     assert not output.exists() and not (tmp_path / "partial-out.mp4").exists()
+
+
+@pytest.mark.skipif(shutil.which("ffmpeg") is None, reason="ffmpeg is not installed")
+def test_gif_only_rebuilds_the_preview_from_an_existing_video(tmp_path, capsys):
+    still = tmp_path / "closing.jpg"
+    video.render_closing_card().save(still, quality=95)
+    video.run_to_file(video.still_scene_command(still, 1.0, tmp_path / "demo.mp4"), tmp_path / "demo.mp4")
+    assert video.main(["--out", str(tmp_path), "--gif-only", "--keep-build", str(tmp_path / "build")]) == 0
+    gif = tmp_path / "demo.gif"
+    assert gif.is_file() and gif.read_bytes()[:6] in (b"GIF87a", b"GIF89a")
+    assert gif.stat().st_size <= video.GIF_MAX_BYTES and "colours" in capsys.readouterr().out
+    with pytest.raises(SystemExit):
+        video.main(["--out", str(tmp_path / "empty"), "--gif-only"])

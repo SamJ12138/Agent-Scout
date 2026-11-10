@@ -5,7 +5,7 @@
 *What is shown: the real console output of the tool run on the six bundled
 fictional sample sites (pauses between requests shortened), then the report of
 that run. Rendered by `scripts/make_demo_video.py`; nothing was recorded by
-hand. Full quality: [docs/demo.mp4](docs/demo.mp4) (32 seconds).*
+hand. Full quality: [docs/demo.mp4](docs/demo.mp4) (31 seconds).*
 
 Agent Scout is a command-line researcher for one narrow job: profiling AI
 marketing-agent products from their own public websites. You give it a list
@@ -348,6 +348,7 @@ change (needs ffmpeg on PATH and Chromium for Playwright):
 python -m playwright install chromium        # once
 python scripts/make_demo_video.py            # writes docs/demo.mp4 and docs/demo.gif, about a minute
 python scripts/make_demo_video.py --report docs/real-corpus/report.html --label "Real-site corpus run"
+python scripts/make_demo_video.py --gif-only # rebuild only the GIF from docs/demo.mp4
 ```
 
 The second form films another report in the middle scene, under a caption you

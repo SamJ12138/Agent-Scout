@@ -295,7 +295,7 @@ def concat_list(scenes: list[Path]) -> str:
     return "".join(f"file '{scene.resolve().as_posix()}'\n" for scene in scenes)
 
 
-GIF_MAX_BYTES = 8_000_000
+GIF_MAX_BYTES = 7_500_000      # the preview must stay under 8 MB; aim lower to leave a margin
 
 
 def gif_commands(video: Path, palette: Path, output: Path, fps: int = 10, width: int = 960,
@@ -308,6 +308,17 @@ def gif_commands(video: Path, palette: Path, output: Path, fps: int = 10, width:
         [ffmpeg_path(), "-y", "-loglevel", "error", "-i", str(video), "-i", str(palette), "-lavfi",
          f"{scale}[x];[x][1:v]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle", str(output)],
     ]
+
+
+def make_gif(video: Path, gif: Path, work: Path) -> int:
+    """Write the GIF preview, with fewer colours if it would be too large. Returns the colours used."""
+    for colours in (256, 128, 64):
+        first_pass, second_pass = gif_commands(video, work / "palette.png", gif, colours=colours)
+        subprocess.run(first_pass, check=True)
+        run_to_file(second_pass, gif)
+        if gif.stat().st_size <= GIF_MAX_BYTES:
+            break
+    return colours
 
 
 def run_to_file(command: list[str], output: Path, feed=None) -> None:
@@ -422,14 +433,18 @@ def film_report(report: Path, label: str, output: Path, work: Path, preview: Pat
         keep("top")
         table = edges("#comparison") or (0, 0)
         heading_stop = table[0] - 96                           # the table with its heading and filters
-        scroll_to(heading_stop, 1.0)
-        hold(1.8)
-        keep("table")
         whole_table_stop = max(heading_stop, table[1] - clear)  # the last row clear of the caption strip
-        if whole_table_stop > heading_stop + 4:
+        if table[1] - table[0] <= clear - 24:                  # the table fits: show all of it at once
+            scroll_to(whole_table_stop, 1.0)
+            hold(3.8)
+            keep("table")
+        else:                                                  # a long table: its top, then its end
+            scroll_to(heading_stop, 1.0)
+            hold(1.8)
+            keep("table")
             scroll_to(whole_table_stop, 0.8)
-        hold(2.0)
-        keep("table-lower")
+            hold(2.0)
+            keep("table-lower")
 
         first = page.query_selector("#comparison tbody tr:not(.not-read) a.open-card")
         if first is not None:
@@ -486,6 +501,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--preview", type=Path,
                         help="only write still frames of the busiest moments into this directory")
     parser.add_argument("--keep-build", type=Path, help="keep scene files and the sample run in this directory")
+    parser.add_argument("--gif-only", action="store_true", help="rebuild demo.gif from the existing demo.mp4")
     return parser
 
 
@@ -496,6 +512,13 @@ def main(argv: list[str] | None = None) -> int:
     work = args.keep_build or Path(tempfile.mkdtemp(prefix="agent-scout-video-"))
     work.mkdir(parents=True, exist_ok=True)
     args.out.mkdir(parents=True, exist_ok=True)
+    if args.gif_only:
+        video, gif = args.out / "demo.mp4", args.out / "demo.gif"
+        if not video.is_file():
+            raise SystemExit(f"make_demo_video: {video} does not exist")
+        colours = make_gif(video, gif, work)
+        print(f"Wrote {gif} ({gif.stat().st_size / 1e6:.1f} MB, {colours} colours)")
+        return 0
 
     print("Running the tool on the bundled fictional sample sites (default settings, about 30 seconds)...")
     lines, stamps = capture_run(work)
@@ -530,12 +553,7 @@ def main(argv: list[str] | None = None) -> int:
     video = args.out / "demo.mp4"
     run_to_file(concat_command(list_file, video), video)
     gif = args.out / "demo.gif"
-    for colours in (256, 128, 64):                 # fewer colours only if the preview would exceed 8 MB
-        first_pass, second_pass = gif_commands(video, work / "palette.png", gif, colours=colours)
-        subprocess.run(first_pass, check=True)
-        run_to_file(second_pass, gif)
-        if gif.stat().st_size <= GIF_MAX_BYTES:
-            break
+    make_gif(video, gif, work)
 
     seconds = probe_seconds(video)
     print(f"Wrote {video} ({seconds:.1f} s, {video.stat().st_size / 1e6:.1f} MB) and "
