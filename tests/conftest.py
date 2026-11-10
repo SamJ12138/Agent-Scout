@@ -4,6 +4,7 @@ request goes to a server started here on 127.0.0.1."""
 from __future__ import annotations
 
 import json
+import os
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
@@ -158,3 +159,21 @@ def make_fetcher(fake_time):
 
 def html_page(body: str, title: str = "Test page", head: str = "") -> str:
     return f"<!doctype html><html><head><title>{title}</title>{head}</head><body>{body}</body></html>"
+
+
+def launch_chromium(playwright):
+    """Start headless Chromium or skip the test, saying why and how to fix it.
+
+    With AGENT_SCOUT_REQUIRE_BROWSER set (CI does this on Linux, where it
+    installs the browser) a missing browser is a failure, so that the browser
+    tests cannot go quiet unnoticed.
+    """
+    try:
+        return playwright.chromium.launch()
+    except Exception as exc:                       # Playwright raises its own Error with a long message
+        first_line = str(exc).strip().splitlines()[0] if str(exc).strip() else type(exc).__name__
+        reason = (f"Chromium for Playwright could not be started ({first_line[:160]}). "
+                  "Install the build this Playwright version needs with: python -m playwright install chromium")
+        if os.environ.get("AGENT_SCOUT_REQUIRE_BROWSER"):
+            pytest.fail(reason)
+        pytest.skip(reason)

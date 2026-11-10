@@ -72,7 +72,7 @@ def test_workflows_are_valid_yaml_with_the_agreed_shape():
     assert "[skip ci]" in text and "github-actions[bot]" in text and "scripts/run_corpus.py" in text
     ci = yaml.safe_load((root / "ci.yml").read_text(encoding="utf-8"))
     matrix = ci["jobs"]["test"]["strategy"]["matrix"]
-    assert matrix["os"] == ["ubuntu-24.04", "windows-2025"] and matrix["python-version"] == ["3.12"]
+    assert matrix["os"] == ["ubuntu-24.04", "windows-2025"] and matrix["python-version"] == ["3.10", "3.13"]
     for workflow in (corpus, ci):
         for job in workflow["jobs"].values():
             for step in job["steps"]:

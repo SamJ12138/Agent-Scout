@@ -11,6 +11,8 @@ from bs4 import BeautifulSoup
 from agent_scout import reports
 from agent_scout.model import FIELDS, UNKNOWN
 
+from conftest import launch_chromium
+
 U = UNKNOWN
 
 
@@ -267,10 +269,7 @@ def browser_page(tmp_path_factory):
     path = tmp_path_factory.mktemp("html") / "report.html"
     path.write_text(reports.render_html(ALL), encoding="utf-8")
     with sync_api.sync_playwright() as playwright:
-        try:
-            browser = playwright.chromium.launch()
-        except Exception as exc:                           # no browser installed on this machine
-            pytest.skip(f"Chromium is not available: {type(exc).__name__}")
+        browser = launch_chromium(playwright)
         page = browser.new_page(viewport={"width": 1280, "height": 720})
         requests_made = []
         page.on("request", lambda request: requests_made.append(request.url))
@@ -312,3 +311,25 @@ def test_one_quote_supporting_several_values_is_shown_once():
     assert len(row.find_all("q")) == 1
     assert row.find(class_="item").get_text() == "email marketing, seo"
     assert reports.render_markdown(doc).count("> email marketing, seo: Email and SEO in one agent.") == 1
+
+
+class _NoBrowser:
+    class chromium:
+        @staticmethod
+        def launch():
+            raise RuntimeError("Executable doesn't exist at /somewhere/chrome\nmore detail on later lines")
+
+
+def test_a_missing_browser_is_skipped_with_the_reason_and_the_fix(monkeypatch):
+    monkeypatch.delenv("AGENT_SCOUT_REQUIRE_BROWSER", raising=False)
+    with pytest.raises(pytest.skip.Exception) as skipped:
+        launch_chromium(_NoBrowser)
+    message = str(skipped.value)
+    assert "Executable doesn't exist" in message and "python -m playwright install chromium" in message
+    assert "more detail" not in message
+
+
+def test_a_missing_browser_is_a_failure_where_one_is_required(monkeypatch):
+    monkeypatch.setenv("AGENT_SCOUT_REQUIRE_BROWSER", "1")
+    with pytest.raises(pytest.fail.Exception):
+        launch_chromium(_NoBrowser)

@@ -302,17 +302,23 @@ error type, and p50 / p95 durations per stage.
 ```bash
 python -m pip install -e . -r requirements-dev.txt
 python -m pytest                      # about 20 seconds
-python scripts/install_hooks.py       # optional: run the suite before every commit
+python scripts/install_hooks.py       # optional: run the suite before every commit and check commit messages
 ```
 
 The suite makes no request to the internet: every HTTP request in it goes to
 a server it starts on `127.0.0.1`. A test fails if an `except` block in the
 package has no log call, if a keyword-table entry has no example, if a
 declared dependency is unused or an import undeclared, or if a tracked file
-contains personal data. Two report tests need Chromium through Playwright
-and one video test needs ffmpeg; they are skipped where those are not
-installed, and Chromium is not installed in CI. CI runs the suite on the
-`ubuntu-24.04` and `windows-2025` runners with Python 3.12.
+contains personal data.
+
+CI runs the suite on the `ubuntu-24.04` and `windows-2025` runners with
+Python 3.10 (the lowest supported version) and 3.13. Two report tests drive
+headless Chromium through Playwright. On the Linux runners CI installs the
+browser and a missing browser is a failure; elsewhere those tests are skipped
+with a message that says why and how to install it
+(`python -m playwright install chromium`; `requirements-dev.txt` pins the
+Playwright version because each release needs one specific Chromium build).
+One video test needs ffmpeg and is skipped without it.
 
 The demo video is rendered by a script, so it can be regenerated after a
 change (needs ffmpeg on PATH and Chromium for Playwright):
