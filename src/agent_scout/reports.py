@@ -35,6 +35,7 @@ METHOD_LABELS = {
 
 
 ITEM_LABELS = {"free_tier": "free plan or trial", "starting_price": "starting price"}
+TABLE_FIELDS = ("categories", "target_user", "can_execute", "multi_agent", "pricing", "hq_location", "integrations")
 
 
 # --------------------------------------------------------------------------- shared formatting
@@ -282,17 +283,23 @@ def _table_row(site: dict) -> str:
         note = '<span class="flag">JavaScript shell: only its head data was read</span>'
     elif site["status"] == "partial":
         note = f'<span class="flag">partly read: {_e(site["status_detail"])}</span>'
-    integrations = _value(site, "integrations")
-    if integrations == UNKNOWN:
-        integration_cell = '<span class="unknown">unknown</span>'
-    else:
-        shown = ", ".join(_e(item) for item in integrations[:3])
-        more = f' <span class="more">and {len(integrations) - 3} more</span>' if len(integrations) > 3 else ""
-        integration_cell = f"{shown}{more}"
-    cells = "".join(f"<td>{_value_html(field, _value(site, field))}</td>"
-                    for field in ("categories", "target_user", "can_execute", "multi_agent", "pricing", "hq_location"))
+    def cell(field: str) -> str:
+        """A known value is a link to the row of the profile that holds its quote."""
+        value = _value(site, field)
+        if value == UNKNOWN:
+            return '<td><span class="unknown">unknown</span></td>'
+        if field == "integrations":
+            shown = ", ".join(_e(item) for item in value[:3])
+            more = f' <span class="more">and {len(value) - 3} more</span>' if len(value) > 3 else ""
+            inner = f"{shown}{more}"
+        else:
+            inner = _value_html(field, value)
+        return (f'<td><a class="to-evidence" href="#card-{_e(site["slug"])}-{field}" '
+                f'title="Show the quote this rests on">{inner}</a></td>')
+
+    cells = "".join(cell(field) for field in TABLE_FIELDS)
     return (f'<tr class="status-{_e(site["status"])}" {_data_attrs(site)}>'
-            f'<th scope="row">{name}{note}</th>{cells}<td>{integration_cell}</td></tr>')
+            f'<th scope="row">{name}{note}</th>{cells}</tr>')
 
 
 def _card(site: dict) -> str:
@@ -308,7 +315,8 @@ def _card(site: dict) -> str:
     rows = []
     for field in FIELDS:
         entry = site["fields"][field]
-        rows.append(f'<div class="field" data-field="{field}"><dt>{_e(FIELD_LABELS[field])}</dt>'
+        rows.append(f'<div class="field" id="card-{_e(site["slug"])}-{field}" data-field="{field}">'
+                    f'<dt>{_e(FIELD_LABELS[field])}</dt>'
                     f'<dd><div class="value">{_value_html(field, entry["value"])}</div>{_evidence_html(entry)}</dd></div>')
     pages = _plural(_pages_read(site), "page") + " read"
     note = f'<p class="crawl-note">{_e(site["status_detail"])}. {_link(site["url"], "Open the site")}</p>' \
@@ -349,6 +357,11 @@ tbody th,tbody td{padding:11px 12px;border-bottom:1px solid var(--rule);vertical
 tbody th{font-weight:600}
 col.c-name{width:19%}col.c-cat{width:15%}col.c-user{width:13%}col.c-exec{width:8%}col.c-multi{width:8%}col.c-price{width:14%}col.c-hq{width:11%}col.c-int{width:12%}
 .open-card{font-weight:650;font-size:15px}
+a.to-evidence{color:inherit;text-decoration:underline dotted var(--muted);text-underline-offset:3px;display:block}
+a.to-evidence:hover{color:var(--link);text-decoration:underline solid}
+a.to-evidence .tag{text-decoration:none}
+.field:target{background:#fffbe0;box-shadow:-12px 0 0 #fffbe0,12px 0 0 #fffbe0}
+html{scroll-padding-top:16px}
 .host{display:block;color:var(--muted);font-weight:400;font-size:12.5px}
 .flag{display:block;margin-top:4px;color:var(--warn);font-weight:500;font-size:12.5px}
 .unknown{color:var(--muted);font-style:italic}
@@ -405,9 +418,10 @@ _JS = """
   }
   category.addEventListener('change', apply);
   country.addEventListener('change', apply);
-  document.querySelectorAll('a.open-card').forEach(function (link) {
+  document.querySelectorAll('a.open-card, a.to-evidence').forEach(function (link) {
     link.addEventListener('click', function () {
-      var card = document.querySelector(link.getAttribute('href'));
+      var target = document.querySelector(link.getAttribute('href'));
+      var card = target && target.closest('details.card');
       if (card) { card.open = true; }
     });
   });
@@ -455,7 +469,8 @@ def render_html(results: dict) -> str:
 <header>
 <h1>Agent Scout report</h1>
 <p id="summary">{_e(summary_sentence(results))}</p>
-<p class="run">Every value links to the sentence it came from. What a site does not state is shown as
+<p class="run">Every value links to the sentence it came from: select a value in the table to see its quote
+and the page the quote is on. What a site does not state is shown as
 <span class="unknown">unknown</span>. Run {_e(results["run_id"])}, finished {_e(finished)},
 agent-scout {_e(results["tool"]["version"])}.{llm_note}</p>
 </header>

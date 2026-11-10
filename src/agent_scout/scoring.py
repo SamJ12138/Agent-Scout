@@ -1,4 +1,4 @@
-"""Compare a results.json with hand-written ground truth, field by field.
+"""Compare a results.json with reference profiles (ground truth), field by field.
 
 Outcomes
     match     the tool's value equals the reference after normalisation.

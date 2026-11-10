@@ -1,4 +1,4 @@
-"""Each rule-based extractor, on small hand-written pages."""
+"""Each rule-based extractor, on small pages written for the test."""
 
 import pytest
 

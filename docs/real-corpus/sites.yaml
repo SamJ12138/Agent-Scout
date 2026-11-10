@@ -1,4 +1,4 @@
-# Agent Scout real-site corpus. Fixed order (alphabetical by slug). Ground truth: <slug>.json in this folder.
+# Agent Scout real-site corpus. Fixed order (alphabetical by slug). Reference profiles: ground-truth/<slug>.json.
 - name: "AdCreative.ai"
   url: "https://www.adcreative.ai/"
   slug: "adcreative-ai"

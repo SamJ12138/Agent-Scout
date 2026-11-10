@@ -53,9 +53,9 @@ def scores_markdown(results: dict, score: scoring.RunScore) -> str:
         f"- Site-fields: {totals['match']} match, {totals['partial']} partial, {totals['mismatch']} mismatch, "
         f"{totals['missing']} missing, of {sum(totals.values())}",
         "",
-        "How to read this: the ground truth in `ground-truth/` was written by reading each product's own "
-        "site before the tool's output existed (see `ground-truth/README.md` for the method and its "
-        "limits). `match`, `partial`, `mismatch` and `missing` are defined in `src/agent_scout/scoring.py`. "
+        "How to read this: the reference profiles in `ground-truth/` were written from tool-mediated "
+        "reads of each product's own site and committed before the tool was run on these sites (see "
+        "`ground-truth/README.md` for the method and its limits). `match`, `partial`, `mismatch` and `missing` are defined in `src/agent_scout/scoring.py`. "
         "A site the tool could not read has every field unknown, so each field the reference knows counts "
         "as `missing` there: those rows measure reachability, not extraction. The corpus has no product "
         "whose site says it only drafts, so nothing here tests `can_execute: false`. Category and task "

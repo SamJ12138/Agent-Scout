@@ -1,11 +1,14 @@
-# Agent Scout real-site corpus: hand-made ground truth
+# Agent Scout real-site corpus: reference profiles (ground truth)
 
-Ten real products that sell AI agents or AI assistants for marketing work, with a hand-written
-profile for each. The profiles were written by reading the products' own websites before anyone
-looked at the tool's output. The annotator did not open the tool's code or results.
+Ten real products that sell AI agents or AI assistants for marketing work, with a reference
+profile for each. The profiles were written from tool-mediated reads of the products' own
+websites (see "Reading method and its limit" below) and committed before the tool was run on
+any of these sites. The annotator did not open the tool's code or results.
 
-- Files: `sites.yaml` (name, url, slug, alphabetical by slug) and one `<slug>.json` per product.
-- Format: `gm-ground-truth-schema.md` (fields, vocabularies, three-valued rules).
+- Files: `../sites.yaml` (name, url, slug, alphabetical by slug) and one `<slug>.json` per
+  product in this folder.
+- Format: the fields, vocabularies and three-valued rules are those of the "Fields" section of
+  the project README (`../../../README.md`); the file layout is shown under "File format" below.
 - `asOf`: 2026-11-10. Pages were read on 2026-11-09 and 2026-11-10.
 
 ## How the set was chosen
@@ -77,6 +80,35 @@ Limits a reader should know:
 - Two very long pages were cut by the tool: the AdCreative.ai homepage (read to 100,000 of about
   102,000 characters, so its footer was lost) and the Relevance AI integrations directory (read to
   100,000 of about 344,000 characters).
+
+## File format
+
+```json
+{
+  "slug": "example",
+  "name": "Example",
+  "url": "https://www.example.com/",
+  "asOf": "2026-11-10",
+  "pages_read": ["https://www.example.com/", "https://www.example.com/pricing"],
+  "fields": {
+    "one_liner":   { "value": "...", "source_url": "..." },
+    "categories":  { "value": ["content generation"], "source_url": "...", "quote": "..." },
+    "target_user": { "value": ["marketers", "enterprise"], "source_url": "...", "quote": "..." },
+    "tasks":       { "value": ["write copy"], "source_url": "...", "quote": "..." },
+    "can_execute": { "value": true, "source_url": "...", "quote": "the sentence that says it acts" },
+    "multi_agent": { "value": "unknown" },
+    "integrations":{ "value": ["HubSpot", "Slack"], "source_url": "..." },
+    "pricing":     { "value": { "free_tier": true, "starting_price": "$49/month" }, "source_url": "..." },
+    "hq_location": { "value": { "city": "Austin", "country": "United States" }, "source_url": "..." }
+  },
+  "hq_external": { "value": { "city": "...", "country": "..." }, "source_url": "..." },
+  "notes": "..."
+}
+```
+
+`"unknown"` (the string) is a valid value for any field and means: the site does not say.
+`hq_external` is optional, comes from a third-party source and is never used for scoring.
+The optional keys some entries carry are listed under "Keys beyond the schema".
 
 ## Annotation rules used
 

@@ -11,8 +11,9 @@ Nothing is recorded by hand. The script
    recorded lines. Waits longer than 0.3 s (the pauses the tool leaves between
    requests) are shortened, and a label says so while that happens;
 3. scene 2: films the report.html of that run in headless Chromium: the
-   comparison table, one profile opened so that quotes and source links are
-   readable, then the row of a site that could not be read;
+   comparison table (scrolled so that its last row is clear of the caption),
+   one profile opened, one value with its quote and source link, then the
+   rows of the sites that could not be read;
 4. scene 3: a two-second closing card;
 5. encodes each scene to its own .mp4 with identical settings, joins them
    with the concat demuxer, and makes a 960 px GIF with a two-pass palette.
@@ -409,31 +410,51 @@ def film_report(report: Path, label: str, output: Path, work: Path, preview: Pat
                 image.alpha_composite(label_overlay(label))
                 image.convert("RGB").save(preview / f"scene2-{name}.jpg", quality=92)
 
+        def edges(selector: str) -> tuple[float, float] | None:
+            return page.evaluate(
+                "s => { const all = document.querySelectorAll(s); if (!all.length) return null; "
+                "const first = all[0].getBoundingClientRect(), last = all[all.length - 1].getBoundingClientRect(); "
+                "return [first.top + window.scrollY, last.bottom + window.scrollY]; }", selector)
+
+        clear = HEIGHT - LABEL_HEIGHT - 14                      # page height not covered by the caption strip
+
         hold(2.2)                                              # summary and coverage
         keep("top")
-        table = top_of("#comparison")
-        scroll_to((table or 0) - 96, 1.0)                      # the comparison table with its filters
-        hold(3.6)
+        table = edges("#comparison") or (0, 0)
+        heading_stop = table[0] - 96                           # the table with its heading and filters
+        scroll_to(heading_stop, 1.0)
+        hold(1.8)
         keep("table")
+        whole_table_stop = max(heading_stop, table[1] - clear)  # the last row clear of the caption strip
+        if whole_table_stop > heading_stop + 4:
+            scroll_to(whole_table_stop, 0.8)
+        hold(2.0)
+        keep("table-lower")
 
         first = page.query_selector("#comparison tbody tr:not(.not-read) a.open-card")
         if first is not None:
             card = first.get_attribute("href")
-            first.click()                                      # the report's own script opens the profile
-            scroll_to((top_of(card) or 0) - 12, 1.0)
-            hold(2.6)
+            page.evaluate("s => { document.querySelector(s).open = true; }", card)
+            scroll_to((top_of(card) or 0) - 12, 1.0)           # the profile, opened
+            hold(2.4)
             keep("profile")
-            scroll_to(position["y"] + 420, 1.6)                # further down the same profile
-            hold(2.8)
-            keep("profile-lower")
+            field = page.evaluate(
+                "s => { const rows = [...document.querySelectorAll(s + ' .field')].filter(r => r.querySelector('q')); "
+                "const pick = rows.find(r => r.dataset.field === 'can_execute') || rows[rows.length - 1]; "
+                "return pick ? '#' + pick.id : null; }", card)
+            if field:
+                scroll_to((top_of(field) or 0) - 16, 1.2)      # one value with its quote and source link
+                page.evaluate("h => { location.hash = h; }", field)   # what following a table value does
+                hold(2.8)
+                keep("evidence")
 
-        unread = top_of("#comparison tr.not-read")
+        unread = edges("#comparison tr.not-read")
         if unread is not None:
-            scroll_to(unread - 300, 1.2)                       # a site that could not be read
-            hold(3.2)
+            scroll_to(max(unread[0] - 260, unread[1] - clear), 1.2)   # the sites that could not be read
+            hold(3.0)
             keep("not-read")
         else:
-            scroll_to((table or 0) - 96, 1.2)
+            scroll_to(heading_stop, 1.2)
             hold(2.0)
         browser.close()
 

@@ -333,3 +333,30 @@ def test_a_missing_browser_is_a_failure_where_one_is_required(monkeypatch):
     monkeypatch.setenv("AGENT_SCOUT_REQUIRE_BROWSER", "1")
     with pytest.raises(pytest.fail.Exception):
         launch_chromium(_NoBrowser)
+
+
+# ------------------------------------------------------------------ "every value links to the sentence it came from"
+def test_every_known_value_in_the_table_links_to_its_evidence_row():
+    soup = BeautifulSoup(reports.render_html(ALL), "html.parser")
+    row = soup.select_one("#comparison tr[data-slug=acme]")
+    table_fields = ["categories", "target_user", "can_execute", "multi_agent", "pricing", "hq_location", "integrations"]
+    links = row.select("td a.to-evidence")
+    assert [link["href"] for link in links] == [f"#card-acme-{name}" for name in table_fields]
+    for link in links:
+        target = soup.find(id=link["href"][1:])
+        assert target is not None and target.find("q") is not None        # the row that holds the quote
+    # an unknown value has no evidence, so it is not a link
+    empty = soup.select_one("#comparison tr[data-slug=empty]")
+    assert empty.select("td a") == [] and len(empty.select("td .unknown")) == 7
+    header = soup.find("header").get_text(" ", strip=True)
+    assert "Every value links to the sentence it came from" in header
+
+
+def test_browser_clicking_a_value_opens_its_evidence(browser_page):
+    page = browser_page
+    page.evaluate("document.querySelectorAll('details.card').forEach(card => { card.open = false; })")
+    assert not page.is_visible("#card-acme-pricing q")
+    page.click("#comparison tr[data-slug=acme] a.to-evidence[href='#card-acme-pricing']")
+    assert page.is_visible("#card-acme-pricing q")
+    box = page.eval_on_selector("#card-acme-pricing", "e => e.getBoundingClientRect().top")
+    assert 0 <= box < 720

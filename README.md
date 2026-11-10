@@ -50,7 +50,9 @@ python -m pip install -e .
 python scripts/demo.py
 ```
 
-It takes about ten seconds and ends with
+The demo shortens the pause between two requests to one site from the default
+1.5 seconds to 0.5 seconds, because the sites are served from your own
+machine (`--delay` changes it). It takes about ten seconds and ends with
 
 ```
 Reports: demo-output/reports/results.json, demo-output/reports/results.csv, demo-output/reports/report.md, demo-output/reports/report.html
@@ -108,7 +110,8 @@ Output files:
   external request): a summary, how many reachable sites state each field, a
   comparison table with category and country filters, and a profile per
   product in which each value sits next to its quote and a link to the page.
-  Sites that could not be read are hatched and say why.
+  A value in the table is a link to that row of the profile. Sites that could
+  not be read are hatched and say why.
 
 ## How it fetches
 
@@ -156,11 +159,11 @@ third-party sites.
 | `categories` | list from a fixed vocabulary | what kind of marketing work the product does |
 | `target_user` | list from a fixed vocabulary | audiences the site names |
 | `tasks` | list from a fixed vocabulary | tasks the site says the product performs |
-| `can_execute` | true / false / unknown | true only if the site states the product itself acts in other systems or channels (sends, publishes, schedules, launches or adjusts campaigns, updates a CRM); false only if the site states it only drafts or suggests; otherwise unknown. If the site says both, unknown |
+| `can_execute` | true / false / unknown | true only if a sentence states that the product itself acts in other systems or channels (sends, publishes, schedules, launches or adjusts campaigns, updates a CRM), automatically or with an agent as the one acting. false only if a sentence states without qualification that it does not act: "only drafts", "only suggests", or a negated action about everything ("never sends or publishes anything", "does not send emails for you"). A negated action with a specific object ("never sends duplicate emails") or a condition ("never sends anything without your approval") is not such a statement and leaves the field unknown, as does an approval step. If the site says both, unknown |
 | `multi_agent` | true / unknown | true if the site states several agents work together. Never false |
 | `integrations` | list of names, at most 25 | third-party products named as integrations |
 | `pricing` | `free_tier` true / false / unknown, `starting_price` as written | a free plan or trial is stated; the lowest paid price exactly as the site writes it |
-| `hq_location` | `city`, `country` | the company address or headquarters as the site states it (JSON-LD, `<address>`, a "headquartered in" sentence, a footer address) |
+| `hq_location` | `city`, `country` | the company address or headquarters as the site states it (JSON-LD, `<address>`, a "headquartered in" sentence about the company itself, a footer address). The country is given only when the site states it; a city alone leaves the country unknown |
 
 Vocabularies:
 
@@ -179,12 +182,26 @@ Each piece of evidence records a `method`: `meta`, `json-ld`, `heading`,
 row joined with ` | `), or `llm`.
 
 How values are decided: the extraction is rule-based. All keyword tables live
-in one file, `src/agent_scout/vocab.py`, and each entry has an example
-sentence in `tests/test_vocab.py`. A phrase preceded by a negation in the same
-sentence ("is not an SEO tool") is ignored. Navigation, footers, table rows
-and lists of integrations are not read as statements about the product. A
-category needs a hit in a heading or meta description, or two separate
-sentences; audiences and tasks are reported when stated once.
+in one file, `src/agent_scout/vocab.py`, and each entry has a test in
+`tests/test_vocab.py`. The rules prefer `unknown` to a wrong value:
+
+- Only the main content and header of a page are read as the site speaking
+  about its product. Navigation (by tag, role or class), customer quotes
+  (`<blockquote>`, `<cite>`, testimonial and review blocks), cookie and
+  consent banners, and lists of integrations are never read as statements.
+  Footers are read for the company address and nothing else.
+- A phrase is ignored when it is negated before ("is not an SEO tool") or
+  after ("SEO is not something we do"), or when the clause is about other
+  products ("Other tools send campaigns automatically").
+- A question, or a heading that opens like one ("Why multi-agent systems
+  fail"), does not make `can_execute` or `multi_agent` true.
+- An audience after "than", "hiring", "replace" or "like having" is a
+  comparison ("cheaper than an agency"), not an audience.
+- A category needs a hit in a heading or meta description, or two separate
+  sentences; audiences and tasks are reported when stated once.
+
+`tests/test_adversarial.py` holds sentences written to provoke wrong values;
+it only ever grows.
 
 ## Optional LLM pass
 
@@ -239,9 +256,8 @@ documentation but are unverified in practice.
 Two different things are measured, and they should not be confused.
 
 **Fixture gate (a regression test, not an accuracy claim).** For the six
-bundled fictional sites there is a ground-truth file each, written from the
-HTML before the extractor was run on it. The suite requires every field of
-every site to match:
+bundled fictional sites there is a ground-truth file each. The suite requires
+every field of every site to match:
 
 ```
 site        status            one_liner  categories target     tasks      executes   multi      integr     pricing    hq
@@ -255,16 +271,21 @@ tessera     robots_disallowed match      match      match      match      match 
 totals: 54 match, 0 partial, 0 mismatch, 0 missing (of 54 site-fields)
 ```
 
-The sites, the ground truth and the keyword tables have the same author, so
-54 of 54 says the pipeline does what it was built to do on pages written with
-it in mind. It says nothing about real websites. The three unread sites match
-because both sides are all `unknown`.
+The sites, the ground truth and the keyword tables have the same author and
+entered the repository in the same commit, so 54 of 54 says the pipeline does
+what it was built to do on pages written with it in mind. It says nothing
+about real websites. The three unread sites match because both sides are all
+`unknown`.
 
 **Real-site corpus.** `docs/real-corpus/` holds a list of ten real products
-and a ground-truth profile for each, written by reading the products' own
-sites before the tool's output existed (method and limits:
+and a reference profile for each, written from tool-mediated reads of the
+products' own sites (method and limits:
 `docs/real-corpus/ground-truth/README.md`). The keyword tables were committed
-before those files were opened. The scores are produced by the `corpus`
+before those files were. They were changed once afterwards, in the commit
+"fix: unknown instead of wrong values on adversarial sentences", to stop
+wrong values on sentences written by a reviewer; the corpus was not used for
+that change, and the tool had not been run on the corpus at that point. The
+scores are produced by the `corpus`
 GitHub Actions workflow, which runs the tool with default settings on those
 sites and commits the result to
 [`docs/real-corpus/scores.md`](docs/real-corpus/scores.md), next to the raw
@@ -357,13 +378,26 @@ docs/real-corpus/  real-site list, ground truth, and the workflow's outputs
   legal notice, a deep pricing page) is not found.
 - A 401, 403 or 429 on any page ends the site as `blocked` and discards what
   was read before it. That is deliberate and conservative.
+- The rules choose `unknown` over a guess, so some things a person would read
+  correctly stay unknown. Examples: "Our agents never send anything without
+  your approval" (acts after approval: `can_execute` stays unknown); "what
+  you approve, it sends automatically" (the word "you" just before the verb);
+  "How our team of agents works" (a heading that opens like a question:
+  `multi_agent` stays unknown); "Integrates with Fernleaf CRM" (a product
+  name outside the known list is only kept next to a known one); a free
+  trial offered only in the navigation bar or footer; any fact stated only
+  inside a customer quote.
 - Prices are recognised with the currency symbol in front (`$49`, `€12`,
   `£29`). `42€`, prices set by a slider or filled in by scripts, and prices
   in other currencies are not. The "lowest price" can be an add-on or a
   promotional figure if that is the lowest number on the pricing page.
 - Headquarters: the country is reported only when the site names it, gives an
-  ISO code in JSON-LD, or names a US state. About 65 countries are
-  recognised. A postcode alone does not yield a country.
+  ISO country code, or gives a US state with a ZIP code or written out in
+  full. "Austin, TX", "Toronto, CA", "Berlin, DE" and "Tbilisi, Georgia" give
+  the city and leave the country unknown, because a bare two-letter code or
+  "Georgia" can mean two places. About 65 countries are recognised. A
+  postcode alone does not yield a country. A headquarters sentence that
+  mentions a customer, client or partner before the place is skipped.
 - Integrations: names are taken from logo alt texts ending in "logo" or
   "icon", from a list of about 90 known product names, and from sentences
   such as "integrates with A, B and C". Logo walls without alt text and

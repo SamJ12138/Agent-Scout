@@ -69,7 +69,11 @@ def test_workflows_are_valid_yaml_with_the_agreed_shape():
     assert set(triggers["push"]["paths"]) == {"src/**", "docs/real-corpus/sites.yaml", "docs/real-corpus/ground-truth/**"}
     assert corpus["permissions"] == {"contents": "write"}
     text = (root / "corpus.yml").read_text(encoding="utf-8")
-    assert "[skip ci]" in text and "github-actions[bot]" in text and "scripts/run_corpus.py" in text
+    assert "[skip ci]" in text and "scripts/run_corpus.py" in text
+    assert 'git config user.name "Tianyi Jia"' in text and "github-actions[bot]" not in text
+    # the files the workflow commits must not be among the paths that trigger it
+    for written in ("docs/real-corpus/results/latest.json", "docs/real-corpus/scores.md", "docs/real-corpus/report.html"):
+        assert written in text and not any(written.startswith(path.rstrip("*")) for path in triggers["push"]["paths"])
     ci = yaml.safe_load((root / "ci.yml").read_text(encoding="utf-8"))
     matrix = ci["jobs"]["test"]["strategy"]["matrix"]
     assert matrix["os"] == ["ubuntu-24.04", "windows-2025"] and matrix["python-version"] == ["3.10", "3.13"]
