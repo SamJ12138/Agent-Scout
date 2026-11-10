@@ -1,4 +1,5 @@
-"""Make git run scripts/hooks/pre-commit (the test suite) before every commit.
+"""Make git run the hooks in scripts/hooks: pre-commit (the test suite) and
+commit-msg (no personal data or attribution lines in the message).
 
     python scripts/install_hooks.py
 
@@ -24,12 +25,13 @@ def install(repo: Path = ROOT) -> int:
         print(f"install_hooks: {hook} is missing", file=sys.stderr)
         return 1
     if os.name != "nt":
-        hook.chmod(hook.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+        for script in hook.parent.iterdir():
+            script.chmod(script.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
     done = subprocess.run(["git", "config", "core.hooksPath", HOOKS], cwd=repo, capture_output=True, text=True)
     if done.returncode != 0:
         print(f"install_hooks: git config failed: {done.stderr.strip()}", file=sys.stderr)
         return 1
-    print(f"git will now run {HOOKS}/pre-commit before each commit in {repo}")
+    print(f"git will now run the hooks in {HOOKS} for each commit in {repo}")
     return 0
 
 

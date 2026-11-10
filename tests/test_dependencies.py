@@ -10,7 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 IMPORT_NAMES = {"pyyaml": "yaml", "beautifulsoup4": "bs4", "pillow": "PIL"}
 LOCAL = {"agent_scout", "fixture_server", "run_corpus", "conftest", "make_demo_video", "demo", "score",
-         "install_hooks"}
+         "install_hooks", "hygiene"}
 
 
 def requirement_names(path: Path) -> set[str]:
