@@ -4,9 +4,9 @@
     "name": "agent-scout",
     "version": "0.1.0"
   },
-  "run_id": "20261110T143957Z-27a7",
-  "started_at": "2026-11-10T14:39:57Z",
-  "finished_at": "2026-11-10T14:41:44Z",
+  "run_id": "20261110T151149Z-0f5c",
+  "started_at": "2026-11-10T15:11:49Z",
+  "finished_at": "2026-11-10T15:13:36Z",
   "settings": {
     "page_budget": 6,
     "delay_seconds": 1.5,
@@ -285,14 +285,14 @@
         },
         "hq_location": {
           "value": {
-            "city": "San Francisco",
-            "country": "United States"
+            "city": "Paris",
+            "country": "unknown"
           },
           "evidence": [
             {
               "item": null,
               "url": "https://www.adcreative.ai/legal/legal-notice",
-              "quote": "This site is published by AdCreative.ai., provided by ADYOUNEED SAS (société par actions simplifiée), with a capital of 1432, 80 €, registered with the RCS of Paris under the number 843 804 899, whose registered office is located at 40 RUE DES BLANCS MANTEAUX 75004 PARIS., Publication manager: ADYOUNEED, 40 rue des Blancs Manteaux – 75004, Paris, Fr., Host: Webflow, Inc., Address: 398 11th Street, Floor 2, San Francisco, CA 94103, USA",
+              "quote": "This site is published by AdCreative.ai., provided by ADYOUNEED SAS (société par actions simplifiée), with a capital of 1432, 80 €, registered with the RCS of Paris under the number 843 804 899, whose registered office is located at 40 RUE DES BLANCS MANTEAUX 75004 PARIS.",
               "method": "sentence"
             }
           ]
@@ -331,7 +331,7 @@
           "outcome": "fetched",
           "http_status": 200,
           "error_type": null,
-          "bytes": 8885,
+          "bytes": 8980,
           "encoding": "br",
           "charset": "utf-8"
         },
@@ -907,7 +907,7 @@
           "outcome": "fetched",
           "http_status": 200,
           "error_type": null,
-          "bytes": 85287,
+          "bytes": 81120,
           "encoding": "gzip",
           "charset": "utf-8"
         },
@@ -918,7 +918,7 @@
           "outcome": "fetched",
           "http_status": 200,
           "error_type": null,
-          "bytes": 80336,
+          "bytes": 80325,
           "encoding": "gzip",
           "charset": "utf-8"
         },
@@ -929,7 +929,7 @@
           "outcome": "fetched",
           "http_status": 200,
           "error_type": null,
-          "bytes": 103164,
+          "bytes": 103244,
           "encoding": "gzip",
           "charset": "utf-8"
         },
@@ -940,7 +940,7 @@
           "outcome": "fetched",
           "http_status": 200,
           "error_type": null,
-          "bytes": 95569,
+          "bytes": 95378,
           "encoding": "gzip",
           "charset": "utf-8"
         },
@@ -951,7 +951,7 @@
           "outcome": "fetched",
           "http_status": 200,
           "error_type": null,
-          "bytes": 68055,
+          "bytes": 67974,
           "encoding": "gzip",
           "charset": "utf-8"
         },
@@ -996,8 +996,8 @@
             },
             {
               "item": "sales & crm",
-              "url": "https://www.klaviyo.com/platform",
-              "quote": "Klaviyo is the first CRM built for B2C businesses to create scalable customer relationships and drive revenue with data and insights at each stage of the journey.",
+              "url": "https://www.klaviyo.com/",
+              "quote": "Klaviyo: AI Email Marketing & SMS | B2C CRM",
               "method": "meta"
             },
             {
@@ -1057,7 +1057,7 @@
             {
               "item": "workflow automation",
               "url": "https://www.klaviyo.com/",
-              "quote": "Turn your best prompts and workflows into reusable Skills, so Composer can pick up where you left off.",
+              "quote": "We also integrate with your favorite AI tools with our Klaviyo ChatGPT app, Klaviyo Claude Connector, and Klaviyo MCP for building agentic workflows.",
               "method": "sentence"
             },
             {
@@ -1250,7 +1250,7 @@
           "evidence": [
             {
               "item": null,
-              "url": "https://www.klaviyo.com/about",
+              "url": "https://www.klaviyo.com/",
               "quote": "{\"address\": {\"@type\": \"PostalAddress\", \"addressLocality\": \"Boston\", \"addressRegion\": \"MA\", \"addressCountry\": \"US\"}}",
               "method": "json-ld"
             }
@@ -1279,7 +1279,7 @@
           "outcome": "fetched",
           "http_status": 200,
           "error_type": null,
-          "bytes": 31336,
+          "bytes": 31549,
           "encoding": "br",
           "charset": "utf-8"
         },
@@ -1290,7 +1290,7 @@
           "outcome": "fetched",
           "http_status": 200,
           "error_type": null,
-          "bytes": 25890,
+          "bytes": 25858,
           "encoding": "br",
           "charset": "utf-8"
         },
@@ -1312,7 +1312,7 @@
           "outcome": "fetched",
           "http_status": 200,
           "error_type": null,
-          "bytes": 24457,
+          "bytes": 24788,
           "encoding": "br",
           "charset": "utf-8"
         },
@@ -1323,7 +1323,7 @@
           "outcome": "fetched",
           "http_status": 200,
           "error_type": null,
-          "bytes": 20052,
+          "bytes": 20097,
           "encoding": "br",
           "charset": "utf-8"
         },
@@ -1478,7 +1478,7 @@
           "outcome": "fetched",
           "http_status": 200,
           "error_type": null,
-          "bytes": 44412,
+          "bytes": 34805,
           "encoding": "br",
           "charset": "utf-8"
         },
@@ -1744,7 +1744,7 @@
           "outcome": "fetched",
           "http_status": 200,
           "error_type": null,
-          "bytes": 26062,
+          "bytes": 26057,
           "encoding": "br",
           "charset": "utf-8"
         },
@@ -2620,7 +2620,7 @@
           "outcome": "fetched",
           "http_status": 200,
           "error_type": null,
-          "bytes": 102743,
+          "bytes": 102754,
           "encoding": "gzip",
           "charset": "utf-8"
         },
@@ -2631,7 +2631,7 @@
           "outcome": "fetched",
           "http_status": 200,
           "error_type": null,
-          "bytes": 86546,
+          "bytes": 86545,
           "encoding": "gzip",
           "charset": "utf-8"
         },
@@ -2642,7 +2642,7 @@
           "outcome": "fetched",
           "http_status": 200,
           "error_type": null,
-          "bytes": 99254,
+          "bytes": 99268,
           "encoding": "gzip",
           "charset": "utf-8"
         },
@@ -2653,7 +2653,7 @@
           "outcome": "fetched",
           "http_status": 200,
           "error_type": null,
-          "bytes": 94132,
+          "bytes": 94130,
           "encoding": "gzip",
           "charset": "utf-8"
         },
@@ -2664,7 +2664,7 @@
           "outcome": "fetched",
           "http_status": 200,
           "error_type": null,
-          "bytes": 73568,
+          "bytes": 73423,
           "encoding": "gzip",
           "charset": "utf-8"
         },

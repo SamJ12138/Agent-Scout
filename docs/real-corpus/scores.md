@@ -2,10 +2,10 @@
 
 Written by `scripts/run_corpus.py` (GitHub Actions workflow `corpus`). Do not edit by hand.
 
-- Run `20261110T143957Z-27a7`, finished 2026-11-10T14:41:44Z, agent-scout 0.1.0
+- Run `20261110T151149Z-0f5c`, finished 2026-11-10T15:13:36Z, agent-scout 0.1.0
 - Settings: rule-based extraction only (no LLM pass), 6 pages per site, 1.5 s between requests to one host, robots.txt honoured
 - Sites read: 10 of 10 (read or partly read); the others are listed below with the reason
-- Site-fields: 37 match, 40 partial, 2 mismatch, 11 missing, of 90
+- Site-fields: 38 match, 40 partial, 1 mismatch, 11 missing, of 90
 
 How to read this: the reference profiles in `ground-truth/` were written from tool-mediated reads of each product's own site and committed before the tool was run on these sites (see `ground-truth/README.md` for the method and its limits). `match`, `partial`, `mismatch` and `missing` are defined in `src/agent_scout/scoring.py`. A site the tool could not read has every field unknown, so each field the reference knows counts as `missing` there: those rows measure reachability, not extraction. The corpus has no product whose site says it only drafts, so nothing here tests `can_execute: false`. Category and task lists involve judgment; one extra or one absent list value makes a field `partial`.
 
@@ -28,7 +28,7 @@ How to read this: the reference profiles in `ground-truth/` were written from to
 
 | site | status | one_liner | categories | target_user | tasks | can_execute | multi_agent | integrations | pricing | hq_location |
 |---|---|---|---|---|---|---|---|---|---|---|
-| adcreative-ai | ok | match | partial | partial | partial | match | match | missing | partial | mismatch |
+| adcreative-ai | ok | match | partial | partial | partial | match | match | missing | partial | match |
 | jacquard | ok | match | partial | match | partial | match | missing | partial | match | match |
 | jasper | ok | match | partial | partial | partial | match | missing | partial | match | match |
 | klaviyo | ok | partial | match | partial | partial | match | match | partial | match | match |
@@ -49,16 +49,15 @@ How to read this: the reference profiles in `ground-truth/` were written from to
 | multi_agent | 7 | 0 | 0 | 3 |
 | integrations | 0 | 6 | 0 | 4 |
 | pricing | 6 | 3 | 1 | 0 |
-| hq_location | 7 | 1 | 1 | 1 |
+| hq_location | 8 | 1 | 0 | 1 |
 
-Totals: 37 match, 40 partial, 2 mismatch, 11 missing (of 90 site-fields).
+Totals: 38 match, 40 partial, 1 mismatch, 11 missing (of 90 site-fields).
 
 Details:
 - adcreative-ai / categories: partial (2 of 3 found, 2 extra)
 - adcreative-ai / target_user: partial (5 of 5 found, 1 extra)
 - adcreative-ai / tasks: partial (3 of 4 found, 4 extra)
 - adcreative-ai / pricing: partial (differs: starting_price)
-- adcreative-ai / hq_location: mismatch (differs: city, country)
 - jacquard / categories: partial (1 of 2 found, 1 extra)
 - jacquard / tasks: partial (2 of 3 found, 2 extra)
 - jacquard / integrations: partial (3 of 14 found, 0 extra)
@@ -111,6 +110,6 @@ The same counts restricted to sites with status read or partly read.
 | multi_agent | 7 | 0 | 0 | 3 |
 | integrations | 0 | 6 | 0 | 4 |
 | pricing | 6 | 3 | 1 | 0 |
-| hq_location | 7 | 1 | 1 | 1 |
+| hq_location | 8 | 1 | 0 | 1 |
 
 Sites in this second table: 10.
