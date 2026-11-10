@@ -187,3 +187,17 @@ def test_integration_overflow_names_are_not_extras(got, outcome):
                                   ("USD 20/month", "$20/month")])
 def test_price_normalisation_reads_trailing_and_spelled_currencies(a, b):
     assert scoring.normalise_price(a) == scoring.normalise_price(b)
+
+
+def test_a_one_liner_of_punctuation_or_a_few_letters_is_not_a_partial_match():
+    truth = "Zed is an ads agent for busy teams."
+    assert scoring.compare("one_liner", truth, "...").outcome == "mismatch"
+    assert scoring.compare("one_liner", truth, "Zed").outcome == "mismatch"
+    assert scoring.compare("one_liner", truth, "Zed is an ads agent").outcome == "partial"
+
+
+def test_country_spellings_are_compared_without_case():
+    truth = {"city": "London", "country": "United Kingdom"}
+    assert scoring.compare("hq_location", truth, {"city": "London", "country": "uk"}).outcome == "match"
+    assert scoring.compare("hq_location", truth, {"city": "London", "country": "Great Britain"}).outcome == "match"
+    assert scoring.compare("hq_location", truth, {"city": "London", "country": "us"}).outcome == "partial"

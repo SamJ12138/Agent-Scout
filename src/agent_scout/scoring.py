@@ -6,8 +6,9 @@ Outcomes
               did not claim anything.
     partial   the tool is partly right:
               - list fields: the two sets share at least one value but differ;
-              - one_liner: one text contains the other, or at least half of
-                their distinct words are shared (Jaccard >= 0.5);
+              - one_liner: one text (of at least three words) is contained
+                in the other, or at least half of their distinct words are
+                shared (Jaccard >= 0.5);
               - pricing: at least one sub-value (free_tier, starting_price)
                 that the reference knows is matched, and another is not;
               - hq_location: the country matches and the city does not, or the
@@ -40,6 +41,7 @@ from .geo import country_name
 from .model import FIELDS, LIST_FIELDS, UNKNOWN
 
 OUTCOMES = ("match", "partial", "mismatch", "missing")
+MIN_CONTAINED_WORDS = 3     # a one-liner contained in the other counts only from this many words
 _RANK = {"match": 0, "partial": 1, "missing": 2, "mismatch": 3}
 
 
@@ -100,7 +102,9 @@ def normalise_price(value: Any) -> str:
 
 
 def _country(value: Any) -> str:
-    return _text(country_name(str(value), allow_code=True) or value)
+    """Countries are compared by meaning: 'uk', 'UK' and 'United Kingdom' are one."""
+    text = str(value).strip()
+    return _text(country_name(text, allow_code=True) or country_name(text.upper()) or text)
 
 
 def _compare_scalar(truth: Any, got: Any) -> Outcome:
@@ -114,7 +118,9 @@ def _compare_one_liner(truth: str, got: str) -> Outcome:
         return Outcome("match")
     wa, wb = _words(a), _words(b)
     jaccard = len(wa & wb) / len(wa | wb) if wa | wb else 0.0
-    if a in b or b in a or jaccard >= 0.5:
+    shorter = min(a, b, key=len)
+    contained = (a in b or b in a) and len(_words(shorter)) >= MIN_CONTAINED_WORDS
+    if contained or jaccard >= 0.5:
         return Outcome("partial", f"word overlap {jaccard:.2f}")
     return Outcome("mismatch", f"word overlap {jaccard:.2f}")
 
