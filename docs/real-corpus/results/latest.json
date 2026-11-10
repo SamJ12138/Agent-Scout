@@ -1,0 +1,3193 @@
+{
+  "schema_version": "1.0",
+  "tool": {
+    "name": "agent-scout",
+    "version": "0.1.0"
+  },
+  "run_id": "20261110T141046Z-418b",
+  "started_at": "2026-11-10T14:10:46Z",
+  "finished_at": "2026-11-10T14:12:34Z",
+  "settings": {
+    "page_budget": 6,
+    "delay_seconds": 1.5,
+    "max_crawl_delay_seconds": 30.0,
+    "timeout_seconds": 20.0,
+    "user_agent": "agent-scout/0.1.0 (+https://github.com/SamJ12138/agent-scout)",
+    "llm": {
+      "enabled": false,
+      "provider": null,
+      "model": null
+    }
+  },
+  "sites": [
+    {
+      "slug": "adcreative-ai",
+      "name": "AdCreative.ai",
+      "url": "https://www.adcreative.ai/",
+      "final_url": "https://www.adcreative.ai/",
+      "status": "ok",
+      "status_detail": "6 pages read",
+      "needs_rendering": false,
+      "robots": {
+        "state": "ok",
+        "http_status": 200,
+        "crawl_delay": null
+      },
+      "pages": [
+        {
+          "url": "https://www.adcreative.ai/",
+          "final_url": "https://www.adcreative.ai/",
+          "topic": "home",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 263131,
+          "encoding": "gzip",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://www.adcreative.ai/generate-product-photoshoots",
+          "final_url": "https://www.adcreative.ai/generate-product-photoshoots",
+          "topic": "product",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 152685,
+          "encoding": "gzip",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://www.adcreative.ai/enterprise",
+          "final_url": "https://www.adcreative.ai/enterprise",
+          "topic": "contact",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 185541,
+          "encoding": "gzip",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://www.adcreative.ai/fashion-photoshoots",
+          "final_url": "https://www.adcreative.ai/fashion-photoshoots",
+          "topic": "product",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 155089,
+          "encoding": "gzip",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://www.adcreative.ai/ai-ugc-videos",
+          "final_url": "https://www.adcreative.ai/ai-ugc-videos",
+          "topic": "product",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 131549,
+          "encoding": "gzip",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://www.adcreative.ai/product-videoshoot-ai",
+          "final_url": "https://www.adcreative.ai/product-videoshoot-ai",
+          "topic": "product",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 147214,
+          "encoding": "gzip",
+          "charset": "utf-8"
+        }
+      ],
+      "llm": null,
+      "fields": {
+        "one_liner": {
+          "value": "Generate high-performing ad creatives, images, videos, and copy with AI. Built for marketers to scale campaigns and improve ROAS.",
+          "evidence": [
+            {
+              "item": null,
+              "url": "https://www.adcreative.ai/",
+              "quote": "Generate high-performing ad creatives, images, videos, and copy with AI. Built for marketers to scale campaigns and improve ROAS.",
+              "method": "meta"
+            }
+          ]
+        },
+        "categories": {
+          "value": [
+            "content generation",
+            "advertising",
+            "social media",
+            "ecommerce",
+            "video & creative"
+          ],
+          "evidence": [
+            {
+              "item": "content generation",
+              "url": "https://www.adcreative.ai/",
+              "quote": "Generate texts that bring results using proven copywriting frameworks using our ad text-trained AI.",
+              "method": "sentence"
+            },
+            {
+              "item": "advertising",
+              "url": "https://www.adcreative.ai/",
+              "quote": "#1 most used AI tool for advertising",
+              "method": "heading"
+            },
+            {
+              "item": "social media",
+              "url": "https://www.adcreative.ai/ai-ugc-videos",
+              "quote": "Generate UGC Videos for Ads, Ecommerce & Social Media",
+              "method": "heading"
+            },
+            {
+              "item": "ecommerce",
+              "url": "https://www.adcreative.ai/",
+              "quote": "Built for E-Commerce Brands",
+              "method": "heading"
+            },
+            {
+              "item": "video & creative",
+              "url": "https://www.adcreative.ai/",
+              "quote": "AI Video Ads for Products",
+              "method": "heading"
+            }
+          ]
+        },
+        "target_user": {
+          "value": [
+            "marketers",
+            "ecommerce brands",
+            "agencies",
+            "enterprise",
+            "small business",
+            "creators"
+          ],
+          "evidence": [
+            {
+              "item": "marketers",
+              "url": "https://www.adcreative.ai/",
+              "quote": "Generate high-performing ad creatives, images, videos, and copy with AI. Built for marketers to scale campaigns and improve ROAS.",
+              "method": "meta"
+            },
+            {
+              "item": "ecommerce brands",
+              "url": "https://www.adcreative.ai/",
+              "quote": "Built for E-Commerce Brands",
+              "method": "heading"
+            },
+            {
+              "item": "agencies",
+              "url": "https://www.adcreative.ai/",
+              "quote": "Helpful in our agency",
+              "method": "sentence"
+            },
+            {
+              "item": "enterprise",
+              "url": "https://www.adcreative.ai/enterprise",
+              "quote": "See how enterprises unlock new levels of creativity, efficiency, and performance with AdCreative.ai. Streamline ad creation and marketing workflows using AI.",
+              "method": "meta"
+            },
+            {
+              "item": "small business",
+              "url": "https://www.adcreative.ai/",
+              "quote": "Made for Small Business who need results, fast",
+              "method": "heading"
+            },
+            {
+              "item": "creators",
+              "url": "https://www.adcreative.ai/ai-ugc-videos",
+              "quote": "Traditional UGC production requires sourcing creators, shipping products, managing revisions, and waiting days or weeks for final assets.",
+              "method": "sentence"
+            }
+          ]
+        },
+        "tasks": {
+          "value": [
+            "write copy",
+            "generate images or video",
+            "manage ads",
+            "lead qualification",
+            "customer chat",
+            "analytics reporting",
+            "workflow automation",
+            "personalization"
+          ],
+          "evidence": [
+            {
+              "item": "write copy",
+              "url": "https://www.adcreative.ai/",
+              "quote": "Generate texts that bring results using proven copywriting frameworks using our ad text-trained AI.",
+              "method": "sentence"
+            },
+            {
+              "item": "generate images or video",
+              "url": "https://www.adcreative.ai/",
+              "quote": "Generate high-performing ad creatives, images, videos, and copy with AI. Built for marketers to scale campaigns and improve ROAS.",
+              "method": "meta"
+            },
+            {
+              "item": "manage ads",
+              "url": "https://www.adcreative.ai/",
+              "quote": "Analyze your creative performance and generate high-performing new ads trained on patterns learned from $35B+ in ad spend data.",
+              "method": "sentence"
+            },
+            {
+              "item": "lead qualification",
+              "url": "https://www.adcreative.ai/",
+              "quote": "Posts are attractive and the value we add for social media marketing, lead generation, and PPC is awesome.",
+              "method": "sentence"
+            },
+            {
+              "item": "customer chat",
+              "url": "https://www.adcreative.ai/",
+              "quote": "To request a refund, reach out via live chat or email us at contact@adcreative.ai.",
+              "method": "sentence"
+            },
+            {
+              "item": "analytics reporting",
+              "url": "https://www.adcreative.ai/enterprise",
+              "quote": "Measure Success with Detailed Reports",
+              "method": "heading"
+            },
+            {
+              "item": "workflow automation",
+              "url": "https://www.adcreative.ai/enterprise",
+              "quote": "See how enterprises unlock new levels of creativity, efficiency, and performance with AdCreative.ai. Streamline ad creation and marketing workflows using AI.",
+              "method": "meta"
+            },
+            {
+              "item": "personalization",
+              "url": "https://www.adcreative.ai/",
+              "quote": "Personalized Live Onboarding",
+              "method": "sentence"
+            }
+          ]
+        },
+        "can_execute": {
+          "value": true,
+          "evidence": [
+            {
+              "item": null,
+              "url": "https://www.adcreative.ai/",
+              "quote": "Instant Ads intelligently scans your webpage to effortlessly produce high-performing, ready-to-launch advertisements—automatically tailored to engage your ideal audience.",
+              "method": "sentence"
+            }
+          ]
+        },
+        "multi_agent": {
+          "value": "unknown",
+          "evidence": []
+        },
+        "integrations": {
+          "value": "unknown",
+          "evidence": []
+        },
+        "pricing": {
+          "value": {
+            "free_tier": true,
+            "starting_price": "unknown"
+          },
+          "evidence": [
+            {
+              "item": "free_tier",
+              "url": "https://www.adcreative.ai/",
+              "quote": "Try For Free Now",
+              "method": "sentence"
+            }
+          ]
+        },
+        "hq_location": {
+          "value": "unknown",
+          "evidence": []
+        }
+      }
+    },
+    {
+      "slug": "jacquard",
+      "name": "Jacquard",
+      "url": "https://www.jacquard.com/",
+      "final_url": "https://www.jacquard.com/",
+      "status": "ok",
+      "status_detail": "3 pages read",
+      "needs_rendering": false,
+      "robots": {
+        "state": "ok",
+        "http_status": 200,
+        "crawl_delay": null
+      },
+      "pages": [
+        {
+          "url": "https://www.jacquard.com/",
+          "final_url": "https://www.jacquard.com/",
+          "topic": "home",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 23980,
+          "encoding": "br",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://www.jacquard.com/about",
+          "final_url": "https://www.jacquard.com/about/",
+          "topic": "about",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 8885,
+          "encoding": "br",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://www.jacquard.com/contact",
+          "final_url": "https://www.jacquard.com/contact/",
+          "topic": "contact",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 6437,
+          "encoding": "br",
+          "charset": "utf-8"
+        }
+      ],
+      "llm": null,
+      "fields": {
+        "one_liner": {
+          "value": "The agentic creative intelligence layer: agents that plan, write, check and optimise your marketing across email, SMS, push and web, in your brand voice.",
+          "evidence": [
+            {
+              "item": null,
+              "url": "https://www.jacquard.com/",
+              "quote": "The agentic creative intelligence layer: agents that plan, write, check and optimise your marketing across email, SMS, push and web, in your brand voice.",
+              "method": "meta"
+            }
+          ]
+        },
+        "categories": {
+          "value": [
+            "content generation",
+            "sales & crm"
+          ],
+          "evidence": [
+            {
+              "item": "content generation",
+              "url": "https://www.jacquard.com/",
+              "quote": "# copywriting",
+              "method": "sentence"
+            },
+            {
+              "item": "sales & crm",
+              "url": "https://www.jacquard.com/",
+              "quote": "J“Set up a cross-channel Black Friday campaign across CRM and web that’s compliant and proven to lift conversions.”",
+              "method": "sentence"
+            }
+          ]
+        },
+        "target_user": {
+          "value": [
+            "marketers",
+            "enterprise"
+          ],
+          "evidence": [
+            {
+              "item": "marketers",
+              "url": "https://www.jacquard.com/about/",
+              "quote": "A team of marketers, technologists and language PhDs built technology capable of generating high-performing, brand-aligned messaging at scale — years before generative AI reached the mainstream.",
+              "method": "sentence"
+            },
+            {
+              "item": "enterprise",
+              "url": "https://www.jacquard.com/about/",
+              "quote": "Built on a decade of language system expertise. Meet the people helping enterprise brands resonate everywhere.",
+              "method": "meta"
+            }
+          ]
+        },
+        "tasks": {
+          "value": [
+            "write copy",
+            "analytics reporting",
+            "workflow automation",
+            "personalization"
+          ],
+          "evidence": [
+            {
+              "item": "write copy",
+              "url": "https://www.jacquard.com/",
+              "quote": "See how AI inbox summaries condense your subject lines and offers.",
+              "method": "sentence"
+            },
+            {
+              "item": "analytics reporting",
+              "url": "https://www.jacquard.com/",
+              "quote": "It runs the performance, compliance and brand agents, spots the next win, drafts the copy, asks for a one-click sign-off — and reports performance back in the thread.",
+              "method": "sentence"
+            },
+            {
+              "item": "workflow automation",
+              "url": "https://www.jacquard.com/about/",
+              "quote": "But scaling brand-safe, high-performing messaging is impossible with traditional creative workflows.",
+              "method": "sentence"
+            },
+            {
+              "item": "personalization",
+              "url": "https://www.jacquard.com/",
+              "quote": "Performance AI models and agents analyse, generate, predict, optimise and personalise your campaign copy at every level.",
+              "method": "sentence"
+            }
+          ]
+        },
+        "can_execute": {
+          "value": true,
+          "evidence": [
+            {
+              "item": null,
+              "url": "https://www.jacquard.com/",
+              "quote": "The agentic creative intelligence layer: agents that plan, write, check and optimise your marketing across email, SMS, push and web, in your brand voice.",
+              "method": "meta"
+            }
+          ]
+        },
+        "multi_agent": {
+          "value": "unknown",
+          "evidence": []
+        },
+        "integrations": {
+          "value": [
+            "Salesforce",
+            "Braze",
+            "Iterable"
+          ],
+          "evidence": [
+            {
+              "item": "Salesforce",
+              "url": "https://www.jacquard.com/",
+              "quote": "Salesforce",
+              "method": "link"
+            },
+            {
+              "item": "Braze",
+              "url": "https://www.jacquard.com/",
+              "quote": "Braze",
+              "method": "link"
+            },
+            {
+              "item": "Iterable",
+              "url": "https://www.jacquard.com/",
+              "quote": "Iterable",
+              "method": "link"
+            }
+          ]
+        },
+        "pricing": {
+          "value": "unknown",
+          "evidence": []
+        },
+        "hq_location": {
+          "value": {
+            "city": "London",
+            "country": "United Kingdom"
+          },
+          "evidence": [
+            {
+              "item": null,
+              "url": "https://www.jacquard.com/",
+              "quote": "{\"address\": {\"@type\": \"PostalAddress\", \"streetAddress\": \"82 St John Street\", \"addressLocality\": \"London\", \"postalCode\": \"EC1M 4JN\", \"addressCountry\": \"GB\"}}",
+              "method": "json-ld"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "slug": "jasper",
+      "name": "Jasper",
+      "url": "https://www.jasper.ai/",
+      "final_url": "https://www.jasper.ai/",
+      "status": "ok",
+      "status_detail": "6 pages read",
+      "needs_rendering": false,
+      "robots": {
+        "state": "ok",
+        "http_status": 200,
+        "crawl_delay": null
+      },
+      "pages": [
+        {
+          "url": "https://www.jasper.ai/",
+          "final_url": "https://www.jasper.ai/",
+          "topic": "home",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 102877,
+          "encoding": "gzip",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://www.jasper.ai/platform",
+          "final_url": "https://www.jasper.ai/platform",
+          "topic": "product",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 104299,
+          "encoding": "gzip",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://www.jasper.ai/integrations",
+          "final_url": "https://www.jasper.ai/integrations",
+          "topic": "integrations",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 86231,
+          "encoding": "gzip",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://www.jasper.ai/pricing",
+          "final_url": "https://www.jasper.ai/pricing",
+          "topic": "pricing",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 101116,
+          "encoding": "gzip",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://www.jasper.ai/company",
+          "final_url": "https://www.jasper.ai/company",
+          "topic": "about",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 81989,
+          "encoding": "gzip",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://www.jasper.ai/contact-support",
+          "final_url": "https://www.jasper.ai/contact-support",
+          "topic": "contact",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 64897,
+          "encoding": "gzip",
+          "charset": "utf-8"
+        }
+      ],
+      "llm": null,
+      "fields": {
+        "one_liner": {
+          "value": "Orchestrate intelligent agents to run end-to-end marketing workflows delivering speed, control, and measurable impact.",
+          "evidence": [
+            {
+              "item": null,
+              "url": "https://www.jasper.ai/",
+              "quote": "Orchestrate intelligent agents to run end-to-end marketing workflows delivering speed, control, and measurable impact.",
+              "method": "meta"
+            }
+          ]
+        },
+        "categories": {
+          "value": [
+            "content generation",
+            "seo",
+            "social media",
+            "analytics & reporting",
+            "customer support",
+            "video & creative",
+            "general agent platform"
+          ],
+          "evidence": [
+            {
+              "item": "content generation",
+              "url": "https://www.jasper.ai/",
+              "quote": "Connect company knowledge, content creation, and review in workflows that help your team move from brief to execution faster without the slop.",
+              "method": "sentence"
+            },
+            {
+              "item": "seo",
+              "url": "https://www.jasper.ai/",
+              "quote": "Jasper includes a library of purpose-built agents, each designed for a specific marketing job: SEO and GEO content, campaign execution, email, social media, personalization, research, and more.",
+              "method": "sentence"
+            },
+            {
+              "item": "social media",
+              "url": "https://www.jasper.ai/",
+              "quote": "Jasper includes a library of purpose-built agents, each designed for a specific marketing job: SEO and GEO content, campaign execution, email, social media, personalization, research, and more.",
+              "method": "sentence"
+            },
+            {
+              "item": "analytics & reporting",
+              "url": "https://www.jasper.ai/pricing",
+              "quote": "Team Usage & Analytics",
+              "method": "sentence"
+            },
+            {
+              "item": "customer support",
+              "url": "https://www.jasper.ai/",
+              "quote": "Is Jasper a chatbot?",
+              "method": "heading"
+            },
+            {
+              "item": "video & creative",
+              "url": "https://www.jasper.ai/pricing",
+              "quote": "Image Generation & Editing",
+              "method": "sentence"
+            },
+            {
+              "item": "general agent platform",
+              "url": "https://www.jasper.ai/",
+              "quote": "Teams can also build custom agents using AI Studio and deploy them across their workspace.",
+              "method": "sentence"
+            }
+          ]
+        },
+        "target_user": {
+          "value": [
+            "marketers",
+            "agencies",
+            "enterprise",
+            "sales teams",
+            "creators"
+          ],
+          "evidence": [
+            {
+              "item": "marketers",
+              "url": "https://www.jasper.ai/",
+              "quote": "World-class marketing teams trust Jasper",
+              "method": "heading"
+            },
+            {
+              "item": "agencies",
+              "url": "https://www.jasper.ai/platform",
+              "quote": "Over six months, Mongoose Media, an Orlando-based digital marketing agency, wrote 40+ blog posts for a client’s site, something that CEO Lauren Petrullo says wouldn’t have been possible without Jasper.",
+              "method": "sentence"
+            },
+            {
+              "item": "enterprise",
+              "url": "https://www.jasper.ai/",
+              "quote": "Applied AI for Enterprise Marketing",
+              "method": "heading"
+            },
+            {
+              "item": "sales teams",
+              "url": "https://www.jasper.ai/pricing",
+              "quote": "Contact Jasper's sales team to customize the Business Plan with additional seats, unlimited custom agents via Jasper’s no-code AI Agent Builder, marketing Agents, SSO, custom style guide, and API access, everything your team needs to streamline workflows and scale content production.",
+              "method": "sentence"
+            },
+            {
+              "item": "creators",
+              "url": "https://www.jasper.ai/company",
+              "quote": "But Jasper is more than just a tool; it’s a community. A space where marketers and creators gather to inspire one another, solve problems together, and push the boundaries of what’s possible. We’re not here to replace your creativity, but to unlock it—empowering teams to think boldly, act decisively, and grow into their full potential. With Jasper, you’re not just keeping up with the pace of change—you’re leading it.",
+              "method": "heading"
+            }
+          ]
+        },
+        "tasks": {
+          "value": [
+            "write copy",
+            "generate images or video",
+            "seo optimization",
+            "schedule social posts",
+            "customer chat",
+            "analytics reporting",
+            "workflow automation",
+            "personalization"
+          ],
+          "evidence": [
+            {
+              "item": "write copy",
+              "url": "https://www.jasper.ai/",
+              "quote": "Connect company knowledge, content creation, and review in workflows that help your team move from brief to execution faster without the slop.",
+              "method": "sentence"
+            },
+            {
+              "item": "generate images or video",
+              "url": "https://www.jasper.ai/platform",
+              "quote": "AI Image Suite",
+              "method": "sentence"
+            },
+            {
+              "item": "seo optimization",
+              "url": "https://www.jasper.ai/",
+              "quote": "Jasper includes a library of purpose-built agents, each designed for a specific marketing job: SEO and GEO content, campaign execution, email, social media, personalization, research, and more.",
+              "method": "sentence"
+            },
+            {
+              "item": "schedule social posts",
+              "url": "https://www.jasper.ai/",
+              "quote": "On the text side, Jasper handles the full range of marketing content: articles, emails, ads, social posts, and more.",
+              "method": "sentence"
+            },
+            {
+              "item": "customer chat",
+              "url": "https://www.jasper.ai/",
+              "quote": "Is Jasper a chatbot?",
+              "method": "heading"
+            },
+            {
+              "item": "analytics reporting",
+              "url": "https://www.jasper.ai/pricing",
+              "quote": "Team Usage & Analytics",
+              "method": "sentence"
+            },
+            {
+              "item": "workflow automation",
+              "url": "https://www.jasper.ai/",
+              "quote": "Orchestrate intelligent agents to run end-to-end marketing workflows delivering speed, control, and measurable impact.",
+              "method": "meta"
+            },
+            {
+              "item": "personalization",
+              "url": "https://www.jasper.ai/platform",
+              "quote": "Personalization",
+              "method": "heading"
+            }
+          ]
+        },
+        "can_execute": {
+          "value": true,
+          "evidence": [
+            {
+              "item": null,
+              "url": "https://www.jasper.ai/",
+              "quote": "Jasper includes a library of purpose-built agents, each designed for a specific marketing job: SEO and GEO content, campaign execution, email, social media, personalization, research, and more.",
+              "method": "sentence"
+            }
+          ]
+        },
+        "multi_agent": {
+          "value": "unknown",
+          "evidence": []
+        },
+        "integrations": {
+          "value": [
+            "Facebook",
+            "Instagram",
+            "YouTube",
+            "Google Drive",
+            "Semrush",
+            "Box",
+            "Salesforce",
+            "Monday.com",
+            "Asana",
+            "BigQuery",
+            "Slack",
+            "Webflow",
+            "Google Sheets",
+            "Google Docs",
+            "Zapier",
+            "Make"
+          ],
+          "evidence": [
+            {
+              "item": "Facebook",
+              "url": "https://www.jasper.ai/integrations",
+              "quote": "Facebook",
+              "method": "link"
+            },
+            {
+              "item": "Instagram",
+              "url": "https://www.jasper.ai/integrations",
+              "quote": "Instagram",
+              "method": "link"
+            },
+            {
+              "item": "YouTube",
+              "url": "https://www.jasper.ai/integrations",
+              "quote": "Youtube",
+              "method": "link"
+            },
+            {
+              "item": "Google Drive",
+              "url": "https://www.jasper.ai/integrations",
+              "quote": "Google Drive",
+              "method": "heading"
+            },
+            {
+              "item": "Semrush",
+              "url": "https://www.jasper.ai/integrations",
+              "quote": "Semrush",
+              "method": "heading"
+            },
+            {
+              "item": "Box",
+              "url": "https://www.jasper.ai/integrations",
+              "quote": "Box",
+              "method": "heading"
+            },
+            {
+              "item": "Salesforce",
+              "url": "https://www.jasper.ai/integrations",
+              "quote": "Salesforce",
+              "method": "heading"
+            },
+            {
+              "item": "Monday.com",
+              "url": "https://www.jasper.ai/integrations",
+              "quote": "Monday.com",
+              "method": "heading"
+            },
+            {
+              "item": "Asana",
+              "url": "https://www.jasper.ai/integrations",
+              "quote": "Asana",
+              "method": "heading"
+            },
+            {
+              "item": "BigQuery",
+              "url": "https://www.jasper.ai/integrations",
+              "quote": "Google BigQuery",
+              "method": "heading"
+            },
+            {
+              "item": "Slack",
+              "url": "https://www.jasper.ai/integrations",
+              "quote": "Slack",
+              "method": "heading"
+            },
+            {
+              "item": "Webflow",
+              "url": "https://www.jasper.ai/integrations",
+              "quote": "Webflow",
+              "method": "heading"
+            },
+            {
+              "item": "Google Sheets",
+              "url": "https://www.jasper.ai/integrations",
+              "quote": "Google Sheets",
+              "method": "heading"
+            },
+            {
+              "item": "Google Docs",
+              "url": "https://www.jasper.ai/integrations",
+              "quote": "Google Docs",
+              "method": "heading"
+            },
+            {
+              "item": "Zapier",
+              "url": "https://www.jasper.ai/integrations",
+              "quote": "Zapier",
+              "method": "heading"
+            },
+            {
+              "item": "Make",
+              "url": "https://www.jasper.ai/integrations",
+              "quote": "Make",
+              "method": "heading"
+            }
+          ]
+        },
+        "pricing": {
+          "value": {
+            "free_tier": true,
+            "starting_price": "$59/month"
+          },
+          "evidence": [
+            {
+              "item": "free_tier",
+              "url": "https://www.jasper.ai/pricing",
+              "quote": "Start Free 7-Day TrialStart Free 7-Day Trial",
+              "method": "link"
+            },
+            {
+              "item": "starting_price",
+              "url": "https://www.jasper.ai/pricing",
+              "quote": "Pro: $59/month billed yearly or $69/month billed monthly (cancel anytime).",
+              "method": "sentence"
+            }
+          ]
+        },
+        "hq_location": {
+          "value": "unknown",
+          "evidence": []
+        }
+      }
+    },
+    {
+      "slug": "klaviyo",
+      "name": "Klaviyo",
+      "url": "https://www.klaviyo.com/",
+      "final_url": "https://www.klaviyo.com/",
+      "status": "ok",
+      "status_detail": "6 pages read",
+      "needs_rendering": false,
+      "robots": {
+        "state": "ok",
+        "http_status": 200,
+        "crawl_delay": null
+      },
+      "pages": [
+        {
+          "url": "https://www.klaviyo.com/",
+          "final_url": "https://www.klaviyo.com/",
+          "topic": "home",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 81120,
+          "encoding": "gzip",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://www.klaviyo.com/platform",
+          "final_url": "https://www.klaviyo.com/platform",
+          "topic": "product",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 80325,
+          "encoding": "gzip",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://www.klaviyo.com/integrate",
+          "final_url": "https://www.klaviyo.com/integrate",
+          "topic": "integrations",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 103164,
+          "encoding": "gzip",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://www.klaviyo.com/pricing",
+          "final_url": "https://www.klaviyo.com/pricing",
+          "topic": "pricing",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 95569,
+          "encoding": "gzip",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://www.klaviyo.com/about",
+          "final_url": "https://www.klaviyo.com/about",
+          "topic": "about",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 67974,
+          "encoding": "gzip",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://www.klaviyo.com/contact-us",
+          "final_url": "https://www.klaviyo.com/contact-us",
+          "topic": "contact",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 61779,
+          "encoding": "gzip",
+          "charset": "utf-8"
+        }
+      ],
+      "llm": null,
+      "fields": {
+        "one_liner": {
+          "value": "Klaviyo unifies AI-powered email marketing and SMS to drive growth, retention, and measurable results. Build personalized, omnichannel experiences across WhatsApp, ecommerce, and more with K:AI Agents.",
+          "evidence": [
+            {
+              "item": null,
+              "url": "https://www.klaviyo.com/",
+              "quote": "Klaviyo unifies AI-powered email marketing and SMS to drive growth, retention, and measurable results. Build personalized, omnichannel experiences across WhatsApp, ecommerce, and more with K:AI Agents.",
+              "method": "meta"
+            }
+          ]
+        },
+        "categories": {
+          "value": [
+            "email marketing",
+            "sales & crm",
+            "analytics & reporting",
+            "customer support",
+            "ecommerce"
+          ],
+          "evidence": [
+            {
+              "item": "email marketing",
+              "url": "https://www.klaviyo.com/",
+              "quote": "Klaviyo unifies AI-powered email marketing and SMS to drive growth, retention, and measurable results. Build personalized, omnichannel experiences across WhatsApp, ecommerce, and more with K:AI Agents.",
+              "method": "meta"
+            },
+            {
+              "item": "sales & crm",
+              "url": "https://www.klaviyo.com/",
+              "quote": "Klaviyo: AI Email Marketing & SMS | B2C CRM",
+              "method": "meta"
+            },
+            {
+              "item": "analytics & reporting",
+              "url": "https://www.klaviyo.com/platform",
+              "quote": "Klaviyo Analytics",
+              "method": "heading"
+            },
+            {
+              "item": "customer support",
+              "url": "https://www.klaviyo.com/",
+              "quote": "Customer Agent, your 24/7 customer service",
+              "method": "heading"
+            },
+            {
+              "item": "ecommerce",
+              "url": "https://www.klaviyo.com/",
+              "quote": "Klaviyo unifies AI-powered email marketing and SMS to drive growth, retention, and measurable results. Build personalized, omnichannel experiences across WhatsApp, ecommerce, and more with K:AI Agents.",
+              "method": "meta"
+            }
+          ]
+        },
+        "target_user": {
+          "value": [
+            "marketers",
+            "ecommerce brands",
+            "enterprise"
+          ],
+          "evidence": [
+            {
+              "item": "marketers",
+              "url": "https://www.klaviyo.com/platform",
+              "quote": "AI CRM solutions offer AI agents that support marketers and service teams by handling time-consuming tasks—like building campaigns or responding to routine questions.",
+              "method": "sentence"
+            },
+            {
+              "item": "ecommerce brands",
+              "url": "https://www.klaviyo.com/platform",
+              "quote": "Learn why ecommerce brands should use a CRM.",
+              "method": "sentence"
+            },
+            {
+              "item": "enterprise",
+              "url": "https://www.klaviyo.com/",
+              "quote": "How does Klaviyo support enterprise brands?",
+              "method": "heading"
+            }
+          ]
+        },
+        "tasks": {
+          "value": [
+            "analytics reporting",
+            "workflow automation",
+            "personalization"
+          ],
+          "evidence": [
+            {
+              "item": "analytics reporting",
+              "url": "https://www.klaviyo.com/platform",
+              "quote": "Klaviyo Analytics",
+              "method": "heading"
+            },
+            {
+              "item": "workflow automation",
+              "url": "https://www.klaviyo.com/",
+              "quote": "We also integrate with your favorite AI tools with our Klaviyo ChatGPT app, Klaviyo Claude Connector, and Klaviyo MCP for building agentic workflows.",
+              "method": "sentence"
+            },
+            {
+              "item": "personalization",
+              "url": "https://www.klaviyo.com/",
+              "quote": "Klaviyo unifies AI-powered email marketing and SMS to drive growth, retention, and measurable results. Build personalized, omnichannel experiences across WhatsApp, ecommerce, and more with K:AI Agents.",
+              "method": "meta"
+            }
+          ]
+        },
+        "can_execute": {
+          "value": true,
+          "evidence": [
+            {
+              "item": null,
+              "url": "https://www.klaviyo.com/",
+              "quote": "Klaviyo AI generates and personalizes campaigns, optimizes interactions, and supports customers 24/7 with tools and agents that do the work for you.",
+              "method": "sentence"
+            }
+          ]
+        },
+        "multi_agent": {
+          "value": "unknown",
+          "evidence": []
+        },
+        "integrations": {
+          "value": [
+            "Shopify",
+            "Salesforce",
+            "OpenAI",
+            "Meta",
+            "Canva",
+            "HubSpot",
+            "Stripe",
+            "Square",
+            "TikTok",
+            "Gorgias",
+            "Claude",
+            "Zendesk",
+            "Yotpo",
+            "Microsoft Azure",
+            "WooCommerce",
+            "Magento",
+            "Google Ads",
+            "Mindbody",
+            "Adobe"
+          ],
+          "evidence": [
+            {
+              "item": "Shopify",
+              "url": "https://www.klaviyo.com/",
+              "quote": "Shopify logo",
+              "method": "link"
+            },
+            {
+              "item": "Salesforce",
+              "url": "https://www.klaviyo.com/",
+              "quote": "Salesforce logo",
+              "method": "link"
+            },
+            {
+              "item": "OpenAI",
+              "url": "https://www.klaviyo.com/",
+              "quote": "OpenAI logo",
+              "method": "link"
+            },
+            {
+              "item": "Meta",
+              "url": "https://www.klaviyo.com/",
+              "quote": "Meta logo",
+              "method": "link"
+            },
+            {
+              "item": "Canva",
+              "url": "https://www.klaviyo.com/",
+              "quote": "Canva logo",
+              "method": "link"
+            },
+            {
+              "item": "HubSpot",
+              "url": "https://www.klaviyo.com/",
+              "quote": "HubSpot logo",
+              "method": "link"
+            },
+            {
+              "item": "Stripe",
+              "url": "https://www.klaviyo.com/",
+              "quote": "Stripe logo",
+              "method": "link"
+            },
+            {
+              "item": "Square",
+              "url": "https://www.klaviyo.com/",
+              "quote": "Square logo",
+              "method": "link"
+            },
+            {
+              "item": "TikTok",
+              "url": "https://www.klaviyo.com/",
+              "quote": "TikTok logo",
+              "method": "link"
+            },
+            {
+              "item": "Gorgias",
+              "url": "https://www.klaviyo.com/",
+              "quote": "Gorgias logo",
+              "method": "link"
+            },
+            {
+              "item": "Claude",
+              "url": "https://www.klaviyo.com/",
+              "quote": "Claude logo",
+              "method": "link"
+            },
+            {
+              "item": "Zendesk",
+              "url": "https://www.klaviyo.com/",
+              "quote": "Zendesk logo",
+              "method": "link"
+            },
+            {
+              "item": "Yotpo",
+              "url": "https://www.klaviyo.com/",
+              "quote": "Yotpo logo",
+              "method": "link"
+            },
+            {
+              "item": "Microsoft Azure",
+              "url": "https://www.klaviyo.com/",
+              "quote": "Microsoft Azure logo",
+              "method": "link"
+            },
+            {
+              "item": "WooCommerce",
+              "url": "https://www.klaviyo.com/",
+              "quote": "WooCommerce logo",
+              "method": "link"
+            },
+            {
+              "item": "Magento",
+              "url": "https://www.klaviyo.com/",
+              "quote": "Magento logo",
+              "method": "link"
+            },
+            {
+              "item": "Google Ads",
+              "url": "https://www.klaviyo.com/",
+              "quote": "Google Ads logo",
+              "method": "link"
+            },
+            {
+              "item": "Mindbody",
+              "url": "https://www.klaviyo.com/",
+              "quote": "Mindbody logo",
+              "method": "link"
+            },
+            {
+              "item": "Adobe",
+              "url": "https://www.klaviyo.com/",
+              "quote": "Adobe logo",
+              "method": "link"
+            }
+          ]
+        },
+        "pricing": {
+          "value": {
+            "free_tier": true,
+            "starting_price": "$1/month"
+          },
+          "evidence": [
+            {
+              "item": "free_tier",
+              "url": "https://www.klaviyo.com/pricing",
+              "quote": "Klaviyo free plan",
+              "method": "heading"
+            },
+            {
+              "item": "starting_price",
+              "url": "https://www.klaviyo.com/pricing",
+              "quote": "$25$1/month",
+              "method": "sentence"
+            }
+          ]
+        },
+        "hq_location": {
+          "value": {
+            "city": "Boston",
+            "country": "United States"
+          },
+          "evidence": [
+            {
+              "item": null,
+              "url": "https://www.klaviyo.com/",
+              "quote": "{\"address\": {\"@type\": \"PostalAddress\", \"addressLocality\": \"Boston\", \"addressRegion\": \"MA\", \"addressCountry\": \"US\"}}",
+              "method": "json-ld"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "slug": "madgicx",
+      "name": "Madgicx",
+      "url": "https://madgicx.com/",
+      "final_url": "https://madgicx.com/",
+      "status": "ok",
+      "status_detail": "6 pages read",
+      "needs_rendering": false,
+      "robots": {
+        "state": "ok",
+        "http_status": 200,
+        "crawl_delay": null
+      },
+      "pages": [
+        {
+          "url": "https://madgicx.com/",
+          "final_url": "https://madgicx.com/",
+          "topic": "home",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 31336,
+          "encoding": "br",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://madgicx.com/products/creative-insights",
+          "final_url": "https://madgicx.com/products/creative-insights",
+          "topic": "product",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 25890,
+          "encoding": "br",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://madgicx.com/pricing",
+          "final_url": "https://madgicx.com/pricing",
+          "topic": "pricing",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 27267,
+          "encoding": "br",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://madgicx.com/about-us",
+          "final_url": "https://madgicx.com/about-us",
+          "topic": "about",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 24457,
+          "encoding": "br",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://madgicx.com/contact",
+          "final_url": "https://madgicx.com/contact",
+          "topic": "contact",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 20052,
+          "encoding": "br",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://madgicx.com/case-studies",
+          "final_url": "https://madgicx.com/case-studies",
+          "topic": "customers",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 21152,
+          "encoding": "br",
+          "charset": "utf-8"
+        }
+      ],
+      "llm": null,
+      "fields": {
+        "one_liner": {
+          "value": "You just found the #1 AI performance marketer that runs your Facebook ads autonomously. Agentic campaign management for ad ROI. Start your free trial.",
+          "evidence": [
+            {
+              "item": null,
+              "url": "https://madgicx.com/",
+              "quote": "You just found the #1 AI performance marketer that runs your Facebook ads autonomously. Agentic campaign management for ad ROI. Start your free trial.",
+              "method": "meta"
+            }
+          ]
+        },
+        "categories": {
+          "value": [
+            "advertising",
+            "analytics & reporting",
+            "ecommerce"
+          ],
+          "evidence": [
+            {
+              "item": "advertising",
+              "url": "https://madgicx.com/",
+              "quote": "You just found the #1 AI performance marketer that runs your Facebook ads autonomously. Agentic campaign management for ad ROI. Start your free trial.",
+              "method": "meta"
+            },
+            {
+              "item": "analytics & reporting",
+              "url": "https://madgicx.com/",
+              "quote": "Analytics",
+              "method": "sentence"
+            },
+            {
+              "item": "ecommerce",
+              "url": "https://madgicx.com/pricing",
+              "quote": "These include different ad channels, ad accounts, and Shopify stores.",
+              "method": "sentence"
+            }
+          ]
+        },
+        "target_user": {
+          "value": [
+            "ecommerce brands",
+            "agencies"
+          ],
+          "evidence": [
+            {
+              "item": "ecommerce brands",
+              "url": "https://madgicx.com/pricing",
+              "quote": "These include different ad channels, ad accounts, and Shopify stores.",
+              "method": "sentence"
+            },
+            {
+              "item": "agencies",
+              "url": "https://madgicx.com/",
+              "quote": "The AI Marketer works like your personal AI Ad Agency, using advanced Optimization Software and Meta Campaign Automation to audit your account, identify opportunities, and tell you exactly what to do next!",
+              "method": "sentence"
+            }
+          ]
+        },
+        "tasks": {
+          "value": [
+            "manage ads",
+            "customer chat",
+            "analytics reporting"
+          ],
+          "evidence": [
+            {
+              "item": "manage ads",
+              "url": "https://madgicx.com/",
+              "quote": "You just found the #1 AI performance marketer that runs your Facebook ads autonomously. Agentic campaign management for ad ROI. Start your free trial.",
+              "method": "meta"
+            },
+            {
+              "item": "customer chat",
+              "url": "https://madgicx.com/pricing",
+              "quote": "Free training + live chat support",
+              "method": "sentence"
+            },
+            {
+              "item": "analytics reporting",
+              "url": "https://madgicx.com/contact",
+              "quote": "Get in touch with Madgicx for product support, billing questions, security reports, or partnership inquiries.",
+              "method": "meta"
+            }
+          ]
+        },
+        "can_execute": {
+          "value": true,
+          "evidence": [
+            {
+              "item": null,
+              "url": "https://madgicx.com/",
+              "quote": "You just found the #1 AI performance marketer that runs your Facebook ads autonomously. Agentic campaign management for ad ROI. Start your free trial.",
+              "method": "meta"
+            }
+          ]
+        },
+        "multi_agent": {
+          "value": "unknown",
+          "evidence": []
+        },
+        "integrations": {
+          "value": "unknown",
+          "evidence": []
+        },
+        "pricing": {
+          "value": {
+            "free_tier": true,
+            "starting_price": "$2"
+          },
+          "evidence": [
+            {
+              "item": "free_tier",
+              "url": "https://madgicx.com/pricing",
+              "quote": "Start for Free, Choose Your Plan Later",
+              "method": "heading"
+            },
+            {
+              "item": "starting_price",
+              "url": "https://madgicx.com/pricing",
+              "quote": "Less than $1K $1K - $2.5K $2.5K - $5K $5K - $10K $10K - $20K $20K - $30K $30K+",
+              "method": "sentence"
+            }
+          ]
+        },
+        "hq_location": {
+          "value": "unknown",
+          "evidence": []
+        }
+      }
+    },
+    {
+      "slug": "neuroflash",
+      "name": "neuroflash",
+      "url": "https://neuroflash.com/",
+      "final_url": "https://neuroflash.com/",
+      "status": "ok",
+      "status_detail": "6 pages read",
+      "needs_rendering": false,
+      "robots": {
+        "state": "ok",
+        "http_status": 200,
+        "crawl_delay": null
+      },
+      "pages": [
+        {
+          "url": "https://neuroflash.com/",
+          "final_url": "https://neuroflash.com/",
+          "topic": "home",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 44412,
+          "encoding": "br",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://neuroflash.com/pricing",
+          "final_url": "https://neuroflash.com/pricing",
+          "topic": "pricing",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 47202,
+          "encoding": "br",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://neuroflash.com/about-us",
+          "final_url": "https://neuroflash.com/about-us",
+          "topic": "about",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 45634,
+          "encoding": "br",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://neuroflash.com/sales-call",
+          "final_url": "https://neuroflash.com/sales-call",
+          "topic": "contact",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 33511,
+          "encoding": "br",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://neuroflash.com/case-studies",
+          "final_url": "https://neuroflash.com/case-studies",
+          "topic": "customers",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 32593,
+          "encoding": "br",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://neuroflash.com/digital-twins-api",
+          "final_url": "https://neuroflash.com/digital-twins-api",
+          "topic": "pricing",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 41569,
+          "encoding": "br",
+          "charset": "utf-8"
+        }
+      ],
+      "llm": null,
+      "fields": {
+        "one_liner": {
+          "value": "AI platform for content, branding, and digital twins. Create content and predict its impact in advance. 85–98% accuracy. GDPR-compliant.",
+          "evidence": [
+            {
+              "item": null,
+              "url": "https://neuroflash.com/",
+              "quote": "AI platform for content, branding, and digital twins. Create content and predict its impact in advance. 85–98% accuracy. GDPR-compliant.",
+              "method": "meta"
+            }
+          ]
+        },
+        "categories": {
+          "value": [
+            "content generation",
+            "seo",
+            "video & creative"
+          ],
+          "evidence": [
+            {
+              "item": "content generation",
+              "url": "https://neuroflash.com/",
+              "quote": "Content Creation",
+              "method": "heading"
+            },
+            {
+              "item": "seo",
+              "url": "https://neuroflash.com/case-studies",
+              "quote": "AI-powered SEO productivity for film production",
+              "method": "heading"
+            },
+            {
+              "item": "video & creative",
+              "url": "https://neuroflash.com/",
+              "quote": "Image Generation",
+              "method": "heading"
+            }
+          ]
+        },
+        "target_user": {
+          "value": [
+            "marketers",
+            "agencies",
+            "enterprise",
+            "developers"
+          ],
+          "evidence": [
+            {
+              "item": "marketers",
+              "url": "https://neuroflash.com/",
+              "quote": "From performance marketing teams at agencies to mid-market B2B brands and the innovation and strategy departments of large corporations.",
+              "method": "sentence"
+            },
+            {
+              "item": "agencies",
+              "url": "https://neuroflash.com/case-studies",
+              "quote": "AI-powered text resonance for Germany's leading communications agency",
+              "method": "heading"
+            },
+            {
+              "item": "enterprise",
+              "url": "https://neuroflash.com/about-us",
+              "quote": "Our models are validated by over 80 academic studies and deployed by Fortune 500 brands worldwide.",
+              "method": "sentence"
+            },
+            {
+              "item": "developers",
+              "url": "https://neuroflash.com/about-us",
+              "quote": "Today, an international team of engineers, data scientists, researchers, product, and customer success specialists works across multiple continents, with headquarters in Hamburg.",
+              "method": "sentence"
+            }
+          ]
+        },
+        "tasks": {
+          "value": [
+            "write copy",
+            "generate images or video",
+            "seo optimization",
+            "workflow automation",
+            "personalization",
+            "market research"
+          ],
+          "evidence": [
+            {
+              "item": "write copy",
+              "url": "https://neuroflash.com/",
+              "quote": "Content Creation",
+              "method": "heading"
+            },
+            {
+              "item": "generate images or video",
+              "url": "https://neuroflash.com/",
+              "quote": "Image Generation",
+              "method": "heading"
+            },
+            {
+              "item": "seo optimization",
+              "url": "https://neuroflash.com/case-studies",
+              "quote": "AI-powered SEO productivity for film production",
+              "method": "heading"
+            },
+            {
+              "item": "workflow automation",
+              "url": "https://neuroflash.com/",
+              "quote": "Over 100 ready-made workflows for the tasks that matter most.",
+              "method": "sentence"
+            },
+            {
+              "item": "personalization",
+              "url": "https://neuroflash.com/about-us",
+              "quote": "Values, personality, and motivation as the foundation of every response.",
+              "method": "sentence"
+            },
+            {
+              "item": "market research",
+              "url": "https://neuroflash.com/",
+              "quote": "You can survey them just like real target audiences and receive feedback in seconds that would otherwise take weeks of market research.",
+              "method": "sentence"
+            }
+          ]
+        },
+        "can_execute": {
+          "value": "unknown",
+          "evidence": []
+        },
+        "multi_agent": {
+          "value": "unknown",
+          "evidence": []
+        },
+        "integrations": {
+          "value": "unknown",
+          "evidence": []
+        },
+        "pricing": {
+          "value": {
+            "free_tier": true,
+            "starting_price": "unknown"
+          },
+          "evidence": [
+            {
+              "item": "free_tier",
+              "url": "https://neuroflash.com/pricing",
+              "quote": "Compare features | Essential 42€/ month billed annually · plus VAT 7-day free trial | Pro 84€/ month per user billed annually · plus VAT 7-day free trial | Enterprise Custom Contact sales",
+              "method": "table"
+            }
+          ]
+        },
+        "hq_location": {
+          "value": "unknown",
+          "evidence": []
+        }
+      }
+    },
+    {
+      "slug": "predis-ai",
+      "name": "Predis.ai",
+      "url": "https://predis.ai/",
+      "final_url": "https://predis.ai/",
+      "status": "ok",
+      "status_detail": "4 pages read",
+      "needs_rendering": false,
+      "robots": {
+        "state": "ok",
+        "http_status": 200,
+        "crawl_delay": null
+      },
+      "pages": [
+        {
+          "url": "https://predis.ai/",
+          "final_url": "https://predis.ai/",
+          "topic": "home",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 44157,
+          "encoding": "br",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://predis.ai/features",
+          "final_url": "https://predis.ai/features/",
+          "topic": "product",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 19089,
+          "encoding": "br",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://predis.ai/pricing",
+          "final_url": "https://predis.ai/pricing/",
+          "topic": "pricing",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 26062,
+          "encoding": "br",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://predis.ai/product-video-maker",
+          "final_url": "https://predis.ai/product-video-maker/",
+          "topic": "product",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 26648,
+          "encoding": "br",
+          "charset": "utf-8"
+        }
+      ],
+      "llm": null,
+      "fields": {
+        "one_liner": {
+          "value": "Create AI ads, video ads with our free AI ad generator. Use AI and turn text prompts into AI video ads.",
+          "evidence": [
+            {
+              "item": null,
+              "url": "https://predis.ai/",
+              "quote": "Create AI ads, video ads with our free AI ad generator. Use AI and turn text prompts into AI video ads.",
+              "method": "meta"
+            }
+          ]
+        },
+        "categories": {
+          "value": [
+            "content generation",
+            "advertising",
+            "social media",
+            "ecommerce",
+            "video & creative"
+          ],
+          "evidence": [
+            {
+              "item": "content generation",
+              "url": "https://predis.ai/pricing/",
+              "quote": "Content Creation",
+              "method": "heading"
+            },
+            {
+              "item": "advertising",
+              "url": "https://predis.ai/",
+              "quote": "Static ad creatives for paid social and display ads",
+              "method": "heading"
+            },
+            {
+              "item": "social media",
+              "url": "https://predis.ai/",
+              "quote": "Create Social Media Ads for Every Platform",
+              "method": "heading"
+            },
+            {
+              "item": "ecommerce",
+              "url": "https://predis.ai/product-video-maker/",
+              "quote": "Paste a product link or photo and Predis.ai builds the e-commerce product video or demo, with script, voiceover and captions. 3-day free trial, no filming.",
+              "method": "meta"
+            },
+            {
+              "item": "video & creative",
+              "url": "https://predis.ai/",
+              "quote": "Create AI ads, video ads with our free AI ad generator. Use AI and turn text prompts into AI video ads.",
+              "method": "meta"
+            }
+          ]
+        },
+        "target_user": {
+          "value": [
+            "marketers",
+            "agencies",
+            "small business",
+            "creators"
+          ],
+          "evidence": [
+            {
+              "item": "marketers",
+              "url": "https://predis.ai/",
+              "quote": "Loved ❤️ by more than 6.4 Million Entrepreneurs, Marketers and Content Creators.",
+              "method": "heading"
+            },
+            {
+              "item": "agencies",
+              "url": "https://predis.ai/",
+              "quote": "Cut agency and shoot costs.",
+              "method": "sentence"
+            },
+            {
+              "item": "small business",
+              "url": "https://predis.ai/",
+              "quote": "Loved ❤️ by more than 6.4 Million Entrepreneurs, Marketers and Content Creators.",
+              "method": "heading"
+            },
+            {
+              "item": "creators",
+              "url": "https://predis.ai/",
+              "quote": "Loved ❤️ by more than 6.4 Million Entrepreneurs, Marketers and Content Creators.",
+              "method": "heading"
+            }
+          ]
+        },
+        "tasks": {
+          "value": [
+            "write copy",
+            "generate images or video",
+            "manage ads",
+            "schedule social posts",
+            "analytics reporting",
+            "market research"
+          ],
+          "evidence": [
+            {
+              "item": "write copy",
+              "url": "https://predis.ai/",
+              "quote": "Creatives, headlines, copy, and CTAs in one flow",
+              "method": "heading"
+            },
+            {
+              "item": "generate images or video",
+              "url": "https://predis.ai/",
+              "quote": "Create AI ads, video ads with our free AI ad generator. Use AI and turn text prompts into AI video ads.",
+              "method": "meta"
+            },
+            {
+              "item": "manage ads",
+              "url": "https://predis.ai/",
+              "quote": "Facebook Ads",
+              "method": "heading"
+            },
+            {
+              "item": "schedule social posts",
+              "url": "https://predis.ai/features/",
+              "quote": "Social posts and autoposting",
+              "method": "heading"
+            },
+            {
+              "item": "analytics reporting",
+              "url": "https://predis.ai/pricing/",
+              "quote": "Predis.ai makes ads that your brand needs and reports back on what earned the click.",
+              "method": "heading"
+            },
+            {
+              "item": "market research",
+              "url": "https://predis.ai/pricing/",
+              "quote": "Competitor Analysis",
+              "method": "heading"
+            }
+          ]
+        },
+        "can_execute": {
+          "value": "unknown",
+          "evidence": []
+        },
+        "multi_agent": {
+          "value": "unknown",
+          "evidence": []
+        },
+        "integrations": {
+          "value": [
+            "Shopify",
+            "BigCommerce",
+            "Magento"
+          ],
+          "evidence": [
+            {
+              "item": "Shopify",
+              "url": "https://predis.ai/product-video-maker/",
+              "quote": "shopify logo",
+              "method": "link"
+            },
+            {
+              "item": "BigCommerce",
+              "url": "https://predis.ai/product-video-maker/",
+              "quote": "bigcommerce logo",
+              "method": "link"
+            },
+            {
+              "item": "Magento",
+              "url": "https://predis.ai/product-video-maker/",
+              "quote": "magento logo",
+              "method": "link"
+            }
+          ]
+        },
+        "pricing": {
+          "value": {
+            "free_tier": true,
+            "starting_price": "$5/month"
+          },
+          "evidence": [
+            {
+              "item": "free_tier",
+              "url": "https://predis.ai/pricing/",
+              "quote": "The 3-day free trial is there so you can judge Predis.ai before you pay for a plan.",
+              "method": "sentence"
+            },
+            {
+              "item": "starting_price",
+              "url": "https://predis.ai/pricing/",
+              "quote": "Extra Brand ($5/month)",
+              "method": "sentence"
+            }
+          ]
+        },
+        "hq_location": {
+          "value": {
+            "city": "Pune",
+            "country": "India"
+          },
+          "evidence": [
+            {
+              "item": null,
+              "url": "https://predis.ai/",
+              "quote": "{\"address\": {\"@type\": \"PostalAddress\", \"streetAddress\": \"301, Serene Building, Pakharbaug Society, Ram Nagar, Bavdhan\", \"addressLocality\": \"Pune\", \"addressRegion\": \"Maharashtra\", \"postalCode\": \"411021\", \"addressCountry\": \"IN\"}}",
+              "method": "json-ld"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "slug": "relevance-ai",
+      "name": "Relevance AI",
+      "url": "https://relevanceai.com/",
+      "final_url": "https://relevanceai.com/",
+      "status": "ok",
+      "status_detail": "6 pages read",
+      "needs_rendering": false,
+      "robots": {
+        "state": "ok",
+        "http_status": 200,
+        "crawl_delay": null
+      },
+      "pages": [
+        {
+          "url": "https://relevanceai.com/",
+          "final_url": "https://relevanceai.com/",
+          "topic": "home",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 32567,
+          "encoding": "br",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://relevanceai.com/product",
+          "final_url": "https://relevanceai.com/product",
+          "topic": "product",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 35716,
+          "encoding": "br",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://relevanceai.com/integrations",
+          "final_url": "https://relevanceai.com/integrations",
+          "topic": "integrations",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 238680,
+          "encoding": "br",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://relevanceai.com/pricing",
+          "final_url": "https://relevanceai.com/pricing",
+          "topic": "pricing",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 9969,
+          "encoding": "br",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://relevanceai.com/use-cases/research-enricher",
+          "final_url": "https://relevanceai.com/use-cases/research-enricher",
+          "topic": "about",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 26886,
+          "encoding": "br",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://relevanceai.com/customers",
+          "final_url": "https://relevanceai.com/customers",
+          "topic": "customers",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 12187,
+          "encoding": "br",
+          "charset": "utf-8"
+        }
+      ],
+      "llm": null,
+      "fields": {
+        "one_liner": {
+          "value": "Deliver maximum ROI through optimized specialist agents. Build agents for sales, customer success, marketing and HR, and run millions of daily tasks on one platform.",
+          "evidence": [
+            {
+              "item": null,
+              "url": "https://relevanceai.com/",
+              "quote": "Deliver maximum ROI through optimized specialist agents. Build agents for sales, customer success, marketing and HR, and run millions of daily tasks on one platform.",
+              "method": "meta"
+            }
+          ]
+        },
+        "categories": {
+          "value": [
+            "sales & crm",
+            "analytics & reporting",
+            "general agent platform"
+          ],
+          "evidence": [
+            {
+              "item": "sales & crm",
+              "url": "https://relevanceai.com/",
+              "quote": "Outbound Prospector",
+              "method": "heading"
+            },
+            {
+              "item": "analytics & reporting",
+              "url": "https://relevanceai.com/product",
+              "quote": "We have dashboards and tooling designed specifically for agent management.",
+              "method": "sentence"
+            },
+            {
+              "item": "general agent platform",
+              "url": "https://relevanceai.com/",
+              "quote": "We've helped thousands of teams launch their AI workforce",
+              "method": "heading"
+            }
+          ]
+        },
+        "target_user": {
+          "value": [
+            "enterprise",
+            "developers",
+            "sales teams"
+          ],
+          "evidence": [
+            {
+              "item": "enterprise",
+              "url": "https://relevanceai.com/",
+              "quote": "Built for enterprise teams",
+              "method": "heading"
+            },
+            {
+              "item": "developers",
+              "url": "https://relevanceai.com/product",
+              "quote": "Experts and engineers build together",
+              "method": "heading"
+            },
+            {
+              "item": "sales teams",
+              "url": "https://relevanceai.com/product",
+              "quote": "Your ops and revenue teams — the people closest to the work.",
+              "method": "sentence"
+            }
+          ]
+        },
+        "tasks": {
+          "value": [
+            "lead qualification",
+            "customer chat",
+            "analytics reporting",
+            "workflow automation",
+            "personalization"
+          ],
+          "evidence": [
+            {
+              "item": "lead qualification",
+              "url": "https://relevanceai.com/product",
+              "quote": "Lead Enrichment Agent",
+              "method": "sentence"
+            },
+            {
+              "item": "customer chat",
+              "url": "https://relevanceai.com/product",
+              "quote": "An agent that triages support tickets",
+              "method": "sentence"
+            },
+            {
+              "item": "analytics reporting",
+              "url": "https://relevanceai.com/product",
+              "quote": "We have dashboards and tooling designed specifically for agent management.",
+              "method": "sentence"
+            },
+            {
+              "item": "workflow automation",
+              "url": "https://relevanceai.com/",
+              "quote": "We help you map your workflows and find the best agent use cases for your organization.",
+              "method": "sentence"
+            },
+            {
+              "item": "personalization",
+              "url": "https://relevanceai.com/",
+              "quote": "Personalizes multi-channel prospect engagement.",
+              "method": "sentence"
+            }
+          ]
+        },
+        "can_execute": {
+          "value": "unknown",
+          "evidence": []
+        },
+        "multi_agent": {
+          "value": true,
+          "evidence": [
+            {
+              "item": null,
+              "url": "https://relevanceai.com/",
+              "quote": "Drive ROI in just weeks with your first team of agents",
+              "method": "heading"
+            }
+          ]
+        },
+        "integrations": {
+          "value": [
+            "0CodeKit",
+            "10,000ft by Smartsheet",
+            "10to8",
+            "123FormBuilder",
+            "15Five",
+            "1CRM",
+            "1msg",
+            "21RISK",
+            "2Chat",
+            "2markdown",
+            "360NRS",
+            "46elks",
+            "4Dem",
+            "8x8 Connect",
+            "Ably",
+            "Abstract",
+            "AbuseIPDB",
+            "Abyssale",
+            "Accelo",
+            "Accredible",
+            "AccuRanker",
+            "AccuWeather",
+            "Acelle Mail",
+            "Acquire",
+            "Acronis Cyber Protect Cloud"
+          ],
+          "evidence": [
+            {
+              "item": "0CodeKit",
+              "url": "https://relevanceai.com/integrations",
+              "quote": "0CodeKit logo",
+              "method": "link"
+            },
+            {
+              "item": "10,000ft by Smartsheet",
+              "url": "https://relevanceai.com/integrations",
+              "quote": "10,000ft by Smartsheet logo",
+              "method": "link"
+            },
+            {
+              "item": "10to8",
+              "url": "https://relevanceai.com/integrations",
+              "quote": "10to8 logo",
+              "method": "link"
+            },
+            {
+              "item": "123FormBuilder",
+              "url": "https://relevanceai.com/integrations",
+              "quote": "123FormBuilder logo",
+              "method": "link"
+            },
+            {
+              "item": "15Five",
+              "url": "https://relevanceai.com/integrations",
+              "quote": "15Five logo",
+              "method": "link"
+            },
+            {
+              "item": "1CRM",
+              "url": "https://relevanceai.com/integrations",
+              "quote": "1CRM logo",
+              "method": "link"
+            },
+            {
+              "item": "1msg",
+              "url": "https://relevanceai.com/integrations",
+              "quote": "1msg logo",
+              "method": "link"
+            },
+            {
+              "item": "21RISK",
+              "url": "https://relevanceai.com/integrations",
+              "quote": "21RISK logo",
+              "method": "link"
+            },
+            {
+              "item": "2Chat",
+              "url": "https://relevanceai.com/integrations",
+              "quote": "2Chat logo",
+              "method": "link"
+            },
+            {
+              "item": "2markdown",
+              "url": "https://relevanceai.com/integrations",
+              "quote": "2markdown logo",
+              "method": "link"
+            },
+            {
+              "item": "360NRS",
+              "url": "https://relevanceai.com/integrations",
+              "quote": "360NRS logo",
+              "method": "link"
+            },
+            {
+              "item": "46elks",
+              "url": "https://relevanceai.com/integrations",
+              "quote": "46elks logo",
+              "method": "link"
+            },
+            {
+              "item": "4Dem",
+              "url": "https://relevanceai.com/integrations",
+              "quote": "4Dem logo",
+              "method": "link"
+            },
+            {
+              "item": "8x8 Connect",
+              "url": "https://relevanceai.com/integrations",
+              "quote": "8x8 Connect logo",
+              "method": "link"
+            },
+            {
+              "item": "Ably",
+              "url": "https://relevanceai.com/integrations",
+              "quote": "Ably logo",
+              "method": "link"
+            },
+            {
+              "item": "Abstract",
+              "url": "https://relevanceai.com/integrations",
+              "quote": "Abstract logo",
+              "method": "link"
+            },
+            {
+              "item": "AbuseIPDB",
+              "url": "https://relevanceai.com/integrations",
+              "quote": "AbuseIPDB logo",
+              "method": "link"
+            },
+            {
+              "item": "Abyssale",
+              "url": "https://relevanceai.com/integrations",
+              "quote": "Abyssale logo",
+              "method": "link"
+            },
+            {
+              "item": "Accelo",
+              "url": "https://relevanceai.com/integrations",
+              "quote": "Accelo logo",
+              "method": "link"
+            },
+            {
+              "item": "Accredible",
+              "url": "https://relevanceai.com/integrations",
+              "quote": "Accredible logo",
+              "method": "link"
+            },
+            {
+              "item": "AccuRanker",
+              "url": "https://relevanceai.com/integrations",
+              "quote": "AccuRanker logo",
+              "method": "link"
+            },
+            {
+              "item": "AccuWeather",
+              "url": "https://relevanceai.com/integrations",
+              "quote": "AccuWeather logo",
+              "method": "link"
+            },
+            {
+              "item": "Acelle Mail",
+              "url": "https://relevanceai.com/integrations",
+              "quote": "Acelle Mail logo",
+              "method": "link"
+            },
+            {
+              "item": "Acquire",
+              "url": "https://relevanceai.com/integrations",
+              "quote": "Acquire logo",
+              "method": "link"
+            },
+            {
+              "item": "Acronis Cyber Protect Cloud",
+              "url": "https://relevanceai.com/integrations",
+              "quote": "Acronis Cyber Protect Cloud logo",
+              "method": "link"
+            }
+          ]
+        },
+        "pricing": {
+          "value": {
+            "free_tier": true,
+            "starting_price": "unknown"
+          },
+          "evidence": [
+            {
+              "item": "free_tier",
+              "url": "https://relevanceai.com/integrations",
+              "quote": "Get Started for free.",
+              "method": "sentence"
+            }
+          ]
+        },
+        "hq_location": {
+          "value": "unknown",
+          "evidence": []
+        }
+      }
+    },
+    {
+      "slug": "seo-ai",
+      "name": "SEO.AI",
+      "url": "https://seo.ai/",
+      "final_url": "https://seo.ai/",
+      "status": "ok",
+      "status_detail": "6 pages read",
+      "needs_rendering": false,
+      "robots": {
+        "state": "ok",
+        "http_status": 200,
+        "crawl_delay": null
+      },
+      "pages": [
+        {
+          "url": "https://seo.ai/",
+          "final_url": "https://seo.ai/",
+          "topic": "home",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 13473,
+          "encoding": "gzip",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://seo.ai/feed-optimization",
+          "final_url": "https://seo.ai/feed-optimization",
+          "topic": "product",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 11204,
+          "encoding": "gzip",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://seo.ai/pricing",
+          "final_url": "https://seo.ai/pricing",
+          "topic": "pricing",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 8387,
+          "encoding": "gzip",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://seo.ai/features/content-analysis",
+          "final_url": "https://seo.ai/features/content-analysis",
+          "topic": "product",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 12460,
+          "encoding": "gzip",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://seo.ai/features/meta-descriptions",
+          "final_url": "https://seo.ai/features/meta-descriptions",
+          "topic": "product",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 8869,
+          "encoding": "gzip",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://seo.ai/features/seo-audits",
+          "final_url": "https://seo.ai/features/seo-audits",
+          "topic": "product",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 8755,
+          "encoding": "gzip",
+          "charset": "utf-8"
+        }
+      ],
+      "llm": null,
+      "fields": {
+        "one_liner": {
+          "value": "AI SEO agent that plans, writes, and publishes content for you. Grow organic traffic month by month - on autopilot, with full control when needed.",
+          "evidence": [
+            {
+              "item": null,
+              "url": "https://seo.ai/",
+              "quote": "AI SEO agent that plans, writes, and publishes content for you. Grow organic traffic month by month - on autopilot, with full control when needed.",
+              "method": "meta"
+            }
+          ]
+        },
+        "categories": {
+          "value": [
+            "content generation",
+            "seo",
+            "analytics & reporting",
+            "ecommerce"
+          ],
+          "evidence": [
+            {
+              "item": "content generation",
+              "url": "https://seo.ai/features/content-analysis",
+              "quote": "SEO Copywriting on Autopilot for Blogs and E-commerce Sites",
+              "method": "heading"
+            },
+            {
+              "item": "seo",
+              "url": "https://seo.ai/",
+              "quote": "AI SEO agent that plans, writes, and publishes content for you. Grow organic traffic month by month - on autopilot, with full control when needed.",
+              "method": "meta"
+            },
+            {
+              "item": "analytics & reporting",
+              "url": "https://seo.ai/",
+              "quote": "Most SEO tools give you dashboards, warnings, keyword lists, and recommendations.",
+              "method": "sentence"
+            },
+            {
+              "item": "ecommerce",
+              "url": "https://seo.ai/feed-optimization",
+              "quote": "Get more organic product listings in Google with AI-optimized feeds",
+              "method": "heading"
+            }
+          ]
+        },
+        "target_user": {
+          "value": [
+            "marketers",
+            "ecommerce brands",
+            "agencies",
+            "developers",
+            "sales teams",
+            "creators"
+          ],
+          "evidence": [
+            {
+              "item": "marketers",
+              "url": "https://seo.ai/feed-optimization",
+              "quote": "SEO.AI is for e-commerce brands, retailers, agencies, and marketing teams who want to scale organic traffic through smarter product feed optimization.",
+              "method": "sentence"
+            },
+            {
+              "item": "ecommerce brands",
+              "url": "https://seo.ai/feed-optimization",
+              "quote": "We already helps merchants of every size, from indie DTC brands to global retailers, drive massive lifts in impressions, clicks, and revenue - often within the first 24 hours.",
+              "method": "sentence"
+            },
+            {
+              "item": "agencies",
+              "url": "https://seo.ai/",
+              "quote": "Can agencies use SEO.AI for client projects?",
+              "method": "heading"
+            },
+            {
+              "item": "developers",
+              "url": "https://seo.ai/",
+              "quote": "Do I need developers to get started?",
+              "method": "heading"
+            },
+            {
+              "item": "sales teams",
+              "url": "https://seo.ai/feed-optimization",
+              "quote": "Join thousands of sellers who rely on AI-powered optimization and start getting more clicks from Google.",
+              "method": "sentence"
+            },
+            {
+              "item": "creators",
+              "url": "https://seo.ai/features/content-analysis",
+              "quote": "With AI, content creators and SEO marketers can craft content that stands out in search results.",
+              "method": "sentence"
+            }
+          ]
+        },
+        "tasks": {
+          "value": [
+            "write copy",
+            "manage ads",
+            "seo optimization",
+            "analytics reporting"
+          ],
+          "evidence": [
+            {
+              "item": "write copy",
+              "url": "https://seo.ai/features/content-analysis",
+              "quote": "SEO Copywriting on Autopilot for Blogs and E-commerce Sites",
+              "method": "heading"
+            },
+            {
+              "item": "manage ads",
+              "url": "https://seo.ai/pricing",
+              "quote": "Builds and optimizes Google Ads",
+              "method": "sentence"
+            },
+            {
+              "item": "seo optimization",
+              "url": "https://seo.ai/",
+              "quote": "AI SEO agent that plans, writes, and publishes content for you. Grow organic traffic month by month - on autopilot, with full control when needed.",
+              "method": "meta"
+            },
+            {
+              "item": "analytics reporting",
+              "url": "https://seo.ai/",
+              "quote": "Most SEO tools give you dashboards, warnings, keyword lists, and recommendations.",
+              "method": "sentence"
+            }
+          ]
+        },
+        "can_execute": {
+          "value": true,
+          "evidence": [
+            {
+              "item": null,
+              "url": "https://seo.ai/",
+              "quote": "AI SEO agent that plans, writes, and publishes content for you. Grow organic traffic month by month - on autopilot, with full control when needed.",
+              "method": "meta"
+            }
+          ]
+        },
+        "multi_agent": {
+          "value": "unknown",
+          "evidence": []
+        },
+        "integrations": {
+          "value": "unknown",
+          "evidence": []
+        },
+        "pricing": {
+          "value": {
+            "free_tier": true,
+            "starting_price": "$149"
+          },
+          "evidence": [
+            {
+              "item": "free_tier",
+              "url": "https://seo.ai/pricing",
+              "quote": "Get started for free",
+              "method": "link"
+            },
+            {
+              "item": "starting_price",
+              "url": "https://seo.ai/pricing",
+              "quote": "What an SEO agency charges $1,000 for, we deliver for $149",
+              "method": "heading"
+            }
+          ]
+        },
+        "hq_location": {
+          "value": "unknown",
+          "evidence": []
+        }
+      }
+    },
+    {
+      "slug": "sintra",
+      "name": "Sintra",
+      "url": "https://sintra.ai/",
+      "final_url": "https://sintra.ai/",
+      "status": "ok",
+      "status_detail": "6 pages read",
+      "needs_rendering": false,
+      "robots": {
+        "state": "ok",
+        "http_status": 200,
+        "crawl_delay": null
+      },
+      "pages": [
+        {
+          "url": "https://sintra.ai/",
+          "final_url": "https://sintra.ai/",
+          "topic": "home",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 102743,
+          "encoding": "gzip",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://sintra.ai/ai-employees",
+          "final_url": "https://sintra.ai/ai-employees",
+          "topic": "product",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 86472,
+          "encoding": "gzip",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://sintra.ai/integrations",
+          "final_url": "https://sintra.ai/integrations",
+          "topic": "integrations",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 99268,
+          "encoding": "gzip",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://sintra.ai/pricing",
+          "final_url": "https://sintra.ai/pricing",
+          "topic": "pricing",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 113690,
+          "encoding": "gzip",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://sintra.ai/case-studies",
+          "final_url": "https://sintra.ai/case-studies",
+          "topic": "customers",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 73423,
+          "encoding": "gzip",
+          "charset": "utf-8"
+        },
+        {
+          "url": "https://sintra.ai/features/brain-ai",
+          "final_url": "https://sintra.ai/features/brain-ai",
+          "topic": "product",
+          "outcome": "fetched",
+          "http_status": 200,
+          "error_type": null,
+          "bytes": 75848,
+          "encoding": "gzip",
+          "charset": "utf-8"
+        }
+      ],
+      "llm": null,
+      "fields": {
+        "one_liner": {
+          "value": "Build and scale your business with AI employees - smart AI workers designed to work around the clock. Get started today - thank us later!",
+          "evidence": [
+            {
+              "item": null,
+              "url": "https://sintra.ai/",
+              "quote": "Build and scale your business with AI employees - smart AI workers designed to work around the clock. Get started today - thank us later!",
+              "method": "meta"
+            }
+          ]
+        },
+        "categories": {
+          "value": [
+            "content generation",
+            "email marketing",
+            "advertising",
+            "seo",
+            "social media",
+            "sales & crm",
+            "analytics & reporting",
+            "customer support",
+            "ecommerce",
+            "video & creative",
+            "general agent platform"
+          ],
+          "evidence": [
+            {
+              "item": "content generation",
+              "url": "https://sintra.ai/",
+              "quote": "Dedicated to writing compelling copy for your ads, blog posts, websites, advertorials and other marketing campaigns that convert readers into customers.",
+              "method": "sentence"
+            },
+            {
+              "item": "email marketing",
+              "url": "https://sintra.ai/",
+              "quote": "Do newsletters even work these days?",
+              "method": "sentence"
+            },
+            {
+              "item": "advertising",
+              "url": "https://sintra.ai/pricing",
+              "quote": "Writes your Facebook ads",
+              "method": "sentence"
+            },
+            {
+              "item": "seo",
+              "url": "https://sintra.ai/ai-employees",
+              "quote": "SEO Specialist",
+              "method": "heading"
+            },
+            {
+              "item": "social media",
+              "url": "https://sintra.ai/",
+              "quote": "Soshie, schedule social media posts for me",
+              "method": "heading"
+            },
+            {
+              "item": "sales & crm",
+              "url": "https://sintra.ai/",
+              "quote": "You can use it for tasks like administrative work, lead generation, content creation, email outreach, social media management, project management, and much more.",
+              "method": "sentence"
+            },
+            {
+              "item": "analytics & reporting",
+              "url": "https://sintra.ai/ai-employees",
+              "quote": "An AI employee improves accuracy and reliability by handling transactions, data analysis, and reporting with total precision.",
+              "method": "sentence"
+            },
+            {
+              "item": "customer support",
+              "url": "https://sintra.ai/ai-employees",
+              "quote": "Customer Support",
+              "method": "heading"
+            },
+            {
+              "item": "ecommerce",
+              "url": "https://sintra.ai/",
+              "quote": "eCommerce Manager.",
+              "method": "sentence"
+            },
+            {
+              "item": "video & creative",
+              "url": "https://sintra.ai/",
+              "quote": "Image Generation",
+              "method": "sentence"
+            },
+            {
+              "item": "general agent platform",
+              "url": "https://sintra.ai/",
+              "quote": "Build and scale your business with AI employees - smart AI workers designed to work around the clock. Get started today - thank us later!",
+              "method": "meta"
+            }
+          ]
+        },
+        "target_user": {
+          "value": [
+            "marketers",
+            "ecommerce brands",
+            "agencies",
+            "enterprise",
+            "small business",
+            "sales teams"
+          ],
+          "evidence": [
+            {
+              "item": "marketers",
+              "url": "https://sintra.ai/",
+              "quote": "Soshie can collaborate with your marketing and content teams to ensure a unified social media strategy.",
+              "method": "sentence"
+            },
+            {
+              "item": "ecommerce brands",
+              "url": "https://sintra.ai/case-studies",
+              "quote": "That was just the beginning of a decades-long career that would help shape multiple e-commerce businesses.",
+              "method": "sentence"
+            },
+            {
+              "item": "agencies",
+              "url": "https://sintra.ai/case-studies",
+              "quote": "This AI solution enabled the agency to stay ahead of the competition and produce content that converts and builds a strong relationship with the clients.",
+              "method": "sentence"
+            },
+            {
+              "item": "enterprise",
+              "url": "https://sintra.ai/ai-employees",
+              "quote": "Built for enterprise-grade scalability",
+              "method": "sentence"
+            },
+            {
+              "item": "small business",
+              "url": "https://sintra.ai/ai-employees",
+              "quote": "Meet the twelve Sintra AI employees. Pre-built AI roles running socials, inbox, content, support and sales for small business owners.",
+              "method": "meta"
+            },
+            {
+              "item": "sales teams",
+              "url": "https://sintra.ai/pricing",
+              "quote": "Milli provides tools and techniques to maintain high team morale, ensuring your sales team stays motivated and productive.",
+              "method": "sentence"
+            }
+          ]
+        },
+        "tasks": {
+          "value": [
+            "write copy",
+            "generate images or video",
+            "send email campaigns",
+            "manage ads",
+            "seo optimization",
+            "schedule social posts",
+            "lead qualification",
+            "customer chat",
+            "analytics reporting",
+            "workflow automation",
+            "personalization",
+            "market research"
+          ],
+          "evidence": [
+            {
+              "item": "write copy",
+              "url": "https://sintra.ai/",
+              "quote": "Dedicated to writing compelling copy for your ads, blog posts, websites, advertorials and other marketing campaigns that convert readers into customers.",
+              "method": "sentence"
+            },
+            {
+              "item": "generate images or video",
+              "url": "https://sintra.ai/",
+              "quote": "Image Generation",
+              "method": "sentence"
+            },
+            {
+              "item": "send email campaigns",
+              "url": "https://sintra.ai/",
+              "quote": "Do newsletters even work these days?",
+              "method": "sentence"
+            },
+            {
+              "item": "manage ads",
+              "url": "https://sintra.ai/pricing",
+              "quote": "Writes your Facebook ads",
+              "method": "sentence"
+            },
+            {
+              "item": "seo optimization",
+              "url": "https://sintra.ai/ai-employees",
+              "quote": "SEO Specialist",
+              "method": "heading"
+            },
+            {
+              "item": "schedule social posts",
+              "url": "https://sintra.ai/",
+              "quote": "Soshie, schedule social media posts for me",
+              "method": "heading"
+            },
+            {
+              "item": "lead qualification",
+              "url": "https://sintra.ai/",
+              "quote": "You can use it for tasks like administrative work, lead generation, content creation, email outreach, social media management, project management, and much more.",
+              "method": "sentence"
+            },
+            {
+              "item": "customer chat",
+              "url": "https://sintra.ai/",
+              "quote": "Every AI worker runs as a chatbot.",
+              "method": "sentence"
+            },
+            {
+              "item": "analytics reporting",
+              "url": "https://sintra.ai/ai-employees",
+              "quote": "📝 Create reports",
+              "method": "sentence"
+            },
+            {
+              "item": "workflow automation",
+              "url": "https://sintra.ai/features/brain-ai",
+              "quote": "Unlock the power of Brain AI, Sintra’s intelligent solution designed to automate workflows. Experience the future of AI technology today",
+              "method": "meta"
+            },
+            {
+              "item": "personalization",
+              "url": "https://sintra.ai/features/brain-ai",
+              "quote": "Unlock the Power of Personalized AI with Brain AI",
+              "method": "heading"
+            },
+            {
+              "item": "market research",
+              "url": "https://sintra.ai/pricing",
+              "quote": "Competitor Research",
+              "method": "sentence"
+            }
+          ]
+        },
+        "can_execute": {
+          "value": "unknown",
+          "evidence": []
+        },
+        "multi_agent": {
+          "value": "unknown",
+          "evidence": []
+        },
+        "integrations": {
+          "value": [
+            "Gmail",
+            "LinkedIn",
+            "Google Calendar",
+            "Facebook",
+            "Instagram",
+            "Notion",
+            "Google Drive",
+            "Microsoft",
+            "Strava",
+            "Google Analytics",
+            "QuickBooks",
+            "WordPress",
+            "HubSpot",
+            "Trello",
+            "Salesforce",
+            "TikTok",
+            "Webflow",
+            "GitHub",
+            "Linear",
+            "Slack",
+            "Shopify",
+            "Meta",
+            "Meta Ads",
+            "YouTube",
+            "Outlook"
+          ],
+          "evidence": [
+            {
+              "item": "Gmail",
+              "url": "https://sintra.ai/ai-employees",
+              "quote": "Gmail Logo",
+              "method": "link"
+            },
+            {
+              "item": "LinkedIn",
+              "url": "https://sintra.ai/ai-employees",
+              "quote": "LinkedIn Logo",
+              "method": "link"
+            },
+            {
+              "item": "Google Calendar",
+              "url": "https://sintra.ai/ai-employees",
+              "quote": "Google Calendar Logo",
+              "method": "link"
+            },
+            {
+              "item": "Facebook",
+              "url": "https://sintra.ai/ai-employees",
+              "quote": "Facebook Logo",
+              "method": "link"
+            },
+            {
+              "item": "Instagram",
+              "url": "https://sintra.ai/ai-employees",
+              "quote": "Instagram Logo",
+              "method": "link"
+            },
+            {
+              "item": "Notion",
+              "url": "https://sintra.ai/ai-employees",
+              "quote": "Notion Logo",
+              "method": "link"
+            },
+            {
+              "item": "Google Drive",
+              "url": "https://sintra.ai/ai-employees",
+              "quote": "Google Drive Logo",
+              "method": "link"
+            },
+            {
+              "item": "Microsoft",
+              "url": "https://sintra.ai/ai-employees",
+              "quote": "Microsoft Logo",
+              "method": "link"
+            },
+            {
+              "item": "Strava",
+              "url": "https://sintra.ai/ai-employees",
+              "quote": "Strava Logo",
+              "method": "link"
+            },
+            {
+              "item": "Google Analytics",
+              "url": "https://sintra.ai/ai-employees",
+              "quote": "Google Analytics Logo",
+              "method": "link"
+            },
+            {
+              "item": "QuickBooks",
+              "url": "https://sintra.ai/ai-employees",
+              "quote": "QuickBooks Logo",
+              "method": "link"
+            },
+            {
+              "item": "WordPress",
+              "url": "https://sintra.ai/integrations",
+              "quote": "WordPress",
+              "method": "heading"
+            },
+            {
+              "item": "HubSpot",
+              "url": "https://sintra.ai/integrations",
+              "quote": "HubSpot",
+              "method": "heading"
+            },
+            {
+              "item": "Trello",
+              "url": "https://sintra.ai/integrations",
+              "quote": "Trello",
+              "method": "heading"
+            },
+            {
+              "item": "Salesforce",
+              "url": "https://sintra.ai/integrations",
+              "quote": "Salesforce",
+              "method": "heading"
+            },
+            {
+              "item": "TikTok",
+              "url": "https://sintra.ai/integrations",
+              "quote": "TikTok",
+              "method": "heading"
+            },
+            {
+              "item": "Webflow",
+              "url": "https://sintra.ai/integrations",
+              "quote": "Webflow",
+              "method": "heading"
+            },
+            {
+              "item": "GitHub",
+              "url": "https://sintra.ai/integrations",
+              "quote": "GitHub",
+              "method": "heading"
+            },
+            {
+              "item": "Linear",
+              "url": "https://sintra.ai/integrations",
+              "quote": "Linear",
+              "method": "heading"
+            },
+            {
+              "item": "Slack",
+              "url": "https://sintra.ai/integrations",
+              "quote": "Slack",
+              "method": "heading"
+            },
+            {
+              "item": "Shopify",
+              "url": "https://sintra.ai/integrations",
+              "quote": "Shopify",
+              "method": "heading"
+            },
+            {
+              "item": "Meta",
+              "url": "https://sintra.ai/integrations",
+              "quote": "Meta",
+              "method": "heading"
+            },
+            {
+              "item": "Meta Ads",
+              "url": "https://sintra.ai/integrations",
+              "quote": "Meta Ads",
+              "method": "heading"
+            },
+            {
+              "item": "YouTube",
+              "url": "https://sintra.ai/integrations",
+              "quote": "YouTube",
+              "method": "heading"
+            },
+            {
+              "item": "Outlook",
+              "url": "https://sintra.ai/integrations",
+              "quote": "Outlook",
+              "method": "heading"
+            }
+          ]
+        },
+        "pricing": {
+          "value": {
+            "free_tier": "unknown",
+            "starting_price": "$39/month"
+          },
+          "evidence": [
+            {
+              "item": "starting_price",
+              "url": "https://sintra.ai/pricing",
+              "quote": "$39/month",
+              "method": "sentence"
+            }
+          ]
+        },
+        "hq_location": {
+          "value": "unknown",
+          "evidence": []
+        }
+      }
+    }
+  ]
+}
