@@ -1,0 +1,17 @@
+[project]
+name = "ecommerce-agent"
+version = "0.1.0"
+description = "Ecommerce Agent - Auto researcher CLI tool"
+requires-python = ">=3.10"
+
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-v --tb=short"
+
+[tool.setuptools.packages.find]
+where = ["src"]
