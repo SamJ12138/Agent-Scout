@@ -52,11 +52,23 @@ wrong, some are stated on pages the reference did not read); `mismatch`, a
 stated value that the reference contradicts or does not find, is the count
 that matters most.
 
-These are not held-out scores. The first run, made before any rule had been
-adjusted to a real site, gave 30 match, 43 partial, 4 mismatch, 13 missing of 90 site-fields
-([docs/real-corpus/run-1/scores.md](docs/real-corpus/run-1/scores.md)). The
-rules were then adjusted using what that run showed, so every later run is
-not a clean held-out score; the first run stays here as the before figure.
+These are not held-out scores. The runs so far, oldest first:
+
+- Run 1, made before any rule had been adjusted to a real site:
+  30 match, 43 partial, 4 mismatch, 13 missing of 90 site-fields
+  ([docs/real-corpus/run-1/scores.md](docs/real-corpus/run-1/scores.md)). The
+  rules were then adjusted using what that run showed, so every later run is
+  not a clean held-out score; run 1 stays here as the before figure.
+- Run 2, after those adjustments:
+  37 match, 40 partial, 2 mismatch, 11 missing of 90 site-fields
+  ([docs/real-corpus/run-2/scores.md](docs/real-corpus/run-2/scores.md)).
+  One of the adjustments made a new error: run 2 reported a wrong headquarters
+  for one product, read from the address of its hosting provider in a legal
+  notice. The corpus found it, and it was fixed afterwards ("fix: a host's
+  address in a legal notice is not the headquarters").
+- The latest run is the block above. Until a run later than run 2 appears
+  there, that fix has not been run on the real sites.
+
 Per site and field: [docs/real-corpus/scores.md](docs/real-corpus/scores.md).
 The report of the run, with every quote:
 [docs/real-corpus/report.html](docs/real-corpus/report.html).
@@ -341,6 +353,16 @@ The history, in order:
    the places real sites state them". Each change has a stated reason that
    does not depend on one site, and a test in `tests/test_adversarial.py`.
    The reference profiles were not edited.
+5. The second real run followed. Three of the four mismatches of run 1 were
+   gone, one remained, and there was a new wrong value: a headquarters read
+   from the address of a hosting provider in a legal notice, which the
+   legal-notice rule added in step 4 had made possible.
+6. That was fixed in "fix: a host's address in a legal notice is not the
+   headquarters": a legal notice is split into the parts about the company
+   and the parts about other parties, a registered-office address is
+   preferred, and several addresses without such a cue give `unknown`.
+   The mismatch that remained from run 1 was left alone and is listed in
+   `docs/real-corpus/README.md`.
 
 So a run after step 4 measures the same ten sites the rules were adjusted on.
 Expect it to flatter the tool compared with ten sites it has never seen.

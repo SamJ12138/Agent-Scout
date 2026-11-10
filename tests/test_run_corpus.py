@@ -155,3 +155,43 @@ def test_the_block_says_whether_rules_changed_since_the_run():
     assert "first run on real sites" in run_corpus.readme_block(first, first["run_id"])
     later = dict(first, run_id="20270101T000000Z-0000")
     assert "not a held-out score" in run_corpus.readme_block(later, first["run_id"])
+
+
+# ------------------------------------------------------------------ run 2 and what it got wrong stay on record
+def _outside_the_generated_block(text):
+    start, end = text.index(run_corpus.README_START), text.index(run_corpus.README_END)
+    return " ".join((text[:start] + text[end + len(run_corpus.README_END):]).split())
+
+
+def test_the_second_run_is_kept_as_history():
+    second = run_corpus.parse_scores((run_corpus.CORPUS / "run-2" / "scores.md").read_text(encoding="utf-8"))
+    assert second["run_id"] == "20261110T143957Z-27a7"
+    assert second["totals"] == {"match": 37, "partial": 40, "mismatch": 2, "missing": 11} and second["site_fields"] == 90
+    assert "- adcreative-ai / hq_location: mismatch" in (run_corpus.CORPUS / "run-2" / "scores.md").read_text(
+        encoding="utf-8")
+
+
+def test_readme_shows_run_1_then_run_2_then_the_latest():
+    first = run_corpus.parse_scores((run_corpus.CORPUS / "run-1" / "scores.md").read_text(encoding="utf-8"))
+    second = run_corpus.parse_scores((run_corpus.CORPUS / "run-2" / "scores.md").read_text(encoding="utf-8"))
+    readme = README.read_text(encoding="utf-8")
+    permanent = _outside_the_generated_block(readme)          # typed text: it must agree with the kept files
+    assert run_corpus.totals_sentence(first) in permanent and run_corpus.totals_sentence(second) in permanent
+    assert permanent.index(run_corpus.totals_sentence(first)) < permanent.index(run_corpus.totals_sentence(second))
+    assert "docs/real-corpus/run-1/scores.md" in permanent and "docs/real-corpus/run-2/scores.md" in permanent
+    assert "docs/real-corpus/scores.md" in permanent           # the latest
+
+
+def test_readme_says_what_run_2_got_wrong():
+    permanent = _outside_the_generated_block(README.read_text(encoding="utf-8"))
+    assert "wrong headquarters" in permanent and "hosting provider" in permanent and "legal notice" in permanent
+    assert "a host's address in a legal notice is not the headquarters" in permanent    # the commit that fixed it
+
+
+def test_known_disagreements_with_the_reference_are_listed():
+    text = " ".join((run_corpus.CORPUS / "README.md").read_text(encoding="utf-8").split())
+    assert "## Known disagreements with the reference" in text
+    assert "relevance-ai / pricing" in text and '"Get Started for free."' in text
+    assert "https://relevanceai.com/integrations" in text
+    assert "not edited after the fact" in text
+    assert "run-2/scores.md" in text
