@@ -294,3 +294,104 @@ def test_malformed_redirect_target_is_an_error_not_a_crash(scripted, make_fetche
     scripted.route("/", status=302, headers={"Location": "http://[not-an-address/"})
     result = make_fetcher().get(scripted.base + "/")
     assert result.outcome == "error" and result.error_type in ("bad_redirect", "request_error")
+
+
+# ------------------------------------------------------------------ redirects that carry a body
+MOVED_BODY = ("<html>\r\n<head><title>301 Moved Permanently</title></head>\r\n<body>\r\n"
+              "<center><h1>301 Moved Permanently</h1></center>\r\n<hr><center>server</center>\r\n</body>\r\n</html>\r\n")
+
+
+def test_redirect_with_a_body_is_followed(scripted, make_fetcher):
+    """Web servers send a small HTML page with their redirects by default."""
+    scripted.route("/", status=301, headers={"Location": "/start"}, body=MOVED_BODY).route("/start", body=OK_BODY)
+    result = make_fetcher().get(scripted.base + "/")
+    assert (result.outcome, result.error_type) == ("ok", None)
+    assert result.final_url == scripted.base + "/start" and "A real page with enough words." in result.text
+
+
+def test_robots_redirect_with_a_body_is_followed(scripted, make_fetcher):
+    scripted.route("/robots.txt", status=301, headers={"Location": "/robots-real.txt"}, body=MOVED_BODY)
+    scripted.route("/robots-real.txt", headers={"Content-Type": "text/plain"}, body="User-agent: *\nDisallow: /secret\n")
+    scripted.route("/", body=OK_BODY).route("/secret", body=OK_BODY)
+    fetcher = make_fetcher()
+    assert fetcher.get(scripted.base + "/").outcome == "ok"
+    assert fetcher.get(scripted.base + "/secret").outcome == "robots_disallowed"   # the redirected file was read
+    assert "/secret" not in scripted.paths()
+
+
+@pytest.mark.parametrize("encoding, compress", [("gzip", gzip.compress), ("br", brotli.compress)])
+def test_compressed_redirect_body_is_followed(scripted, make_fetcher, encoding, compress):
+    scripted.route("/", status=302, headers={"Location": "/start", "Content-Encoding": encoding},
+                   body=compress(MOVED_BODY.encode())).route("/start", body=OK_BODY)
+    assert make_fetcher().get(scripted.base + "/").outcome == "ok"
+
+
+# ------------------------------------------------------------------ header names in lower case
+LOWER = {"X-Test-Lowercase-Names": "1"}
+
+
+def test_lower_case_location_header_is_a_redirect_not_an_empty_page(scripted, make_fetcher):
+    scripted.route("/", status=302, headers={**LOWER, "Location": "/start"})
+    scripted.route("/start", headers={**LOWER, "Content-Type": "text/html; charset=utf-8"}, body=OK_BODY)
+    result = make_fetcher().get(scripted.base + "/")
+    assert result.outcome == "ok" and result.status == 200
+    assert result.final_url == scripted.base + "/start" and result.redirects == [scripted.base + "/"]
+
+
+def test_lower_case_content_encoding_and_content_type_are_honoured(scripted, make_fetcher):
+    body = html_page("<p>Prices from £29 – “simple”.</p>").encode("windows-1252")
+    scripted.route("/", headers={**LOWER, "Content-Type": "text/html; charset=windows-1252", "Content-Encoding": "br"},
+                   body=brotli.compress(body))
+    result = make_fetcher().get(scripted.base + "/")
+    assert result.outcome == "ok" and "Prices from £29 – “simple”." in result.text
+    assert (result.content_encoding, result.charset) == ("br", "windows-1252")
+
+
+def test_lower_case_content_type_that_is_not_html_is_refused(scripted, make_fetcher):
+    scripted.route("/", headers={**LOWER, "Content-Type": "application/pdf"}, body=b"%PDF-1.7")
+    assert make_fetcher().get(scripted.base + "/").error_type == "not_html"
+
+
+def test_lower_case_retry_after_and_content_length_are_honoured(scripted, make_fetcher, fake_time):
+    scripted.route("/", status=429, headers={**LOWER, "Retry-After": "3"}, body="slow down")
+    assert make_fetcher().get(scripted.base + "/").outcome == "blocked"
+    assert 3.0 in fake_time.sleeps
+    scripted.route("/cut", headers={**LOWER, "X-Test-Declared-Length": str(len(OK_BODY) + 500)}, body=OK_BODY)
+    assert make_fetcher().get(scripted.base + "/cut").error_type == "read_error"
+
+
+def test_lower_case_robots_redirect(scripted, make_fetcher):
+    scripted.route("/robots.txt", status=302, headers={**LOWER, "Location": "/r.txt"})
+    scripted.route("/r.txt", headers={**LOWER, "Content-Type": "text/plain"}, body="User-agent: *\nDisallow: /\n")
+    scripted.route("/", body=OK_BODY)
+    assert make_fetcher().get(scripted.base + "/").outcome == "robots_disallowed"
+
+
+# ------------------------------------------------------------------ challenge pages: both directions
+@pytest.mark.parametrize("title", [
+    "Just a moment...", "Attention Required! | Cloudflare", "Access denied", "Access Denied | example.test",
+    "Security check", "Are you a robot?", "Pardon Our Interruption", "Verify you are human",
+])
+def test_known_challenge_titles_are_blocked(scripted, make_fetcher, title):
+    scripted.route("/", body=html_page("<p>Please wait while we check your browser.</p>", title=title))
+    result = make_fetcher().get(scripted.base + "/")
+    assert (result.outcome, result.error_type) == ("blocked", "challenge_page")
+
+
+@pytest.mark.parametrize("title", [
+    "Security Checklist for Marketers | Wardenly",
+    "reCAPTCHA alternative for lead forms - Formly",
+    "Access Denied Errors Explained | Docs",
+    "Human verification without friction: our product",
+    "Pricing",
+])
+def test_ordinary_pages_whose_title_resembles_a_challenge_are_read(scripted, make_fetcher, title):
+    scripted.route("/", body=html_page("<p>" + "An ordinary product page with words. " * 10 + "</p>", title=title))
+    result = make_fetcher().get(scripted.base + "/")
+    assert (result.outcome, result.error_type) == ("ok", None)
+
+
+def test_loose_title_plus_challenge_markup_is_blocked():
+    page = html_page("<script src='https://captcha-delivery.com/c.js'></script>", title="Site security check in progress")
+    assert looks_like_challenge(200, {}, page) is True
+    assert looks_like_challenge(200, {}, html_page("<p>x</p>", title="Site security check in progress")) is False

@@ -27,6 +27,7 @@ from urllib.parse import urljoin, urlsplit
 
 import brotli
 import requests
+from requests.structures import CaseInsensitiveDict
 
 from . import USER_AGENT, obs
 from .config import Config
@@ -61,7 +62,11 @@ REQUEST_HEADERS = {
 
 BLOCKED_STATUSES = (401, 403, 429)
 
-# Page titles used by bot-protection interstitials (compared lower-case).
+# Titles of bot-protection interstitials (compared lower-case). A page is a
+# challenge when its title IS one of these, or starts with one followed by
+# punctuation or a separator ("Attention Required! | Cloudflare"). A longer
+# title that merely contains the words ("Security Checklist for Marketers")
+# is an ordinary page.
 CHALLENGE_TITLES = (
     "just a moment",
     "attention required",
@@ -71,9 +76,11 @@ CHALLENGE_TITLES = (
     "security check",
     "captcha",
     "verify you are human",
+    "verifying you are human",
     "human verification",
 )
-# Markup that only appears on challenge pages.
+# Markup that challenge pages load. On its own it only counts for non-200
+# responses: ordinary pages served through the same CDN reference it too.
 CHALLENGE_MARKUP = (
     "/cdn-cgi/challenge-platform",
     "cf-chl-",
@@ -81,22 +88,35 @@ CHALLENGE_MARKUP = (
     "px-captcha",
     "_incapsula_resource",
 )
+_TITLE_END = re.compile(r"\s*(?:$|[|!?.:\u2013\u2014\u00b7-])")
 
 
-def looks_like_challenge(status: int, headers: dict, text: str) -> bool:
+def _challenge_title(title: str) -> tuple[bool, bool]:
+    """(is a challenge title, merely contains challenge words)."""
+    title = " ".join(title.lower().split())
+    strict = any(title.startswith(marker) and _TITLE_END.match(title[len(marker):]) for marker in CHALLENGE_TITLES)
+    loose = any(marker in title for marker in CHALLENGE_TITLES)
+    return bool(strict), loose
+
+
+def looks_like_challenge(status: int, headers, text: str) -> bool:
     """True when a response is a bot-protection challenge rather than content.
 
-    For a 200 response only the page title counts: ordinary pages served
-    through a CDN may reference its challenge scripts.
+    Signals: the ``cf-mitigated: challenge`` header; a title that is a known
+    challenge title; challenge markup on a non-200 response; or, on a 200
+    response, challenge markup together with a title containing challenge
+    words. Challenge words inside a longer title are never enough.
     """
-    lowered = {str(k).lower(): str(v).lower() for k, v in headers.items()}
+    lowered = {str(k).lower(): str(v).lower() for k, v in dict(headers).items()}
     if lowered.get("cf-mitigated") == "challenge":
         return True
     head = text[:20000].lower()
-    title = re.search(r"<title[^>]*>(.*?)</title>", head, re.DOTALL)
-    if title and any(marker in title.group(1) for marker in CHALLENGE_TITLES):
+    match = re.search(r"<title[^>]*>(.*?)</title>", head, re.DOTALL)
+    strict, loose = _challenge_title(match.group(1)) if match else (False, False)
+    markup = any(marker in head for marker in CHALLENGE_MARKUP)
+    if strict:
         return True
-    return status != 200 and any(marker in head for marker in CHALLENGE_MARKUP)
+    return markup and (status != 200 or loose)
 
 
 @dataclass
@@ -119,7 +139,7 @@ REDIRECT_STATUSES = (301, 302, 303, 307, 308)
 @dataclass
 class _Response:
     status: int | None = None
-    headers: dict = field(default_factory=dict)
+    headers: CaseInsensitiveDict = field(default_factory=CaseInsensitiveDict)   # names compare case-insensitively
     body: bytes = b""                     # decoded (decompressed) body
     encoding: str | None = None
     error: str | None = None              # set when the request or the decoding failed
@@ -211,8 +231,12 @@ class Fetcher:
         return wait
 
     # ------------------------------------------------------------------ one request
-    def _request(self, url: str) -> tuple[int, dict, bytes]:
-        """One GET without redirects. Returns status, headers, raw body bytes."""
+    def _request(self, url: str) -> tuple[int, CaseInsensitiveDict, bytes]:
+        """One GET without redirects. Returns status, headers, raw body bytes.
+
+        The body of a redirect is not returned: nobody reads it, and the HTTP
+        library has already drained it from the connection.
+        """
         try:
             response = self.session.get(url, headers=REQUEST_HEADERS, timeout=self.config.timeout_seconds,
                                         allow_redirects=False, stream=True)
@@ -230,6 +254,10 @@ class Fetcher:
             raise _Failure("request_error") from None
         finally:
             self._last_request[urlsplit(url).netloc] = self._clock()
+        headers = CaseInsensitiveDict(response.headers)
+        if response.status_code in REDIRECT_STATUSES and headers.get("Location"):
+            response.close()
+            return response.status_code, headers, b""
         try:
             body = response.raw.read(self.config.max_body_bytes + 1, decode_content=False)
         except Exception as exc:   # the HTTP library raises its own error types while a body is read
@@ -239,16 +267,18 @@ class Fetcher:
         finally:
             response.close()
             self._last_request[urlsplit(url).netloc] = self._clock()
-        declared = str(response.headers.get("Content-Length", "")).strip()
+        declared = str(headers.get("Content-Length", "")).strip()
         if declared.isdigit() and len(body) < min(int(declared), self.config.max_body_bytes + 1):
             obs.emit("fetch", "skip", error_type="read_error", url=url, detail="incomplete_body",
                      received=len(body), declared=int(declared))
             raise _Failure("read_error")
-        return response.status_code, dict(response.headers), body
+        return response.status_code, headers, body
 
-    def _decoded_body(self, headers: dict, body: bytes) -> tuple[bytes, str | None]:
+    def _decoded_body(self, headers, body: bytes) -> tuple[bytes, str | None]:
         if len(body) > self.config.max_body_bytes:
             raise _Failure("too_large")
+        if not body:
+            return body, None                 # nothing to decode (a redirect, an empty answer)
         header = (headers.get("Content-Encoding") or "").strip().lower()
         encodings = [part.strip() for part in header.split(",") if part.strip() and part.strip() != "identity"]
         for encoding in reversed(encodings):
@@ -264,7 +294,7 @@ class Fetcher:
                 raise _Failure("too_large")
         return body, (", ".join(encodings) or None)
 
-    def _retry_after(self, headers: dict) -> float:
+    def _retry_after(self, headers) -> float:
         value = str(headers.get("Retry-After", "")).strip()
         return min(float(value), MAX_RETRY_AFTER_SECONDS) if value.isdigit() else 0.0
 

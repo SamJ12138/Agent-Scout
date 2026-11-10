@@ -86,13 +86,19 @@ class ScriptedServer:
                 headers = dict(headers)
                 stall = float(headers.pop("X-Test-Stall-Body", 0))        # send half the body, then wait
                 declared = headers.pop("X-Test-Declared-Length", None)    # lie about the length, then close
+                lower = headers.pop("X-Test-Lowercase-Names", None)       # write every header name in lower case
+                if lower:
+                    headers = {name.lower(): value for name, value in headers.items()}
                 if delay:
                     time.sleep(delay)
                 try:
-                    self.send_response(status)
+                    if lower:
+                        self.send_response_only(status)       # no Server / Date headers in mixed case
+                    else:
+                        self.send_response(status)
                     for name, value in headers.items():
                         self.send_header(name, value)
-                    self.send_header("Content-Length", declared or str(len(body)))
+                    self.send_header("content-length" if lower else "Content-Length", declared or str(len(body)))
                     self.end_headers()
                     if stall:
                         self.wfile.write(body[:len(body) // 2])
