@@ -13,8 +13,6 @@ venv/
 /logs/
 /demo-output/
 
-# Demo video scratch
-/docs/.demo-build/
 
 # Editors / OS
 .vscode/

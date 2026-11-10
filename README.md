@@ -1,5 +1,12 @@
 # Agent Scout
 
+![The tool running in a terminal on six sample sites, then its HTML report: comparison table, a product profile with quoted evidence, and a blocked site](docs/demo.gif)
+
+*What is shown: the real console output of the tool run on the six bundled
+fictional sample sites (pauses between requests shortened), then the report of
+that run. Rendered by `scripts/make_demo_video.py`; nothing was recorded by
+hand. Full quality: [docs/demo.mp4](docs/demo.mp4) (32 seconds).*
+
 Agent Scout is a command-line researcher for one narrow job: profiling AI
 marketing-agent products from their own public websites. You give it a list
 of product URLs. For each product it reads a handful of pages (politely) and
@@ -301,9 +308,22 @@ The suite makes no request to the internet: every HTTP request in it goes to
 a server it starts on `127.0.0.1`. A test fails if an `except` block in the
 package has no log call, if a keyword-table entry has no example, if a
 declared dependency is unused or an import undeclared, or if a tracked file
-contains personal data. Two report tests need Chromium through Playwright and
-are skipped where it is not installed, which includes CI. CI runs the suite on
-the `ubuntu-24.04` and `windows-2025` runners with Python 3.12.
+contains personal data. Two report tests need Chromium through Playwright
+and one video test needs ffmpeg; they are skipped where those are not
+installed, and Chromium is not installed in CI. CI runs the suite on the
+`ubuntu-24.04` and `windows-2025` runners with Python 3.12.
+
+The demo video is rendered by a script, so it can be regenerated after a
+change (needs ffmpeg on PATH and Chromium for Playwright):
+
+```bash
+python -m playwright install chromium        # once
+python scripts/make_demo_video.py            # writes docs/demo.mp4 and docs/demo.gif, about a minute
+python scripts/make_demo_video.py --report docs/real-corpus/report.html --label "Real-site corpus run"
+```
+
+The second form films another report in the middle scene, under a caption you
+supply; the terminal scene always shows the bundled sample sites and says so.
 
 Layout:
 
@@ -312,7 +332,7 @@ src/agent_scout/   cli, config, inputs, robots, fetch, page, links, crawl,
                    vocab, textmatch, geo, extract, llm, pipeline, reports,
                    scoring, obs
 scripts/           demo.py, score.py, run_corpus.py, fixture_server.py,
-                   install_hooks.py, hooks/pre-commit
+                   make_demo_video.py, install_hooks.py, hooks/pre-commit
 tests/             the suite; fixtures/sites (fictional sites) and
                    fixtures/ground-truth
 docs/real-corpus/  real-site list, ground truth, and the workflow's outputs
