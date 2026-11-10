@@ -125,3 +125,20 @@ def test_needs_rendering(body, expected):
 def test_visible_chars_counts_text_only():
     page = parse("<p>12345</p><script>var x = 'not counted';</script>")
     assert page.visible_chars == 5
+
+
+def test_malformed_link_targets_are_skipped_not_fatal(events):
+    page = parse("<a href='http://[broken/'>Broken</a><a href='http://host:notaport/x'>Bad port</a>"
+                 "<a href='/fine'>Fine</a>")
+    assert [link.url for link in page.links] == ["http://site.test/fine"]
+    assert [e["error_type"] for e in events() if e["event"] == "skip"] == ["bad_link", "bad_link"]
+
+
+def test_json_ld_with_unusual_type_values_does_not_break_extraction():
+    from agent_scout import extract
+    head = ('<script type="application/ld+json">[{"@type": {"@id": "x"}, "description": "odd", "address": 5, "offers": "none"},'
+            '{"@type": ["Organization", {"a": 1}], "description": "An organisation.", "address": {"addressCountry": 7}}]</script>')
+    page = parse("<p>" + "Words on the page. " * 20 + "</p>", head=head)
+    fields = extract.extract_fields([page], "Acme", CFG)
+    assert fields["one_liner"].value == "An organisation."
+    assert fields["hq_location"].value == "unknown" and fields["pricing"].value == "unknown"

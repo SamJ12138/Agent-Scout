@@ -83,15 +83,26 @@ class ScriptedServer:
                     status, headers, body, delay = 404, {"Content-Type": "text/html"}, b"<p>missing</p>", 0.0
                 else:
                     status, headers, body, delay = queue[0] if len(queue) == 1 else queue.pop(0)
+                headers = dict(headers)
+                stall = float(headers.pop("X-Test-Stall-Body", 0))        # send half the body, then wait
+                declared = headers.pop("X-Test-Declared-Length", None)    # lie about the length, then close
                 if delay:
                     time.sleep(delay)
                 try:
                     self.send_response(status)
                     for name, value in headers.items():
                         self.send_header(name, value)
-                    self.send_header("Content-Length", str(len(body)))
+                    self.send_header("Content-Length", declared or str(len(body)))
                     self.end_headers()
-                    self.wfile.write(body)
+                    if stall:
+                        self.wfile.write(body[:len(body) // 2])
+                        self.wfile.flush()
+                        time.sleep(stall)
+                        self.wfile.write(body[len(body) // 2:])
+                    else:
+                        self.wfile.write(body)
+                    if declared:
+                        self.close_connection = True
                 except OSError:
                     pass  # client gave up (timeout tests)
 

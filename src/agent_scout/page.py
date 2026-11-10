@@ -202,8 +202,14 @@ def parse_page(url: str, html: str, config: Config) -> Page:
 
     for anchor in soup.find_all("a", href=True):
         href = anchor["href"].strip()
-        absolute = urljoin(url, href).split("#")[0]
-        if urlsplit(absolute).scheme not in ("http", "https") or href.startswith("#"):
+        try:
+            absolute = urljoin(url, href).split("#")[0]
+            parts = urlsplit(absolute)
+            parts.port                      # raises on a malformed host or port
+        except ValueError:
+            obs.emit("parse", "skip", error_type="bad_link", url=url, href=href[:200])
+            continue
+        if parts.scheme not in ("http", "https") or not parts.hostname or href.startswith("#"):
             continue
         text = inline_text([anchor]) if not anchor.find(list(BLOCK_TAGS)) else clean(anchor.get_text(" "))
         if not text:

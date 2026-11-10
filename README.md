@@ -94,7 +94,8 @@ agent-scout report-log logs/run_<id>.jsonl    # error counts and stage timings o
 
 Exit codes: `0` the run finished (a blocked or unreachable site is a result,
 not an error); `1` an error, reported as one line on stderr; `2` a usage
-error.
+error. An unexpected exception is also one line and exit code `1`; its
+traceback goes to the run log, and to stderr when `AGENT_SCOUT_TRACEBACK=1`.
 
 Output files:
 

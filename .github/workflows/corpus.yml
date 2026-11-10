@@ -34,6 +34,8 @@ jobs:
       # Exit code 0 whatever the sites answer: a blocked or unreachable site
       # is recorded in scores.md. Non-zero only if the tool itself fails.
       - name: Run the tool on the corpus and score it
+        env:
+          AGENT_SCOUT_TRACEBACK: "1"     # if the tool crashes, show where
         run: python scripts/run_corpus.py --keep-run-dir corpus-run
       - name: Keep the full run output (reports and run log)
         if: always()

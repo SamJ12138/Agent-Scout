@@ -216,10 +216,6 @@ class Fetcher:
         try:
             response = self.session.get(url, headers=REQUEST_HEADERS, timeout=self.config.timeout_seconds,
                                         allow_redirects=False, stream=True)
-            try:
-                body = response.raw.read(self.config.max_body_bytes + 1, decode_content=False)
-            finally:
-                response.close()
         except requests.exceptions.Timeout:
             obs.emit("fetch", "skip", error_type="timeout", url=url)
             raise _Failure("timeout") from None
@@ -229,11 +225,25 @@ class Fetcher:
         except requests.exceptions.ConnectionError:
             obs.emit("fetch", "skip", error_type="connection_error", url=url)
             raise _Failure("connection_error") from None
-        except (requests.exceptions.RequestException, OSError) as exc:
+        except (requests.exceptions.RequestException, OSError, ValueError) as exc:
             obs.emit("fetch", "skip", error_type="request_error", url=url, detail=type(exc).__name__)
             raise _Failure("request_error") from None
         finally:
             self._last_request[urlsplit(url).netloc] = self._clock()
+        try:
+            body = response.raw.read(self.config.max_body_bytes + 1, decode_content=False)
+        except Exception as exc:   # the HTTP library raises its own error types while a body is read
+            kind = "timeout" if "Timeout" in type(exc).__name__ else "read_error"
+            obs.emit("fetch", "skip", error_type=kind, url=url, detail=type(exc).__name__)
+            raise _Failure(kind) from None
+        finally:
+            response.close()
+            self._last_request[urlsplit(url).netloc] = self._clock()
+        declared = str(response.headers.get("Content-Length", "")).strip()
+        if declared.isdigit() and len(body) < min(int(declared), self.config.max_body_bytes + 1):
+            obs.emit("fetch", "skip", error_type="read_error", url=url, detail="incomplete_body",
+                     received=len(body), declared=int(declared))
+            raise _Failure("read_error")
         return response.status_code, dict(response.headers), body
 
     def _decoded_body(self, headers: dict, body: bytes) -> tuple[bytes, str | None]:
@@ -303,8 +313,13 @@ class Fetcher:
             status = None if response.error else response.status
             location = response.headers.get("Location")
             if status in REDIRECT_STATUSES and location:
-                robots_url = urljoin(robots_url, location)
                 status = None                 # stays None if the redirects never end
+                try:
+                    robots_url = urljoin(robots_url, location)
+                    urlsplit(robots_url).port
+                except ValueError:
+                    obs.emit("robots", "fail", site=site, error_type="bad_redirect", url=robots_url)
+                    break
                 continue
             if status is not None and 200 <= status < 300:
                 text = response.body.decode("utf-8", errors="replace")
@@ -340,7 +355,12 @@ class Fetcher:
             location = headers.get("Location")
             if status in REDIRECT_STATUSES and location:
                 hops.append(url)
-                url = urljoin(url, location).split("#")[0]
+                try:
+                    url = urljoin(url, location).split("#")[0]
+                    urlsplit(url).port          # raises on a malformed host or port
+                except ValueError:
+                    obs.emit("fetch", "fail", site=site, error_type="bad_redirect", url=hops[-1])
+                    return FetchResult(outcome="error", error_type="bad_redirect", **base)
                 continue
             if looks_like_challenge(status, headers, response.preview()):
                 obs.emit("fetch", "fail", site=site, error_type="challenge_page", url=url, status=status)

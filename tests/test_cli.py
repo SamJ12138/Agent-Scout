@@ -116,3 +116,26 @@ def test_console_that_cannot_encode_a_site_name_does_not_crash_the_run(tmp_path,
     assert code == 0
     assert b"Caf\\xe9" in raw.getvalue()
     assert "Café → Agent 東京" in (tmp_path / "out" / "report.html").read_text(encoding="utf-8")
+
+
+def test_unexpected_exception_is_one_line_exit_1_and_is_logged(tmp_path, capsys, monkeypatch):
+    import json
+    from agent_scout import pipeline
+    sites = tmp_path / "sites.txt"
+    sites.write_text("http://127.0.0.1:9/\n", encoding="utf-8")
+
+    def explode(*args, **kwargs):
+        raise RuntimeError("something nobody planned for")
+    monkeypatch.setattr(pipeline, "crawl_site", explode)
+    monkeypatch.delenv("AGENT_SCOUT_TRACEBACK", raising=False)
+    code = main(["run", str(sites), "-o", str(tmp_path / "out"), "--log-dir", str(tmp_path / "logs"), "--quiet"])
+    captured = capsys.readouterr()
+    assert code == 1
+    assert captured.err.count("\n") == 1 and "RuntimeError" in captured.err and "Traceback" not in captured.err
+    log = next((tmp_path / "logs").glob("run_*.jsonl"))
+    events = [json.loads(line) for line in log.read_text(encoding="utf-8").splitlines()]
+    crash = [e for e in events if e["error_type"] == "RuntimeError" and "traceback" in e["context"]]
+    assert crash and "something nobody planned for" in crash[-1]["context"]["traceback"]
+    monkeypatch.setenv("AGENT_SCOUT_TRACEBACK", "1")
+    assert main(["run", str(sites), "-o", str(tmp_path / "out"), "--log-dir", str(tmp_path / "logs"), "--quiet"]) == 1
+    assert "Traceback" in capsys.readouterr().err

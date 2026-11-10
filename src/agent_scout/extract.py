@@ -34,6 +34,12 @@ DESCRIBING_TYPES = {"SoftwareApplication", "WebApplication", "Product", "Organiz
 MAX_ONE_LINER_CHARS = 300
 
 
+def _types(obj: dict) -> set[str]:
+    """The schema.org types of a JSON-LD object (a string or a list in the wild)."""
+    kinds = obj.get("@type")
+    return {kind for kind in (kinds if isinstance(kinds, list) else [kinds]) if isinstance(kind, str)}
+
+
 def _readable(pages: list[Page]) -> list[Page]:
     return [page for page in pages if not page.needs_rendering]
 
@@ -80,9 +86,7 @@ def extract_one_liner(pages: list[Page]) -> FieldResult:
             text = _trim(home.meta[key])
             return FieldResult(text, [Evidence(home.url, text, "meta")])
     for obj in home.json_ld:
-        kinds = obj.get("@type")
-        kinds = set(kinds if isinstance(kinds, list) else [kinds])
-        if kinds & DESCRIBING_TYPES and isinstance(obj.get("description"), str) and obj["description"].strip():
+        if _types(obj) & DESCRIBING_TYPES and isinstance(obj.get("description"), str) and obj["description"].strip():
             text = _trim(" ".join(obj["description"].split()))
             return FieldResult(text, [Evidence(home.url, text, "json-ld")])
     if home.needs_rendering:
@@ -399,9 +403,7 @@ def _place_after_cue(rest: str) -> tuple[str | None, str | None]:
 
 def extract_hq(pages: list[Page]) -> FieldResult:
     for page in pages:                                  # head data: also from JavaScript shells
-        typed = sorted(page.json_ld, key=lambda obj: not (
-            {"Organization", "Corporation", "LocalBusiness"} & set(
-                obj.get("@type") if isinstance(obj.get("@type"), list) else [obj.get("@type")])))
+        typed = sorted(page.json_ld, key=lambda obj: not ({"Organization", "Corporation", "LocalBusiness"} & _types(obj)))
         for obj in typed:
             address = obj.get("address")
             if address is None:

@@ -276,3 +276,21 @@ def test_politeness_wait_is_logged_but_not_counted_as_request_time(scripted, mak
     fetch = [e for e in events() if e["stage"] == "fetch" and e["event"] == "success"][0]
     assert fetch["context"]["waited_ms"] == 30000
     assert fetch["duration_ms"] < 5000
+
+
+def test_body_that_stalls_after_the_headers_is_a_timeout_not_a_crash(scripted, make_fetcher):
+    scripted.route("/", headers={"X-Test-Stall-Body": "1.5"}, body=OK_BODY)
+    result = make_fetcher(timeout_seconds=0.3).get(scripted.base + "/")
+    assert (result.outcome, result.error_type, result.text) == ("error", "timeout", None)
+
+
+def test_connection_closed_in_the_middle_of_the_body_is_a_read_error(scripted, make_fetcher):
+    scripted.route("/", headers={"X-Test-Declared-Length": str(len(OK_BODY) + 500)}, body=OK_BODY)
+    result = make_fetcher().get(scripted.base + "/")
+    assert (result.outcome, result.error_type, result.text) == ("error", "read_error", None)
+
+
+def test_malformed_redirect_target_is_an_error_not_a_crash(scripted, make_fetcher):
+    scripted.route("/", status=302, headers={"Location": "http://[not-an-address/"})
+    result = make_fetcher().get(scripted.base + "/")
+    assert result.outcome == "error" and result.error_type in ("bad_redirect", "request_error")

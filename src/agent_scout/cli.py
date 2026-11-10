@@ -7,7 +7,9 @@ A site that is blocked or unreachable is a result, not an error.
 from __future__ import annotations
 
 import argparse
+import os
 import sys
+import traceback
 from pathlib import Path
 
 from . import __version__, obs
@@ -70,9 +72,6 @@ def _cmd_report_log(args: argparse.Namespace) -> int:
 
 
 def _cmd_run(args: argparse.Namespace) -> int:
-    from .pipeline import run_sites
-    from .reports import write_all
-
     run_id = obs.new_run_id()
     try:
         log = obs.EventLog(args.log_dir / f"run_{run_id}.jsonl", run_id)
@@ -82,62 +81,79 @@ def _cmd_run(args: argparse.Namespace) -> int:
     obs.set_current(log)
     write = None if args.quiet else print
     try:
-        with obs.span("input", path=str(args.sites)) as span:
-            try:
-                config = load_config(args.config, {
-                    "page_budget": args.page_budget, "delay_seconds": args.delay, "timeout_seconds": args.timeout,
-                    "llm_enabled": bool(args.llm), "llm_provider": args.llm_provider,
-                    "llm_base_url": args.llm_base_url, "llm_model": args.llm_model})
-                sites = load_sites(args.sites)
-            except (ConfigError, InputError) as exc:
-                span.fail(type(exc).__name__)
-                raise CliError(str(exc)) from None
-            span.context["sites"] = len(sites)
-        after_site = None
-        llm_failures: list[str] = []
-        if config.llm.enabled:
-            from . import llm
-            try:
-                settings = llm.resolve_settings(config.llm)
-            except llm.LLMError as exc:
-                obs.emit("llm", "fail", error_type=exc.error_type)
-                raise CliError(str(exc)) from None
-            log.register_secret(settings.api_key)
-            config.llm.provider, config.llm.model = settings.provider, settings.model
-            client = llm.LLMClient(settings)
-
-            def after_site(result: dict) -> None:
-                pages = result.get("_pages") or []
-                if llm_failures and llm_failures[-1] == "auth":
-                    obs.emit("llm", "skip", site=result["slug"], error_type="auth_failed_earlier")
-                    result["llm"] = {"status": "skipped", "added": 0, "dropped": 0, "error_type": "auth_failed_earlier"}
-                    return
-                summary = llm.llm_pass(result, pages, client)
-                if summary["status"] == "failed":
-                    llm_failures.append(summary["error_type"])
-                if write:
-                    write({"ok": f"      llm: {summary['added']} added, {summary['dropped']} dropped (quote not verified)",
-                           "failed": f"      llm: failed ({summary['error_type']}); rule-based values kept",
-                           "skipped": "      llm: nothing sent"}[summary["status"]])
-
-        results = run_sites(sites, config, run_id, write=write, after_site=after_site)
-        try:
-            paths = write_all(results, args.out)
-        except OSError as exc:
-            obs.emit("report", "fail", error_type="output_unwritable", path=str(args.out))
-            raise CliError(f"cannot write reports in {args.out}: {exc.strerror or exc}") from None
-        if write:
-            write("")
-            write("Reports: " + ", ".join(str(path) for path in paths))
-            write(f"Log:     {log.path}")
-        if llm_failures:
-            raise CliError(f"the LLM pass failed ({', '.join(sorted(set(llm_failures)))}) for "
-                           f"{len(llm_failures)} site{'s' if len(llm_failures) != 1 else ''}; "
-                           f"the reports in {args.out} hold rule-based values for them")
-        return 0
+        return _run(args, log, run_id, write)
+    except CliError:
+        obs.emit("run", "fail", error_type="cli_error")
+        raise
+    except Exception as exc:
+        # Not expected: record the traceback in the run log, report one line.
+        obs.emit("run", "fail", error_type=type(exc).__name__, traceback=traceback.format_exc())
+        if os.environ.get("AGENT_SCOUT_TRACEBACK"):
+            traceback.print_exc()
+        raise CliError(f"unexpected {type(exc).__name__}: {' '.join(str(exc).split())[:200]} "
+                       f"(traceback in {log.path}; set AGENT_SCOUT_TRACEBACK=1 to print it)") from None
     finally:
         obs.set_current(None)
         log.close()
+
+
+def _run(args: argparse.Namespace, log: obs.EventLog, run_id: str, write) -> int:
+    from .pipeline import run_sites
+    from .reports import write_all
+
+    with obs.span("input", path=str(args.sites)) as span:
+        try:
+            config = load_config(args.config, {
+                "page_budget": args.page_budget, "delay_seconds": args.delay, "timeout_seconds": args.timeout,
+                "llm_enabled": bool(args.llm), "llm_provider": args.llm_provider,
+                "llm_base_url": args.llm_base_url, "llm_model": args.llm_model})
+            sites = load_sites(args.sites)
+        except (ConfigError, InputError) as exc:
+            span.fail(type(exc).__name__)
+            raise CliError(str(exc)) from None
+        span.context["sites"] = len(sites)
+    after_site = None
+    llm_failures: list[str] = []
+    if config.llm.enabled:
+        from . import llm
+        try:
+            settings = llm.resolve_settings(config.llm)
+        except llm.LLMError as exc:
+            obs.emit("llm", "fail", error_type=exc.error_type)
+            raise CliError(str(exc)) from None
+        log.register_secret(settings.api_key)
+        config.llm.provider, config.llm.model = settings.provider, settings.model
+        client = llm.LLMClient(settings)
+
+        def after_site(result: dict) -> None:
+            pages = result.get("_pages") or []
+            if llm_failures and llm_failures[-1] == "auth":
+                obs.emit("llm", "skip", site=result["slug"], error_type="auth_failed_earlier")
+                result["llm"] = {"status": "skipped", "added": 0, "dropped": 0, "error_type": "auth_failed_earlier"}
+                return
+            summary = llm.llm_pass(result, pages, client)
+            if summary["status"] == "failed":
+                llm_failures.append(summary["error_type"])
+            if write:
+                write({"ok": f"      llm: {summary['added']} added, {summary['dropped']} dropped (quote not verified)",
+                       "failed": f"      llm: failed ({summary['error_type']}); rule-based values kept",
+                       "skipped": "      llm: nothing sent"}[summary["status"]])
+
+    results = run_sites(sites, config, run_id, write=write, after_site=after_site)
+    try:
+        paths = write_all(results, args.out)
+    except OSError as exc:
+        obs.emit("report", "fail", error_type="output_unwritable", path=str(args.out))
+        raise CliError(f"cannot write reports in {args.out}: {exc.strerror or exc}") from None
+    if write:
+        write("")
+        write("Reports: " + ", ".join(str(path) for path in paths))
+        write(f"Log:     {log.path}")
+    if llm_failures:
+        raise CliError(f"the LLM pass failed ({', '.join(sorted(set(llm_failures)))}) for "
+                       f"{len(llm_failures)} site{'s' if len(llm_failures) != 1 else ''}; "
+                       f"the reports in {args.out} hold rule-based values for them")
+    return 0
 
 
 COMMANDS = {"run": _cmd_run, "report-log": _cmd_report_log}
