@@ -83,3 +83,75 @@ def test_workflows_are_valid_yaml_with_the_agreed_shape():
                 if "uses" in step:
                     assert step["uses"] in ("actions/checkout@v7", "actions/setup-python@v7",
                                             "actions/upload-artifact@v7"), step["uses"]
+
+
+# ------------------------------------------------------------------ README "Real-site results": no hand-typed numbers
+README = run_corpus.ROOT / "README.md"
+
+
+def test_scores_file_is_parsed():
+    parsed = run_corpus.parse_scores((run_corpus.CORPUS / "run-1" / "scores.md").read_text(encoding="utf-8"))
+    assert parsed["run_id"] == "20261110T141046Z-418b" and parsed["finished"] == "2026-11-10T14:12:34Z"
+    assert (parsed["sites_read"], parsed["sites"]) == (10, 10)
+    assert parsed["totals"] == {"match": 30, "partial": 43, "mismatch": 4, "missing": 13} and parsed["site_fields"] == 90
+    assert parsed["fields"]["one_liner"] == {"match": 6, "partial": 4, "mismatch": 0, "missing": 0}
+    assert set(parsed["fields"]) == set(scoring.FIELDS)
+    assert sum(sum(row.values()) for row in parsed["fields"].values()) == 90
+
+
+def test_readme_results_block_is_generated_from_the_latest_scores():
+    text = README.read_text(encoding="utf-8")
+    start, end = text.index(run_corpus.README_START), text.index(run_corpus.README_END)
+    block = text[start:end + len(run_corpus.README_END)]
+    scores = run_corpus.parse_scores((run_corpus.CORPUS / "scores.md").read_text(encoding="utf-8"))
+    assert block == run_corpus.readme_block(scores, run_corpus.first_run_id()), \
+        "run scripts/run_corpus.py, or update the README block"
+    assert text.index("## Real-site results") < text.index("## Quickstart")       # near the top
+
+
+def test_readme_keeps_the_first_run_as_the_before_figure():
+    first = run_corpus.parse_scores((run_corpus.CORPUS / "run-1" / "scores.md").read_text(encoding="utf-8"))
+    text = " ".join(README.read_text(encoding="utf-8").split())
+    assert run_corpus.totals_sentence(first) in text
+    assert "docs/real-corpus/run-1/scores.md" in text
+    assert "not a clean held-out score" in text
+    assert "docs/real-corpus/report.html" in text and "docs/real-corpus/scores.md" in text
+
+
+def test_run_corpus_rewrites_only_the_marked_block_of_a_readme(tmp_path, fixture_sites):
+    readme = tmp_path / "README.md"
+    readme.write_text(f"# Title\n\nbefore\n\n{run_corpus.README_START}\nold numbers\n{run_corpus.README_END}\n\nafter\n",
+                      encoding="utf-8")
+    sites = tmp_path / "sites.yaml"
+    sites.write_text(fixture_sites.sites_yaml(), encoding="utf-8")
+    code = run_corpus.main(["--sites", str(sites), "--ground-truth", str(GROUND_TRUTH_DIR), "--out", str(tmp_path / "c"),
+                            "--delay", "0", "--readme", str(readme)])
+    assert code == 0
+    text = readme.read_text(encoding="utf-8")
+    assert text.startswith("# Title\n\nbefore\n\n") and text.endswith("\n\nafter\n")
+    assert "old numbers" not in text and "54 match, 0 partial, 0 mismatch, 0 missing" in text and "Sites read: 4 of 6" in text
+
+
+def test_run_corpus_leaves_the_project_readme_alone_when_writing_elsewhere(tmp_path, fixture_sites):
+    before = README.read_text(encoding="utf-8")
+    sites = tmp_path / "sites.yaml"
+    sites.write_text(fixture_sites.sites_yaml(), encoding="utf-8")
+    assert run_corpus.main(["--sites", str(sites), "--ground-truth", str(GROUND_TRUTH_DIR), "--out", str(tmp_path / "c"),
+                            "--delay", "0"]) == 0
+    assert README.read_text(encoding="utf-8") == before
+
+
+def test_corpus_workflow_commits_the_readme_block_too():
+    text = (run_corpus.ROOT / ".github" / "workflows" / "corpus.yml").read_text(encoding="utf-8")
+    add_line = next(line for line in text.splitlines() if "git add" in line)
+    assert "README.md" in add_line
+    corpus = yaml.safe_load(text)
+    triggers = corpus[True] if True in corpus else corpus["on"]
+    assert "README.md" not in triggers["push"]["paths"]            # so the commit cannot start the workflow again
+
+
+def test_the_block_says_whether_rules_changed_since_the_run():
+    first = run_corpus.parse_scores((run_corpus.CORPUS / "run-1" / "scores.md").read_text(encoding="utf-8"))
+    assert "first run on real sites" in run_corpus.readme_block(first, first["run_id"])
+    later = dict(first, run_id="20270101T000000Z-0000")
+    assert "not a held-out score" in run_corpus.readme_block(later, first["run_id"])

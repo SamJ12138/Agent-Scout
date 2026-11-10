@@ -21,6 +21,46 @@ memory or from a model's guess, and a wrong cell looks exactly like a right
 one. Here a reader can check any cell against the quoted sentence in a few
 seconds, and an empty cell means "the site does not say", never "no".
 
+## Real-site results
+
+A GitHub Actions workflow runs the tool on a list of real products and scores
+it against a reference profile of each one.
+
+<!-- real-site-results:start (written by scripts/run_corpus.py from docs/real-corpus/scores.md) -->
+Latest run on the real-site corpus: `20261110T141046Z-418b`, finished 2026-11-10T14:12:34Z. Sites read: 10 of 10. This is the first run on real sites. Rules adjusted after it have not been run on the corpus yet.
+
+**30 match, 43 partial, 4 mismatch, 13 missing of 90 site-fields.**
+
+| field | match | partial | mismatch | missing |
+|---|---|---|---|---|
+| one_liner | 6 | 4 | 0 | 0 |
+| categories | 1 | 9 | 0 | 0 |
+| target_user | 0 | 10 | 0 | 0 |
+| tasks | 0 | 10 | 0 | 0 |
+| can_execute | 6 | 0 | 1 | 3 |
+| multi_agent | 7 | 0 | 0 | 3 |
+| integrations | 0 | 5 | 1 | 4 |
+| pricing | 3 | 5 | 2 | 0 |
+| hq_location | 7 | 0 | 0 | 3 |
+<!-- real-site-results:end -->
+
+What the numbers mean: the reference profiles were written from tool-mediated
+reads of the same sites and are incomplete in places, so they are a
+yardstick, not the truth. `partial` on categories, target_user and tasks
+mostly means the tool listed more values than the reference does (some are
+wrong, some are stated on pages the reference did not read); `mismatch`, a
+stated value that the reference contradicts or does not find, is the count
+that matters most.
+
+These are not held-out scores. The first run, made before any rule had been
+adjusted to a real site, gave 30 match, 43 partial, 4 mismatch, 13 missing of 90 site-fields
+([docs/real-corpus/run-1/scores.md](docs/real-corpus/run-1/scores.md)). The
+rules were then adjusted using what that run showed, so every later run is
+not a clean held-out score; the first run stays here as the before figure.
+Per site and field: [docs/real-corpus/scores.md](docs/real-corpus/scores.md).
+The report of the run, with every quote:
+[docs/real-corpus/report.html](docs/real-corpus/report.html).
+
 ## Quickstart without network access
 
 The repository bundles six invented product websites (every name ends in
@@ -127,7 +167,8 @@ Output files:
 - It reads at most six pages per site: the homepage, then same-site pages
   picked from the homepage's links, one per topic in this order: features /
   product / platform, integrations, pricing, about / company, contact,
-  customers.
+  customers, and last a legal notice (imprint), where companies state their
+  address.
 - It advertises only the content encodings it can decode (gzip, deflate, br)
   and decodes bodies itself. A body it cannot decode is a fetch error, never a
   page.
@@ -161,7 +202,7 @@ third-party sites.
 | `tasks` | list from a fixed vocabulary | tasks the site says the product performs |
 | `can_execute` | true / false / unknown | true only if a sentence states that the product itself acts in other systems or channels (sends, publishes, schedules, launches or adjusts campaigns, updates a CRM), automatically or with an agent as the one acting. false only if a sentence states without qualification that it does not act: "only drafts", "only suggests", or a negated action about everything ("never sends or publishes anything", "does not send emails for you"). A negated action with a specific object ("never sends duplicate emails") or a condition ("never sends anything without your approval") is not such a statement and leaves the field unknown, as does an approval step. If the site says both, unknown |
 | `multi_agent` | true / unknown | true if the site states several agents work together. Never false |
-| `integrations` | list of names, at most 25 | third-party products named as integrations |
+| `integrations` | list of names, at most 25 | third-party products named as integrations, as the site writes them. When a site lists more than 25, widely known products are kept first |
 | `pricing` | `free_tier` true / false / unknown, `starting_price` as written | a free plan or trial is stated; the lowest paid price exactly as the site writes it |
 | `hq_location` | `city`, `country` | the company address or headquarters as the site states it (JSON-LD, `<address>`, a "headquartered in" sentence about the company itself, a footer address). The country is given only when the site states it; a city alone leaves the country unknown |
 
@@ -280,20 +321,29 @@ about real websites. The three unread sites match because both sides are all
 **Real-site corpus.** `docs/real-corpus/` holds a list of ten real products
 and a reference profile for each, written from tool-mediated reads of the
 products' own sites (method and limits:
-`docs/real-corpus/ground-truth/README.md`). The keyword tables were committed
-before those files were. They were changed once afterwards, in the commit
-"fix: unknown instead of wrong values on adversarial sentences", to stop
-wrong values on sentences written by a reviewer; the corpus was not used for
-that change, and the tool had not been run on the corpus at that point. The
-scores are produced by the `corpus`
-GitHub Actions workflow, which runs the tool with default settings on those
-sites and commits the result to
-[`docs/real-corpus/scores.md`](docs/real-corpus/scores.md), next to the raw
-results and the HTML report of that run. The environment in which the tool was
-written could not reach public websites, so there is no real-site number in
-this README: read `scores.md`. Expect it to be much less flattering than the
-fixture gate, with whole rows missing wherever a site blocks an unknown
-crawler.
+`docs/real-corpus/ground-truth/README.md`). The `corpus` GitHub Actions
+workflow runs the tool with default settings on those sites and commits the
+scores, the raw results, the HTML report and the results block at the top of
+this README.
+
+The keyword tables are not frozen, and the scores are not a held-out test.
+The history, in order:
+
+1. The tables were written and committed before the reference profiles were.
+2. They were changed in "fix: unknown instead of wrong values on adversarial
+   sentences", for sentences written by a reviewer. The corpus was not used
+   and the tool had not been run on it.
+3. The first real run followed (figures under "Real-site results" above).
+4. Rules were then adjusted using that run, in four commits: "fix: causes
+   behind the real-site mismatches (corpus run 1)", "fix: prices as real
+   sites write them", "fix: vocabulary rules that over-triggered on real
+   sites, each for a general reason" and "fix: headquarters found in more of
+   the places real sites state them". Each change has a stated reason that
+   does not depend on one site, and a test in `tests/test_adversarial.py`.
+   The reference profiles were not edited.
+
+So a run after step 4 measures the same ten sites the rules were adjusted on.
+Expect it to flatter the tool compared with ten sites it has never seen.
 
 Scoring rules (`src/agent_scout/scoring.py`): `match` equal after
 normalisation, both `unknown` included; `partial` lists that overlap but
@@ -388,21 +438,30 @@ docs/real-corpus/  real-site list, ground truth, and the workflow's outputs
   name outside the known list is only kept next to a known one); a free
   trial offered only in the navigation bar or footer; any fact stated only
   inside a customer quote.
-- Prices are recognised with the currency symbol in front (`$49`, `€12`,
-  `£29`). `42€`, prices set by a slider or filled in by scripts, and prices
-  in other currencies are not. The "lowest price" can be an add-on or a
-  promotional figure if that is the lowest number on the pricing page.
+- Prices are recognised in dollars, euros and pounds, with the symbol or code
+  before or after the amount (`$49`, `42€`, `49 EUR`). Prices set by a slider
+  or filled in by scripts, and other currencies, are not. Amounts next to
+  "extra", "add-on" or "additional" are skipped, but the "lowest price" can
+  still be a promotional or first-month figure if that is the lowest number
+  on the pricing page.
 - Headquarters: the country is reported only when the site names it, gives an
   ISO country code, or gives a US state with a ZIP code or written out in
   full. "Austin, TX", "Toronto, CA", "Berlin, DE" and "Tbilisi, Georgia" give
   the city and leave the country unknown, because a bare two-letter code or
   "Georgia" can mean two places. About 65 countries are recognised. A
-  postcode alone does not yield a country. A headquarters sentence that
-  mentions a customer, client or partner before the place is skipped.
+  postcode and a city without a country word ("75004 PARIS") do not yield a
+  country, and terms-of-service pages, where some companies print their
+  address, are not fetched. A headquarters sentence that names a customer,
+  client or partner just before the place is skipped.
 - Integrations: names are taken from logo alt texts ending in "logo" or
   "icon", from a list of about 90 known product names, and from sentences
-  such as "integrates with A, B and C". Logo walls without alt text and
-  directories of thousands of apps are covered poorly.
+  such as "integrates with A, B and C". Logo walls without alt text are not
+  read. From a directory of thousands of apps the tool keeps 25 names, known
+  products first, which need not be the ones the site puts forward.
+- Vocabulary fields still list more than a careful reader would. Single
+  mentions of "workflows", "reports", "dashboards" or an audience count, and
+  a sentence ending in a question mark never does, even when its answer is
+  plainly yes ("Can agencies use it?").
 - The LLM pass is untested against a live model (see above).
 - Sites are read one after another. This is a tool for a list of tens of
   products, not a crawler.

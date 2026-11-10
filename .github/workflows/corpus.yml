@@ -2,9 +2,10 @@ name: corpus
 
 # Runs the tool on the real websites listed in docs/real-corpus/sites.yaml,
 # scores the result against docs/real-corpus/ground-truth/ and commits the
-# three output files back to main under the repository owner's identity.
-# No loop: the commit message carries [skip ci], the three output paths are
-# not among the paths that trigger this workflow, and a push made with the
+# three output files, and the results block of README.md that is generated
+# from them, back to main under the repository owner's identity.
+# No loop: the commit message carries [skip ci], none of the committed paths
+# is among the paths that trigger this workflow, and a push made with the
 # built-in token does not start workflows.
 
 on:
@@ -51,7 +52,7 @@ jobs:
         run: |
           git config user.name "Tianyi Jia"
           git config user.email "186099051+SamJ12138@users.noreply.github.com"
-          git add docs/real-corpus/results/latest.json docs/real-corpus/scores.md docs/real-corpus/report.html
+          git add docs/real-corpus/results/latest.json docs/real-corpus/scores.md docs/real-corpus/report.html README.md
           if git diff --cached --quiet; then
             echo "Outputs unchanged."
           else
