@@ -367,3 +367,34 @@ def test_extras_seen_on_real_sites_are_not_reported(body, field, unwanted):
 def test_the_tightened_rules_still_find_plain_statements(body, field, wanted):
     value = _vocab(body, field)
     assert value != UNKNOWN and wanted in value, value
+
+
+# ------------------------------------------------------------------ headquarters (corpus run 1)
+@pytest.mark.parametrize("body, expected", [
+    # "customer success specialists" far before the cue is not "our customer X, based in ..."
+    ("<p>Today, an international team of engineers and customer success specialists works across multiple "
+     "continents, with headquarters in Hamburg.</p>", {"city": "Hamburg", "country": UNKNOWN}),
+    ("<p>Our customer Fjordline, based in Berlin, Germany, doubled its sign-ups.</p>", UNKNOWN),
+    ("<p>We work with agencies headquartered in London, UK.</p>", UNKNOWN),
+    # a footer address without commas: postcode, city, country
+    ("<footer><p>Zedly ApS Diplomvej 381 2800 Kongens Lyngby Denmark</p></footer>",
+     {"city": "Kongens Lyngby", "country": "Denmark"}),
+    ("<footer><div>Zedly ApS<br>Diplomvej 381<br>2800 Kongens Lyngby<br>Denmark</div></footer>",
+     {"city": "Kongens Lyngby", "country": "Denmark"}),
+    # the same address, one element per line
+    ("<footer><p>Zedly ApS</p><p>Diplomvej 381</p><p>2800 Kongens Lyngby</p><p>Denmark</p></footer>",
+     {"city": "Kongens Lyngby", "country": "Denmark"}),
+    # numbers that are not an address
+    ("<footer><p>Copyright 2026 Zedly Denmark</p></footer>", UNKNOWN),
+    ("<footer><p>Copyright 2026 Zedly, Denmark</p></footer>", UNKNOWN),
+    ("<footer><p>Copyright 2026 Zedly</p><p>Denmark</p></footer>", UNKNOWN),
+    ("<footer><p>Rated 4.8 by 2000 Happy Teams Worldwide</p></footer>", UNKNOWN),
+])
+def test_hq_shapes_seen_on_real_sites(body, expected):
+    assert extract.extract_hq([page(body)]).value == expected
+
+
+def test_hq_from_a_legal_notice_page():
+    legal = page("<h1>Legal notice</h1><p>Zedly GmbH, Wulfsdorfer Weg 100, 22359 Hamburg, Germany</p>",
+                 url="https://acme.test/imprint", topic="legal")
+    assert extract.extract_hq([page("<p>Hello.</p>"), legal]).value == {"city": "Hamburg", "country": "Germany"}

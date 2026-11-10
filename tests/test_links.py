@@ -66,3 +66,11 @@ def test_www_and_bare_host_are_the_same_site():
 
 def test_unrelated_links_are_not_selected():
     assert choose("<a href='/team-photos'>Gallery</a><a href='/x'>Read more</a>") == []
+
+
+def test_legal_notice_is_read_last_because_companies_state_their_address_there():
+    body = ("<a href='/imprint'>Imprint</a><a href='/pricing'>Pricing</a><a href='/customers'>Customers</a>"
+            "<a href='/privacy'>Privacy</a><a href='/legal/terms'>Terms</a>")
+    assert choose(body) == [("pricing", HOME + "pricing"), ("customers", HOME + "customers"), ("legal", HOME + "imprint")]
+    assert choose("<a href='/impressum'>Impressum</a>") == [("legal", HOME + "impressum")]
+    assert choose("<a href='/legal/legal-notice'>Legal notice</a>") == [("legal", HOME + "legal/legal-notice")]

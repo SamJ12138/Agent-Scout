@@ -28,12 +28,15 @@ LINK_TOPICS: list[tuple[str, tuple[str, ...]]] = [
     ("about", ("about", "about-us", "company", "our-story")),
     ("contact", ("contact", "contact-us")),
     ("customers", ("customers", "case-studies", "customer-stories")),
+    # last: read only when one of the six above is absent. Companies, in Europe
+    # above all, state their registered address in a legal notice.
+    ("legal", ("imprint", "impressum", "legal-notice")),
 ]
 
 # A link with one of these path segments is never followed.
 LINK_EXCLUDED_SEGMENTS: frozenset[str] = frozenset({
     "blog", "news", "press", "careers", "jobs", "login", "log-in", "signin", "sign-in", "signup",
-    "sign-up", "register", "legal", "privacy", "terms", "docs", "documentation", "help", "support",
+    "sign-up", "register", "privacy", "terms", "docs", "documentation", "help", "support",
     "status", "cart", "checkout", "search", "tag", "category", "author", "webinars", "events",
     "podcast", "changelog", "community", "forum", "academy", "resources", "download", "downloads",
 })
@@ -329,6 +332,9 @@ HQ_CUES: tuple[str, ...] = ("headquartered in", "headquarters in", "headquarters
 THIRD_PARTIES: tuple[str, ...] = ("customer", "customers", "client", "clients", "partner", "partners",
                                   "investor", "investors", "user", "users", "agency", "agencies",
                                   "reseller", "resellers", "brand", "brands")
+# ... when it stands within this many words before the cue. Further back it is
+# about something else ("customer success specialists work ..., with headquarters in Hamburg").
+THIRD_PARTY_WINDOW = 4
 
 # --------------------------------------------------------------------------
 # Parts of a page that are not the site speaking about its product. Matched

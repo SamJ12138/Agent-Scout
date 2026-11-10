@@ -22,7 +22,7 @@ from urllib.parse import urlsplit
 
 from . import obs
 from .config import Config
-from .geo import country_name, parse_place, states_the_united_states
+from .geo import _POSTCODE_CITY_COUNTRY, country_name, parse_place, states_the_united_states
 from .model import FIELDS, UNKNOWN, Evidence, FieldResult, unknown_fields
 from .page import Page, Snippet, split_sentences
 from .textmatch import (find_all, find_phrase, has_phrase, is_rhetorical, normalise_quotes, phrase_regex,
@@ -32,7 +32,7 @@ from .vocab import (AGENT_SUBJECTS, ASSIST_WORDS, AUDIENCE_COMPARISON_WINDOW, AU
                     EXECUTE_OBJECTS, EXECUTE_VERBS, FREE_TIER_PHRASES, GENERAL_OBJECTS, HQ_CUES,
                     INTEGRATION_TRIGGERS, KNOWN_INTEGRATIONS, LOGO_SUFFIXES, MULTI_AGENT_PHRASES, NEGATORS,
                     FREE_NOUNS, NOT_A_CITY, NOT_A_FREE_PLAN, NOT_AVAILABLE, NOT_A_PRICE_AFTER, NOT_A_PRICE_BEFORE, NOT_A_PRICE_WINDOW,
-                    NOT_A_PRODUCT, OFFER_NEGATIONS, OFFER_VERBS, PRICE_CUES, SELF_MARKERS, STRONG_HIT, TARGET_USERS, TASKS, THIRD_PARTIES,
+                    NOT_A_PRODUCT, OFFER_NEGATIONS, OFFER_VERBS, PRICE_CUES, SELF_MARKERS, STRONG_HIT, TARGET_USERS, TASKS, THIRD_PARTIES, THIRD_PARTY_WINDOW,
                     THRESHOLDS, USER_SUBJECT_WINDOW, USER_SUBJECTS, VENDOR_STAFF_MARKERS, VENDOR_STAFF_WINDOW,
                     WEAK_HIT)
 
@@ -572,22 +572,27 @@ def extract_hq(pages: list[Page]) -> FieldResult:
         candidates += [s for s in page.snippets if s.method in ("sentence", "heading") and s.zone in company_zones]
         for snippet in candidates:
             cue = find_phrase(snippet.text, HQ_CUES)
-            if cue is None or has_phrase(snippet.text[:cue.start()], THIRD_PARTIES):
+            if cue is None or preceded_by(snippet.text, cue.start(), THIRD_PARTIES, THIRD_PARTY_WINDOW):
                 continue                                   # "our customer X, based in ..." is not us
             place = _place(*_place_after_cue(snippet.text[cue.end():]))
             if place:
                 return FieldResult(place, [Evidence(page.url, snippet.text, snippet.method)])
+    # An address written out as plain text: in a footer, or on an about, contact or legal page.
+    # It may be one block or one element per line; up to four neighbouring lines are read together.
     for page in readable:
-        for snippet in page.snippets:
-            if snippet.method != "sentence" or snippet.zone not in company_zones:
-                continue
-            if not (snippet.zone == "footer" or page.topic in ("about", "contact")):
-                continue
-            if not any(ch.isdigit() for ch in snippet.text) or "," not in snippet.text:
-                continue
-            city, country = parse_place(snippet.text)
-            if city and country:
-                return FieldResult(_place(city, country), [Evidence(page.url, snippet.text, "sentence")])
+        lines = [s for s in page.snippets if s.method == "sentence" and s.zone in company_zones
+                 and (s.zone == "footer" or page.topic in ("about", "contact", "legal"))]
+        for index, snippet in enumerate(lines):
+            for size in (1, 2, 3, 4):
+                group = lines[index:index + size]
+                if len(group) < size or any(len(line.text) > 80 for line in group[1:]):
+                    break
+                text = ", ".join(line.text.strip(" ,") for line in group)
+                if len(re.findall(r"\d+", text)) < 2:
+                    continue          # an address has a street number and a postcode; "© 2026 Acme" has one number
+                city, country = parse_place(text)
+                if city and country and (size > 1 or "," in text or _POSTCODE_CITY_COUNTRY.search(text)):
+                    return FieldResult(_place(city, country), [Evidence(page.url, text, "sentence")])
     return FieldResult()
 
 

@@ -163,6 +163,13 @@ def _looks_like_city(text: str) -> bool:
                                        for word in words) and not any(ch.isdigit() for ch in text)
 
 
+# "2800 Kongens Lyngby Denmark": postcode, city, country, written without commas
+_POSTCODE_CITY_COUNTRY = re.compile(
+    r"(?:^|\s)\d{4,5}\s+(?P<city>(?:[A-Z][\w.'-]*\s+){0,2}[A-Z][\w.'-]*)\s+(?P<country>"
+    + "|".join(sorted((re.escape(name) for name in {n for n in COUNTRY_BY_CODE.values()}), key=len, reverse=True))
+    + r")\s*\.?$")
+
+
 def parse_place(text: str) -> tuple[str | None, str | None]:
     """Read 'City, Country', 'City, ST 12345' or a full comma-separated address.
 
@@ -181,6 +188,10 @@ def parse_place(text: str) -> tuple[str | None, str | None]:
     if country == "United States" and index >= 1 and us_state(parts[index - 1]):
         index -= 1                           # "Austin, TX, USA": the city is before the state
     elif country is None and parts:
+        unpunctuated = _POSTCODE_CITY_COUNTRY.search(text.strip())
+        if unpunctuated and re.search(r"\d", text.strip()[:unpunctuated.start() + 1]):
+            # a street number before the postcode: "© 2026 Acme Denmark" is a year, not an address
+            return unpunctuated.group("city"), unpunctuated.group("country")
         last = parts[-1].strip(".;")
         if states_the_united_states(last):
             country, index = "United States", len(parts) - 1
