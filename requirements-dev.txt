@@ -1,0 +1,5 @@
+# Development: tests, report screenshots, demo video.
+-r requirements.txt
+pytest>=8.0
+Pillow>=10.0
+playwright>=1.49

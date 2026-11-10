@@ -1,17 +1,29 @@
 [project]
-name = "ecommerce-agent"
+name = "agent-scout"
 version = "0.1.0"
-description = "Ecommerce Agent - Auto researcher CLI tool"
+description = "Profiles AI marketing-agent products from their own public websites, with evidence for every value."
+readme = "README.md"
 requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Tianyi Jia" }]
+dependencies = [
+    "requests>=2.31",
+    "brotli>=1.1",
+    "PyYAML>=6.0",
+    "beautifulsoup4>=4.12",
+]
+
+[project.scripts]
+agent-scout = "agent_scout.cli:main"
 
 [build-system]
-requires = ["setuptools>=64", "wheel"]
+requires = ["setuptools>=64"]
 build-backend = "setuptools.build_meta"
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-pythonpath = ["src"]
-addopts = "-v --tb=short"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "scripts"]
+addopts = "-q --tb=short"

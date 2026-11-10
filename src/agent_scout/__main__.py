@@ -1,6 +1,7 @@
-"""Entry point for python -m ecommerce_agent."""
+"""Entry point for `python -m agent_scout`."""
 
 import sys
+
 from .cli import main
 
 if __name__ == "__main__":

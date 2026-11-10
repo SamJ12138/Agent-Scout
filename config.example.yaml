@@ -1,0 +1,22 @@
+# Agent Scout settings. Every value shown is the default.
+# Use with:  agent-scout run sites.yaml --config config.yaml
+
+page_budget: 6               # pages fetched per site, homepage included
+delay_seconds: 1.5           # minimum gap between two requests to the same host;
+                             # a larger Crawl-delay in robots.txt replaces it
+max_crawl_delay_seconds: 30  # a site asking for a longer Crawl-delay is skipped
+timeout_seconds: 20          # per request
+max_body_bytes: 5000000      # a larger response is a fetch error
+min_visible_chars: 200       # pages with less visible text that load scripts
+                             # are flagged needs_rendering
+max_integrations: 25
+
+# Optional LLM pass (only used with --llm). The API key is never read from this
+# file: set the environment variable AGENT_SCOUT_LLM_API_KEY.
+llm:
+  enabled: false
+  provider: null             # openai-compatible | anthropic
+  base_url: null             # e.g. https://api.deepseek.com/v1 for openai-compatible
+  model: null
+  timeout_seconds: 60
+  max_chars_per_site: 24000  # cleaned page text sent per site
