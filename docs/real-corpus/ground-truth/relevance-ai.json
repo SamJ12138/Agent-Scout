@@ -1,0 +1,193 @@
+{
+  "slug": "relevance-ai",
+  "name": "Relevance AI",
+  "url": "https://relevanceai.com/",
+  "asOf": "2026-11-10",
+  "pages_read": [
+    "https://relevanceai.com/",
+    "https://relevanceai.com/workforce",
+    "https://relevanceai.com/use-cases/marketing",
+    "https://relevanceai.com/integrations",
+    "https://relevanceai.com/pricing",
+    "https://relevanceai.com/terms-and-conditions"
+  ],
+  "fields": {
+    "one_liner": {
+      "value": "Deliver maximum ROI through optimized specialist agents. Build agents for sales, customer success, marketing and HR, and run millions of daily tasks on one platform.",
+      "source_url": "https://relevanceai.com/",
+      "kind": "meta description",
+      "also_acceptable": [
+        "Meet Invent 2.0. Your 24/7 AI solutions engineer"
+      ],
+      "note": "The reading tool returned the meta description in two overlapping pieces (it caps quotes at about 125 characters); they are joined here."
+    },
+    "categories": {
+      "value": [
+        "general agent platform",
+        "sales & crm",
+        "customer support"
+      ],
+      "source_url": "https://relevanceai.com/",
+      "quote": "Build agents for sales, customer success, marketing and HR, and run millions of daily tasks on one platform.",
+      "evidence": [
+        {
+          "item": "general agent platform",
+          "source_url": "https://relevanceai.com/",
+          "quote": "Build agents for sales, customer success, marketing and HR, and run millions of daily tasks on one platform."
+        },
+        {
+          "item": "sales & crm",
+          "source_url": "https://relevanceai.com/",
+          "quote": "Books qualified meetings into reps’ calendars."
+        },
+        {
+          "item": "customer support",
+          "source_url": "https://relevanceai.com/workforce",
+          "quote": "An agent that triages support tickets"
+        }
+      ]
+    },
+    "target_user": {
+      "value": [
+        "enterprise",
+        "marketers",
+        "sales teams",
+        "developers"
+      ],
+      "source_url": "https://relevanceai.com/",
+      "quote": "We partner with enterprise teams to put purpose-built agents to work on millions of tasks every month.",
+      "evidence": [
+        {
+          "item": "enterprise",
+          "source_url": "https://relevanceai.com/",
+          "quote": "We partner with enterprise teams to put purpose-built agents to work on millions of tasks every month."
+        },
+        {
+          "item": "marketers",
+          "source_url": "https://relevanceai.com/use-cases/marketing",
+          "quote": "We help your marketers spend more time on creative and strategy"
+        },
+        {
+          "item": "sales teams",
+          "source_url": "https://relevanceai.com/",
+          "quote": "Build agents for sales, customer success, marketing and HR, and run millions of daily tasks on one platform."
+        },
+        {
+          "item": "developers",
+          "source_url": "https://relevanceai.com/workforce",
+          "quote": "Engineers drive the same platform from Claude Code, Codex, or Cursor."
+        }
+      ]
+    },
+    "tasks": {
+      "value": [
+        "lead qualification",
+        "personalization",
+        "analytics reporting",
+        "seo optimization",
+        "workflow automation"
+      ],
+      "source_url": "https://relevanceai.com/use-cases/marketing",
+      "quote": "Scores and qualifies inbound leads against fit.",
+      "evidence": [
+        {
+          "item": "lead qualification",
+          "source_url": "https://relevanceai.com/use-cases/marketing",
+          "quote": "Scores and qualifies inbound leads against fit."
+        },
+        {
+          "item": "personalization",
+          "source_url": "https://relevanceai.com/use-cases/marketing",
+          "quote": "Runs personalized nurture campaigns across the full lifecycle."
+        },
+        {
+          "item": "analytics reporting",
+          "source_url": "https://relevanceai.com/use-cases/marketing",
+          "quote": "Pulls multi-channel campaign performance."
+        },
+        {
+          "item": "seo optimization",
+          "source_url": "https://relevanceai.com/use-cases/marketing",
+          "quote": "Researches keywords and writes content briefs."
+        },
+        {
+          "item": "workflow automation",
+          "source_url": "https://relevanceai.com/workforce",
+          "quote": "Build a Workforce that runs your process end to end, triggered by the signals already flowing through your business."
+        }
+      ],
+      "note": "Left out as too loose a match: 'write copy' (the site says 'Turns one asset into channel-native formats.') and 'send email campaigns' (nurture campaigns are named, email is not)."
+    },
+    "can_execute": {
+      "value": true,
+      "source_url": "https://relevanceai.com/",
+      "quote": "Books qualified meetings into reps’ calendars.",
+      "note": "Agent card (Meeting Scheduler), confirmed on a second read; another card says 'Logs notes and fires follow-ups after each call.' The site also lists 'Human-in-the-loop approvals' as a feature."
+    },
+    "multi_agent": {
+      "value": true,
+      "source_url": "https://relevanceai.com/workforce",
+      "quote": "Each agent owns a step, hands off context, and executes end to end.",
+      "note": "Confirmed on a second read. Hero of the same page: 'Orchestrate AI agents to run entire processes'."
+    },
+    "integrations": {
+      "value": [
+        "HubSpot",
+        "Salesforce",
+        "Slack",
+        "Gmail",
+        "Google Sheets",
+        "LinkedIn",
+        "Apollo",
+        "Notion",
+        "Gong",
+        "Microsoft",
+        "BuiltWith",
+        "Freshdesk",
+        "Databricks",
+        "Salesloft",
+        "Snowflake",
+        "SendGrid",
+        "Twilio",
+        "Webflow",
+        "WhatsApp",
+        "PostHog",
+        "Airtable",
+        "ActiveCampaign",
+        "ahrefs",
+        "GitHub",
+        "Confluence"
+      ],
+      "source_url": "https://relevanceai.com/",
+      "overflow": [
+        "Canva",
+        "Intercom",
+        "Google Drive",
+        "Circle",
+        "Zendesk",
+        "Autodesk"
+      ],
+      "note": "First 25 names of the homepage 'Connect to 1,000+ apps' list, in page order; the rest are in 'overflow'. The /integrations directory says 'Showing 48 of 2,728 integrations' and is alphabetical, so it was not used for this list."
+    },
+    "pricing": {
+      "value": {
+        "free_tier": "unknown",
+        "starting_price": "unknown"
+      },
+      "note": "https://relevanceai.com/pricing lists a single Enterprise plan with no price and a 'Talk to sales' button; no free plan or trial wording on the pages read (the homepage button says 'Try it out')."
+    },
+    "hq_location": {
+      "value": "unknown",
+      "note": "No address or headquarters line. The terms page says 'OnSearch Pty Ltd, an Australian business with ABN 33 637 909 409 trading as Relevance AI' and 'These Terms are governed by the laws of New South Wales, Australia.', which states a country of business but not a headquarters."
+    }
+  },
+  "hq_external": {
+    "value": {
+      "city": "Sydney",
+      "country": "Australia"
+    },
+    "source_url": "https://builtinsydney.au/company/relevance-ai",
+    "quote": "HQSydney, New South Wales, AUS"
+  },
+  "notes": "The integrations directory page is very large (about 344,000 characters of text) and shows a partial list, so a plain fetcher may get a truncated or paginated list."
+}

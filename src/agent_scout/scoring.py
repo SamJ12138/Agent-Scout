@@ -20,9 +20,9 @@ Outcomes
 Normalisation: case and surrounding whitespace are ignored everywhere; list
 fields are compared as sets; prices are compared by currency, amount and
 period ("$49/mo" = "$49 per month"); country spellings are unified ("USA" =
-"United States"). A ground-truth entry may carry ``also_acceptable``: a list of
-alternative values, each of which is scored and the best outcome kept. Other
-unknown keys in a ground-truth file are ignored.
+"United States"). A ground-truth entry may carry the optional keys
+``also_acceptable``, ``country_stated`` and ``overflow`` (see compare_entry);
+every other unknown key in a ground-truth file is ignored.
 """
 
 from __future__ import annotations
@@ -69,19 +69,29 @@ def _is_unknown(value: Any) -> bool:
     return False
 
 
+_CURRENCY = {"usd": "$", "eur": "€", "gbp": "£", "$": "$", "€": "€", "£": "£"}
+_AMOUNT = r"(\d[\d,]*(?:\.\d+)?)"
+_SYMBOL = r"([$€£]|usd|eur|gbp)"
+
+
 def normalise_price(value: Any) -> str:
-    """'$49 / mo' -> '$49/month'. Unrecognised text is returned lower-cased."""
+    """'$49 / mo', '49 USD per month' -> '$49/month'. Unrecognised text is returned lower-cased."""
     text = _text(value).replace("us$", "$")
-    match = re.search(r"([$€£])\s?(\d[\d,]*(?:\.\d+)?)", text)
-    if not match:
-        return text
-    amount = float(match.group(2).replace(",", ""))
+    match = re.search(rf"{_SYMBOL}\s?{_AMOUNT}", text)
+    if match:
+        symbol, number = match.group(1), match.group(2)
+    else:
+        match = re.search(rf"{_AMOUNT}\s?{_SYMBOL}", text)
+        if not match:
+            return text
+        number, symbol = match.group(1), match.group(2)
+    amount = float(number.replace(",", ""))
     rest = text[match.end():]
     unit = re.search(r"\b(user|seat|member|agent|editor|workspace|account)\b", rest)
     period = re.search(r"\b(month|mo|monthly|year|yr|annum|annually|yearly|week)\b", rest)
     names = {"mo": "month", "monthly": "month", "yr": "year", "annum": "year", "annually": "year",
              "yearly": "year"}
-    parts = [f"{match.group(1)}{amount:g}"]
+    parts = [f"{_CURRENCY[symbol]}{amount:g}"]
     if unit:
         parts.append(unit.group(1))
     if period:
@@ -179,15 +189,35 @@ def compare(field_name: str, truth: Any, got: Any) -> Outcome:
 
 
 def compare_entry(field_name: str, entry: Any, got: Any) -> Outcome:
-    """Score against a ground-truth entry, honouring ``also_acceptable``."""
+    """Score against a ground-truth entry, honouring its optional keys.
+
+    also_acceptable  alternative values; for pricing a plain string is an
+                     alternative starting_price ("unknown" allowed)
+    country_stated   false means the site prints a city but no country word,
+                     so an unknown country is as right as the derived one
+    overflow         integration names beyond the first 25: a tool may list
+                     them without being wrong, and need not list them
+    Any other key is ignored. The best outcome over the alternatives is kept.
+    """
     if not isinstance(entry, dict):
         entry = {"value": entry}
-    candidates = [entry.get("value", UNKNOWN)]
+    value = entry.get("value", UNKNOWN)
+    candidates = [value]
     extra = entry.get("also_acceptable")
-    if isinstance(extra, list):
-        candidates.extend(extra)
-    elif extra is not None:
-        candidates.append(extra)
+    for alternative in extra if isinstance(extra, list) else ([] if extra is None else [extra]):
+        if field_name == "pricing" and isinstance(alternative, str) and isinstance(value, dict):
+            candidates.append({**value, "starting_price": alternative})
+        else:
+            candidates.append(alternative)
+    if field_name == "hq_location" and entry.get("country_stated") is False and isinstance(value, dict):
+        candidates.append({**value, "country": UNKNOWN})
+    overflow = entry.get("overflow")
+    if field_name == "integrations" and isinstance(overflow, list) and isinstance(got, list):
+        beyond = {_text(name) for name in overflow}
+        listed = [name for name in got if _text(name) not in beyond]
+        if got and not listed:
+            return Outcome("partial", "only names beyond the first 25 of the reference")
+        got = listed
     outcomes = [compare(field_name, candidate, got) for candidate in candidates]
     return min(outcomes, key=lambda outcome: _RANK[outcome.outcome])
 

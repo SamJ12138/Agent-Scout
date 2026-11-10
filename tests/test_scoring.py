@@ -126,3 +126,64 @@ def test_ground_truth_files_that_are_not_sites_are_skipped(tmp_path):
     (tmp_path / "notes.json").write_text('{"about": "not a site"}', encoding="utf-8")
     truth_file(tmp_path, "a", {})
     assert list(scoring.load_ground_truth(tmp_path)) == ["a"]
+
+
+# ------------------------------------------------------------------ optional keys of real ground-truth files
+def entry(value, **extra):
+    return {"value": value, "source_url": "https://x.test/", "note": "ignored", "evidence": [{"item": "x"}],
+            "kind": "meta description", "confidence": "low", **extra}
+
+
+def test_unknown_keys_in_an_entry_are_ignored():
+    assert scoring.compare_entry("can_execute", entry(True), True).outcome == "match"
+
+
+def test_also_acceptable_one_liner():
+    truth = entry("The meta description.", also_acceptable=["The hero headline. With its subhead."])
+    assert scoring.compare_entry("one_liner", truth, "The hero headline. With its subhead.").outcome == "match"
+    assert scoring.compare_entry("one_liner", truth, "Something else entirely here.").outcome == "mismatch"
+
+
+@pytest.mark.parametrize("got_price, outcome", [
+    ("$59/month", "match"),
+    ("$69/month", "match"),            # listed in also_acceptable
+    ("$79/month", "partial"),          # free_tier still right
+    (U, "partial"),
+])
+def test_also_acceptable_prices_are_alternative_starting_prices(got_price, outcome):
+    truth = entry({"free_tier": True, "starting_price": "$59/month"}, also_acceptable=["$69/month"])
+    got = {"free_tier": True, "starting_price": got_price}
+    assert scoring.compare_entry("pricing", truth, got).outcome == outcome
+
+
+def test_also_acceptable_unknown_price():
+    truth = entry({"free_tier": True, "starting_price": "$29/mo"}, also_acceptable=["$49/mo", "unknown"])
+    assert scoring.compare_entry("pricing", truth, {"free_tier": True, "starting_price": U}).outcome == "match"
+
+
+def test_country_not_printed_on_the_site_may_be_left_unknown():
+    truth = entry({"city": "Paris", "country": "France"}, country_stated=False)
+    assert scoring.compare_entry("hq_location", truth, {"city": "Paris", "country": U}).outcome == "match"
+    assert scoring.compare_entry("hq_location", truth, {"city": "Paris", "country": "France"}).outcome == "match"
+    assert scoring.compare_entry("hq_location", truth, {"city": "Paris", "country": "Spain"}).outcome == "partial"
+    stated = entry({"city": "Paris", "country": "France"})
+    assert scoring.compare_entry("hq_location", stated, {"city": "Paris", "country": U}).outcome == "partial"
+
+
+@pytest.mark.parametrize("got, outcome", [
+    (["Slack", "HubSpot"], "match"),
+    (["Slack", "HubSpot", "Canva"], "match"),          # Canva is in overflow: neither required nor an error
+    (["Slack", "Canva"], "partial"),
+    (["Canva", "Zendesk"], "partial"),                 # only overflow names: right names, but not the listed ones
+    (["Slack", "HubSpot", "Notion"], "partial"),       # Notion is a real extra
+    (["Notion"], "mismatch"),
+])
+def test_integration_overflow_names_are_not_extras(got, outcome):
+    truth = entry(["Slack", "HubSpot"], overflow=["Canva", "Zendesk"])
+    assert scoring.compare_entry("integrations", truth, got).outcome == outcome
+
+
+@pytest.mark.parametrize("a, b", [("42€/month", "€42/month"), ("42 €/month", "€42 per month"), ("29 EUR/month", "€29/mo"),
+                                  ("USD 20/month", "$20/month")])
+def test_price_normalisation_reads_trailing_and_spelled_currencies(a, b):
+    assert scoring.normalise_price(a) == scoring.normalise_price(b)

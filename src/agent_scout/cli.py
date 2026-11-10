@@ -143,7 +143,21 @@ def _cmd_run(args: argparse.Namespace) -> int:
 COMMANDS = {"run": _cmd_run, "report-log": _cmd_report_log}
 
 
+def _tolerant_streams() -> None:
+    """A console that cannot encode a character (a legacy Windows code page,
+    a site name in another script) must not crash the run: show an escape."""
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is None:
+            continue
+        try:
+            reconfigure(errors="backslashreplace")
+        except (ValueError, OSError) as exc:
+            obs.emit("run", "skip", error_type="stream_not_reconfigurable", detail=type(exc).__name__)
+
+
 def main(argv: list[str] | None = None) -> int:
+    _tolerant_streams()
     args = build_parser().parse_args(argv)
     try:
         return COMMANDS[args.command](args)

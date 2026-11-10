@@ -1,0 +1,184 @@
+{
+  "slug": "adcreative-ai",
+  "name": "AdCreative.ai",
+  "url": "https://www.adcreative.ai/",
+  "asOf": "2026-11-10",
+  "pages_read": [
+    "https://www.adcreative.ai/",
+    "https://www.adcreative.ai/enterprise",
+    "https://www.adcreative.ai/creative-insights",
+    "https://www.adcreative.ai/legal/en/terms-of-service-for-online-subscribers"
+  ],
+  "fields": {
+    "one_liner": {
+      "value": "Generate high-performing ad creatives, images, videos, and copy with AI. Built for marketers to scale campaigns and improve ROAS.",
+      "source_url": "https://www.adcreative.ai/",
+      "kind": "meta description",
+      "also_acceptable": [
+        "#1 most used AI tool for advertising. Generate ad banners, texts, photoshoots, and videos that outperform those of your competitors."
+      ]
+    },
+    "categories": {
+      "value": [
+        "advertising",
+        "video & creative",
+        "analytics & reporting"
+      ],
+      "source_url": "https://www.adcreative.ai/",
+      "quote": "Generate high-converting AI ad creatives in seconds using proprietary AI models trained on real performance data.",
+      "evidence": [
+        {
+          "item": "advertising",
+          "source_url": "https://www.adcreative.ai/",
+          "quote": "Generate high-converting AI ad creatives in seconds using proprietary AI models trained on real performance data."
+        },
+        {
+          "item": "video & creative",
+          "source_url": "https://www.adcreative.ai/",
+          "quote": "Generate ad banners, texts, photoshoots, and videos that outperform those of your competitors."
+        },
+        {
+          "item": "analytics & reporting",
+          "source_url": "https://www.adcreative.ai/creative-insights",
+          "quote": "Track and optimize your ad creative performance with actionable insights from Creative Insights AI."
+        }
+      ]
+    },
+    "target_user": {
+      "value": [
+        "marketers",
+        "small business",
+        "ecommerce brands",
+        "agencies",
+        "enterprise"
+      ],
+      "source_url": "https://www.adcreative.ai/",
+      "quote": "Generate high-performing ad creatives, images, videos, and copy with AI. Built for marketers to scale campaigns and improve ROAS.",
+      "evidence": [
+        {
+          "item": "marketers",
+          "source_url": "https://www.adcreative.ai/",
+          "quote": "Generate high-performing ad creatives, images, videos, and copy with AI. Built for marketers to scale campaigns and improve ROAS."
+        },
+        {
+          "item": "small business",
+          "source_url": "https://www.adcreative.ai/",
+          "quote": "Made for Small Business who need results, fast"
+        },
+        {
+          "item": "ecommerce brands",
+          "source_url": "https://www.adcreative.ai/",
+          "quote": "Built for E-Commerce Brands"
+        },
+        {
+          "item": "agencies",
+          "source_url": "https://www.adcreative.ai/",
+          "quote": "Whether you're a startup, agency or enterprise, our pricing is crafted to ensure your investment pays off right away."
+        },
+        {
+          "item": "enterprise",
+          "source_url": "https://www.adcreative.ai/enterprise",
+          "quote": "The All-in-One AI Platform for Enterprises"
+        }
+      ]
+    },
+    "tasks": {
+      "value": [
+        "generate images or video",
+        "write copy",
+        "analytics reporting",
+        "market research"
+      ],
+      "source_url": "https://www.adcreative.ai/",
+      "quote": "Generate ad banners, texts, photoshoots, and videos that outperform those of your competitors.",
+      "evidence": [
+        {
+          "item": "generate images or video",
+          "source_url": "https://www.adcreative.ai/",
+          "quote": "Generate ad banners, texts, photoshoots, and videos that outperform those of your competitors."
+        },
+        {
+          "item": "write copy",
+          "source_url": "https://www.adcreative.ai/enterprise",
+          "quote": "Generate texts that bring results using proven copywriting frameworks using our ad text-trained AI."
+        },
+        {
+          "item": "analytics reporting",
+          "source_url": "https://www.adcreative.ai/enterprise",
+          "quote": "Identify which creatives perform the best in your ad accounts and learn why."
+        },
+        {
+          "item": "market research",
+          "source_url": "https://www.adcreative.ai/",
+          "quote": "Our Competitor Insights AI allows you to discover your competitors' best-performing ad creatives across any platform."
+        }
+      ]
+    },
+    "can_execute": {
+      "value": "unknown",
+      "note": "No sentence on the pages read says the product launches or publishes ads, and none says a human must. The site talks about downloading ('A credit is used when you download a generated ad creative.') and 'ready-to-launch' output, and it connects ad accounts for analysis only."
+    },
+    "multi_agent": {
+      "value": "unknown",
+      "note": "No agent wording on the pages read."
+    },
+    "integrations": {
+      "value": [
+        "Meta Ads",
+        "Google Ads",
+        "Linkedin Ads",
+        "Pinterest Ads",
+        "Microsoft Ads",
+        "Google Drive",
+        "OneDrive"
+      ],
+      "source_url": "https://www.adcreative.ai/creative-insights",
+      "evidence": [
+        {
+          "item": "Meta Ads, Google Ads, Linkedin Ads, Pinterest Ads, Microsoft Ads",
+          "source_url": "https://www.adcreative.ai/creative-insights",
+          "quote": "Integrations allow you to connect your ad accounts to your brands on AdCreative.ai."
+        },
+        {
+          "item": "Google Drive, OneDrive",
+          "source_url": "https://www.adcreative.ai/enterprise",
+          "quote": "AdCreative.ai integrates with all major file management systems like Google Drive and OneDrive"
+        }
+      ],
+      "note": "'Linkedin Ads' is spelled as on the site. 'Unlimited Photos by iStock' is a plan feature and is left out."
+    },
+    "pricing": {
+      "value": {
+        "free_tier": true,
+        "starting_price": "$20"
+      },
+      "source_url": "https://www.adcreative.ai/",
+      "quote": "7 day free trial. Cancel anytime.",
+      "also_acceptable": [
+        "$29",
+        "$39"
+      ],
+      "confidence": "low",
+      "note": "Pricing is a section of the homepage with three billing toggles. Starter plan: '$39' monthly, '$29' quarterly, '$20' yearly; the per-period unit was not captured in the reading, and a sale banner was running ('50% off yearly, 25% off quarterly plans!'). The page is internally inconsistent on the Ultimate price ($599 and $999). free_tier is true because of a trial, not a free plan."
+    },
+    "hq_location": {
+      "value": {
+        "city": "Paris",
+        "country": "France"
+      },
+      "source_url": "https://www.adcreative.ai/legal/en/terms-of-service-for-online-subscribers",
+      "quote": "Mail: 40 RUE DES BLANCS MANTEAUX 75004 PARIS",
+      "country_stated": false,
+      "note": "A mailing address on the terms page (contracting entity 'ADYOUNEED SAS and/or any of its affiliates'); the word France does not appear on that page, so the country is derived from 'PARIS' and the postcode. Confirmed on a second read. No address on the homepage or enterprise page."
+    }
+  },
+  "hq_external": {
+    "value": {
+      "city": "Paris",
+      "country": "France"
+    },
+    "source_url": "https://www.appier.com/en/press-media/appier-acquires-adcreative.ai-in-strategic-move",
+    "quote": "AdCreative.ai, based in Paris, France, is a leading AI-driven platform"
+  },
+  "notes": "The homepage is very long (about 102,000 characters of text; the reading tool stopped at 100,000, so the footer was cut). Positioned as an AI ad-creative generator rather than an agent. Owned by Appier per the terms page and the press release used for hq_external."
+}

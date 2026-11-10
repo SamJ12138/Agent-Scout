@@ -1,0 +1,147 @@
+{
+  "slug": "neuroflash",
+  "name": "neuroflash",
+  "url": "https://neuroflash.com/",
+  "asOf": "2026-11-10",
+  "pages_read": [
+    "https://neuroflash.com/",
+    "https://neuroflash.com/content-creation/",
+    "https://neuroflash.com/pricing/",
+    "https://neuroflash.com/about-us/",
+    "https://neuroflash.com/legal/"
+  ],
+  "fields": {
+    "one_liner": {
+      "value": "AI platform for content, branding, and digital twins. Create content and predict its impact in advance. 85–98% accuracy. GDPR-compliant.",
+      "source_url": "https://neuroflash.com/",
+      "kind": "meta description",
+      "also_acceptable": [
+        "AI that creates content. And proves that it works."
+      ]
+    },
+    "categories": {
+      "value": [
+        "content generation",
+        "seo",
+        "video & creative"
+      ],
+      "source_url": "https://neuroflash.com/",
+      "quote": "Copy, campaigns, and ideas in your brand voice for every channel.",
+      "evidence": [
+        {
+          "item": "content generation",
+          "source_url": "https://neuroflash.com/",
+          "quote": "Copy, campaigns, and ideas in your brand voice for every channel."
+        },
+        {
+          "item": "seo",
+          "source_url": "https://neuroflash.com/content-creation/",
+          "quote": "neuroflash creates SEO and GEO-optimized articles with relevant keywords and structure."
+        },
+        {
+          "item": "video & creative",
+          "source_url": "https://neuroflash.com/",
+          "quote": "AI-generated images right in your workflow, no designer required."
+        }
+      ],
+      "note": "'video & creative' is for image generation only; the site does not mention video."
+    },
+    "target_user": {
+      "value": [
+        "marketers",
+        "agencies",
+        "enterprise"
+      ],
+      "source_url": "https://neuroflash.com/",
+      "quote": "Over 1 million content and marketing professionals use neuroflash.",
+      "evidence": [
+        {
+          "item": "marketers",
+          "source_url": "https://neuroflash.com/",
+          "quote": "Over 1 million content and marketing professionals use neuroflash."
+        },
+        {
+          "item": "agencies",
+          "source_url": "https://neuroflash.com/",
+          "quote": "From performance marketing teams at agencies to mid-market B2B brands and the innovation and strategy departments of large corporations."
+        },
+        {
+          "item": "enterprise",
+          "source_url": "https://neuroflash.com/",
+          "quote": "From performance marketing teams at agencies to mid-market B2B brands and the innovation and strategy departments of large corporations."
+        }
+      ],
+      "note": "'enterprise' maps the site's phrase 'large corporations'; the pricing page also has an Enterprise plan."
+    },
+    "tasks": {
+      "value": [
+        "write copy",
+        "generate images or video",
+        "seo optimization",
+        "market research"
+      ],
+      "source_url": "https://neuroflash.com/",
+      "quote": "Copy, campaigns, and ideas in your brand voice for every channel.",
+      "evidence": [
+        {
+          "item": "write copy",
+          "source_url": "https://neuroflash.com/",
+          "quote": "Copy, campaigns, and ideas in your brand voice for every channel."
+        },
+        {
+          "item": "generate images or video",
+          "source_url": "https://neuroflash.com/",
+          "quote": "AI-generated images right in your workflow, no designer required."
+        },
+        {
+          "item": "seo optimization",
+          "source_url": "https://neuroflash.com/content-creation/",
+          "quote": "neuroflash analyzes keywords, scores your content, and optimizes articles for search engines automatically."
+        },
+        {
+          "item": "market research",
+          "source_url": "https://neuroflash.com/",
+          "quote": "Test concepts and value props on your real audience before you present."
+        }
+      ],
+      "note": "'market research' is the Digital Twins audience testing the site describes."
+    },
+    "can_execute": {
+      "value": "unknown",
+      "note": "No sentence on the pages read says it publishes, sends or schedules, and none says it only drafts. Closest wording: 'Maximum confidence BEFORE you publish or invest.'"
+    },
+    "multi_agent": {
+      "value": "unknown",
+      "note": "The words agent, multi-agent and orchestration do not appear on the pages read."
+    },
+    "integrations": {
+      "value": [
+        "Claude",
+        "Cursor",
+        "Chrome",
+        "Firefox"
+      ],
+      "source_url": "https://neuroflash.com/",
+      "note": "Claude and Cursor are named as MCP targets ('neuroflash inside Claude, Cursor, etc.'); Chrome and Firefox as browser extensions (FAQ). The header has an 'Integrations' menu whose entries were not visible in the text reading, so this list may be incomplete."
+    },
+    "pricing": {
+      "value": {
+        "free_tier": true,
+        "starting_price": "42€/month"
+      },
+      "source_url": "https://neuroflash.com/pricing/",
+      "quote": "42€/ month billed annually · plus VAT",
+      "note": "Essential plan. free_tier is true because of a trial ('7-day free trial'), not a free plan. Monthly-billed prices were not on the page."
+    },
+    "hq_location": {
+      "value": {
+        "city": "Hamburg",
+        "country": "Germany"
+      },
+      "source_url": "https://neuroflash.com/legal/",
+      "quote": "22359 Hamburg, Germany",
+      "note": "neuroflash GmbH, Wulfsdorfer Weg 100. The about page also says 'with headquarters in Hamburg'."
+    }
+  },
+  "notes": "The site is bilingual; the og:description is German ('7 Tage kostenlos testen.') while the page text read was English. Not a self-described agent product: it is an AI content assistant, included for contrast on can_execute."
+}

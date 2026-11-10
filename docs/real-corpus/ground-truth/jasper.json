@@ -1,0 +1,180 @@
+{
+  "slug": "jasper",
+  "name": "Jasper",
+  "url": "https://www.jasper.ai/",
+  "asOf": "2026-11-10",
+  "pages_read": [
+    "https://www.jasper.ai/",
+    "https://www.jasper.ai/platform",
+    "https://www.jasper.ai/integrations",
+    "https://www.jasper.ai/pricing",
+    "https://www.jasper.ai/company"
+  ],
+  "fields": {
+    "one_liner": {
+      "value": "Orchestrate intelligent agents to run end-to-end marketing workflows delivering speed, control, and measurable impact.",
+      "source_url": "https://www.jasper.ai/",
+      "kind": "meta description",
+      "also_acceptable": [
+        "Applied AI for Enterprise Marketing. Grow your brand’s visibility. Scale your team’s impact. Keep every move on brand."
+      ]
+    },
+    "categories": {
+      "value": [
+        "content generation",
+        "seo",
+        "analytics & reporting"
+      ],
+      "source_url": "https://www.jasper.ai/",
+      "quote": "Jasper handles the full range of marketing content: articles, emails, ads, social posts, and more.",
+      "evidence": [
+        {
+          "item": "content generation",
+          "source_url": "https://www.jasper.ai/",
+          "quote": "Jasper handles the full range of marketing content: articles, emails, ads, social posts, and more."
+        },
+        {
+          "item": "seo",
+          "source_url": "https://www.jasper.ai/platform",
+          "quote": "Create content that ranks, drives traffic & strengthens authority at scale."
+        },
+        {
+          "item": "analytics & reporting",
+          "source_url": "https://www.jasper.ai/",
+          "quote": "Measure how your brand performs across every major AI answer engine"
+        }
+      ]
+    },
+    "target_user": {
+      "value": [
+        "enterprise",
+        "marketers"
+      ],
+      "source_url": "https://www.jasper.ai/",
+      "quote": "Jasper provides the AI operating system for enterprise marketing teams",
+      "evidence": [
+        {
+          "item": "enterprise",
+          "source_url": "https://www.jasper.ai/",
+          "quote": "Jasper provides the AI operating system for enterprise marketing teams"
+        },
+        {
+          "item": "marketers",
+          "source_url": "https://www.jasper.ai/company",
+          "quote": "We’re giving marketers the power to turn vision into reality with newfound ease."
+        }
+      ]
+    },
+    "tasks": {
+      "value": [
+        "write copy",
+        "generate images or video",
+        "seo optimization",
+        "workflow automation",
+        "personalization",
+        "market research",
+        "analytics reporting"
+      ],
+      "source_url": "https://www.jasper.ai/platform",
+      "quote": "Agents generate high-quality, on-brand content tailored for multi-channel use",
+      "evidence": [
+        {
+          "item": "write copy",
+          "source_url": "https://www.jasper.ai/platform",
+          "quote": "Agents generate high-quality, on-brand content tailored for multi-channel use"
+        },
+        {
+          "item": "generate images or video",
+          "source_url": "https://www.jasper.ai/platform",
+          "quote": "AI Image Suite"
+        },
+        {
+          "item": "seo optimization",
+          "source_url": "https://www.jasper.ai/platform",
+          "quote": "Create content that ranks, drives traffic & strengthens authority at scale."
+        },
+        {
+          "item": "workflow automation",
+          "source_url": "https://www.jasper.ai/platform",
+          "quote": "Design and deploy context-rich AI agents and workflows that transform your marketing processes"
+        },
+        {
+          "item": "personalization",
+          "source_url": "https://www.jasper.ai/platform",
+          "quote": "Agents localize and personalize content for different audiences and markets"
+        },
+        {
+          "item": "market research",
+          "source_url": "https://www.jasper.ai/platform",
+          "quote": "Agents gather insights and data to inform smarter strategies"
+        },
+        {
+          "item": "analytics reporting",
+          "source_url": "https://www.jasper.ai/",
+          "quote": "Measure how your brand performs across every major AI answer engine"
+        }
+      ],
+      "note": "'generate images or video' rests on a feature label (\"AI Image Suite\"), not a full sentence."
+    },
+    "can_execute": {
+      "value": true,
+      "source_url": "https://www.jasper.ai/platform",
+      "quote": "Agents push content into systems of record for effective execution",
+      "note": "Opening of a longer sentence under '04. Activate' (it continues 'ensuring campaigns launch efficiently and reach the…'). Confirmed on a second read. The integrations page hero also says 'create and optimize content with AI agents, and publish everywhere'."
+    },
+    "multi_agent": {
+      "value": true,
+      "source_url": "https://www.jasper.ai/platform",
+      "quote": "Rather than standalone bots, agents operate in context—powered by Jasper IQ and coordinated through pipelines.",
+      "note": "Confirmed on a second read. The homepage meta description also says 'Orchestrate intelligent agents to run end-to-end marketing workflows'. No body sentence uses 'multi-agent' or 'agent team'."
+    },
+    "integrations": {
+      "value": [
+        "Google Drive",
+        "Microsoft SharePoint",
+        "Adobe Workfront",
+        "Semrush",
+        "Box",
+        "Salesforce",
+        "Monday.com",
+        "Asana",
+        "Google BigQuery",
+        "Slack",
+        "Webflow",
+        "Microsoft Word Add-In",
+        "Google Sheets",
+        "Google Docs",
+        "Google Chrome",
+        "Zapier",
+        "Make",
+        "Pabbly Connect"
+      ],
+      "source_url": "https://www.jasper.ai/integrations"
+    },
+    "pricing": {
+      "value": {
+        "free_tier": true,
+        "starting_price": "$59/month"
+      },
+      "source_url": "https://www.jasper.ai/pricing",
+      "quote": "$59/month billed yearly",
+      "also_acceptable": [
+        "$69/month"
+      ],
+      "note": "Pro plan: '$59/month billed yearly' or '$69/month billed monthly (cancel anytime)', per seat. free_tier is true because of a trial, not a free plan: 'Start Free 7-Day Trial'. Business plan is 'custom pricing'."
+    },
+    "hq_location": {
+      "value": "unknown",
+      "note": "Homepage and company page footers show only '© 2026 Jasper AI, INC.'; no address or headquarters line on the pages read."
+    }
+  },
+  "hq_external": {
+    "value": {
+      "city": "Austin",
+      "country": "United States"
+    },
+    "source_url": "https://mergr.com/company/jasper-ai",
+    "quote": "Jasper is headquartered in Austin, Texas."
+  },
+  "notes": "All five pages returned full text through the reading tool. The platform page names no integrations; they are only on /integrations."
+}

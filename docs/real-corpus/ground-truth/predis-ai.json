@@ -1,0 +1,188 @@
+{
+  "slug": "predis-ai",
+  "name": "Predis.ai",
+  "url": "https://predis.ai/",
+  "asOf": "2026-11-10",
+  "pages_read": [
+    "https://predis.ai/",
+    "https://predis.ai/features/",
+    "https://predis.ai/auto-post/",
+    "https://predis.ai/pricing/",
+    "https://predis.ai/termsandconditions/",
+    "https://predis.ai/llm-info/"
+  ],
+  "fields": {
+    "one_liner": {
+      "value": "Create AI ads, video ads with our free AI ad generator. Use AI and turn text prompts into AI video ads.",
+      "source_url": "https://predis.ai/",
+      "kind": "meta description",
+      "also_acceptable": [
+        "The AI Ad Generator for Video Ads, UGC, & Image Ads. Create video ads, UGC ads, and product ads from a product link, a text prompt, or an image."
+      ]
+    },
+    "categories": {
+      "value": [
+        "advertising",
+        "video & creative",
+        "social media"
+      ],
+      "source_url": "https://predis.ai/",
+      "quote": "The AI Ad Generator for Video Ads, UGC, & Image Ads",
+      "evidence": [
+        {
+          "item": "advertising",
+          "source_url": "https://predis.ai/",
+          "quote": "The AI Ad Generator for Video Ads, UGC, & Image Ads"
+        },
+        {
+          "item": "video & creative",
+          "source_url": "https://predis.ai/",
+          "quote": "Create video ads, UGC ads, and product ads from a product link, a text prompt, or an image."
+        },
+        {
+          "item": "social media",
+          "source_url": "https://predis.ai/auto-post/",
+          "quote": "Generate a month of social media content. Posted automatically."
+        }
+      ]
+    },
+    "target_user": {
+      "value": [
+        "ecommerce brands",
+        "creators",
+        "agencies"
+      ],
+      "source_url": "https://predis.ai/llm-info/",
+      "quote": "Predis.ai is built for businesses like e-commerce brands, local services, creators and coaches",
+      "evidence": [
+        {
+          "item": "ecommerce brands",
+          "source_url": "https://predis.ai/llm-info/",
+          "quote": "Predis.ai is built for businesses like e-commerce brands, local services, creators and coaches"
+        },
+        {
+          "item": "creators",
+          "source_url": "https://predis.ai/llm-info/",
+          "quote": "Predis.ai is built for businesses like e-commerce brands, local services, creators and coaches"
+        },
+        {
+          "item": "agencies",
+          "source_url": "https://predis.ai/",
+          "quote": "Agencies"
+        }
+      ],
+      "note": "'agencies' is a navigation segment label on the homepage (with 'Creators & Coaches' and 'E-commerce Stores'), not a sentence."
+    },
+    "tasks": {
+      "value": [
+        "generate images or video",
+        "write copy",
+        "schedule social posts",
+        "analytics reporting",
+        "market research"
+      ],
+      "source_url": "https://predis.ai/",
+      "quote": "Create video ads, UGC ads, and product ads from a product link, a text prompt, or an image.",
+      "evidence": [
+        {
+          "item": "generate images or video",
+          "source_url": "https://predis.ai/",
+          "quote": "Create video ads, UGC ads, and product ads from a product link, a text prompt, or an image."
+        },
+        {
+          "item": "write copy",
+          "source_url": "https://predis.ai/",
+          "quote": "Generate every element together - visuals, headlines, body copy, calls to action, so the ad stays on brand end to end."
+        },
+        {
+          "item": "schedule social posts",
+          "source_url": "https://predis.ai/features/",
+          "quote": "Set the dates once and Predis.ai publishes to Instagram, Facebook, LinkedIn, TikTok, and YouTube on schedule,"
+        },
+        {
+          "item": "analytics reporting",
+          "source_url": "https://predis.ai/features/",
+          "quote": "See which ads beat your average, and which formats and hooks are carrying them."
+        },
+        {
+          "item": "market research",
+          "source_url": "https://predis.ai/features/",
+          "quote": "See the formats, angles, and offers your category is already running."
+        }
+      ],
+      "note": "'manage ads' is left out on purpose: the site has the user launch ads and decide budget ('Download, upload, launch.'; 'where the budget goes next is your call')."
+    },
+    "can_execute": {
+      "value": true,
+      "source_url": "https://predis.ai/features/",
+      "quote": "Set the dates once and Predis.ai publishes to Instagram, Facebook, LinkedIn, TikTok, and YouTube on schedule,",
+      "note": "Opening of a longer sentence, confirmed on a second read. True for social posting only; for paid ads the site keeps the launch and budget with the user. An approval step exists: 'Send a draft for review, and nothing goes out until someone approves it.'"
+    },
+    "multi_agent": {
+      "value": "unknown",
+      "note": "No agent wording. The homepage says 'We orchestrate them', but about AI models, not agents."
+    },
+    "integrations": {
+      "value": [
+        "Instagram",
+        "Facebook",
+        "LinkedIn",
+        "TikTok",
+        "YouTube",
+        "Pinterest",
+        "X",
+        "Google My Business",
+        "Shopify",
+        "Wix",
+        "WooCommerce",
+        "Semrush"
+      ],
+      "source_url": "https://predis.ai/features/",
+      "evidence": [
+        {
+          "item": "Instagram, Facebook, LinkedIn, TikTok, YouTube",
+          "source_url": "https://predis.ai/features/",
+          "quote": "Autoposting publishes to Instagram, Facebook, LinkedIn, TikTok, and YouTube on the dates you set,"
+        },
+        {
+          "item": "X, Pinterest, Google My Business",
+          "source_url": "https://predis.ai/auto-post/",
+          "quote": "Predis.ai integrates with Instagram, Facebook, LinkedIn, X, Pinterest, Google My Business, and TikTok,"
+        },
+        {
+          "item": "Shopify, Wix, WooCommerce",
+          "source_url": "https://predis.ai/llm-info/",
+          "quote": "Connects directly to Shopify, Wix, and WooCommerce"
+        },
+        {
+          "item": "Semrush",
+          "source_url": "https://predis.ai/llm-info/",
+          "quote": "through integrations on platforms such as Shopify, Wix, and Semrush."
+        }
+      ],
+      "note": "There is no integrations page; names are gathered from three pages. The site's own lists disagree with each other (YouTube and Google My Business each appear in only some of them)."
+    },
+    "pricing": {
+      "value": {
+        "free_tier": true,
+        "starting_price": "$19/month"
+      },
+      "source_url": "https://predis.ai/pricing/",
+      "quote": "Every plan starts with 3 days free.",
+      "also_acceptable": [
+        "$32/month"
+      ],
+      "note": "Core plan is written '$19 /month' with a struck-through '$32' and '$230 Billed Yearly'. free_tier is true because of a 3-day card-required trial, not a free plan."
+    },
+    "hq_location": {
+      "value": {
+        "city": "Pune",
+        "country": "India"
+      },
+      "source_url": "https://predis.ai/llm-info/",
+      "quote": "Headquarters: Pune, India",
+      "note": "Stated only on the site's /llm-info/ page ('Predis.ai Official Facts'), which a crawler following normal navigation may never reach. The terms page gives the legal name 'EZML Technologies Pvt Ltd.' and Maharashtra (India) law, but no address."
+    }
+  },
+  "notes": "The reading tool saw '[email protected]' in place of the support address. That placeholder is what Cloudflare's email obfuscation produces, so the site is probably served through Cloudflare (an inference, not something the site states). Positioned as an AI ad generator rather than an agent."
+}

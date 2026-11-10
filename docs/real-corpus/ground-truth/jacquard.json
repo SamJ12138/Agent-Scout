@@ -1,0 +1,130 @@
+{
+  "slug": "jacquard",
+  "name": "Jacquard",
+  "url": "https://www.jacquard.com/",
+  "asOf": "2026-11-10",
+  "pages_read": [
+    "https://www.jacquard.com/",
+    "https://www.jacquard.com/about/",
+    "https://www.jacquard.com/contact/"
+  ],
+  "fields": {
+    "one_liner": {
+      "value": "The agentic creative intelligence layer: agents that plan, write, check and optimise your marketing across email, SMS, push and web, in your brand voice.",
+      "source_url": "https://www.jacquard.com/",
+      "kind": "meta description",
+      "also_acceptable": [
+        "Resonate everywhere. Jacquard is the agentic creative intelligence layer that makes your brand resonate everywhere."
+      ]
+    },
+    "categories": {
+      "value": [
+        "content generation",
+        "email marketing"
+      ],
+      "source_url": "https://www.jacquard.com/",
+      "quote": "Agents that plan, write, check and optimise your marketing content, always in your brand voice, always with your sign-off.",
+      "evidence": [
+        {
+          "item": "content generation",
+          "source_url": "https://www.jacquard.com/",
+          "quote": "Agents that plan, write, check and optimise your marketing content, always in your brand voice, always with your sign-off."
+        },
+        {
+          "item": "email marketing",
+          "source_url": "https://www.jacquard.com/",
+          "quote": "Launch to email, SMS, push and web at once."
+        }
+      ]
+    },
+    "target_user": {
+      "value": [
+        "enterprise"
+      ],
+      "source_url": "https://www.jacquard.com/about/",
+      "quote": "Meet the people helping enterprise brands resonate everywhere.",
+      "evidence": [
+        {
+          "item": "enterprise",
+          "source_url": "https://www.jacquard.com/about/",
+          "quote": "Meet the people helping enterprise brands resonate everywhere."
+        }
+      ],
+      "note": "The homepage never names an audience in a sentence; this comes from the about page."
+    },
+    "tasks": {
+      "value": [
+        "write copy",
+        "send email campaigns",
+        "personalization"
+      ],
+      "source_url": "https://www.jacquard.com/",
+      "quote": "Agents that plan, write, check and optimise your marketing content, always in your brand voice, always with your sign-off.",
+      "evidence": [
+        {
+          "item": "write copy",
+          "source_url": "https://www.jacquard.com/",
+          "quote": "Agents that plan, write, check and optimise your marketing content, always in your brand voice, always with your sign-off."
+        },
+        {
+          "item": "send email campaigns",
+          "source_url": "https://www.jacquard.com/",
+          "quote": "Launch to email, SMS, push and web at once."
+        },
+        {
+          "item": "personalization",
+          "source_url": "https://www.jacquard.com/",
+          "quote": "Performance AI models and agents analyse, generate, predict, optimise and personalise your campaign copy at every level."
+        }
+      ]
+    },
+    "can_execute": {
+      "value": true,
+      "source_url": "https://www.jacquard.com/",
+      "quote": "Launch to email, SMS, push and web at once.",
+      "note": "Confirmed on a second read ('How it works', Send step). Also: 'It goes live, watches the results, and learns for next time.' The site stresses human sign-off before launch ('always with your sign-off')."
+    },
+    "multi_agent": {
+      "value": true,
+      "source_url": "https://www.jacquard.com/",
+      "quote": "Runs the other three end to end and brings the work to your team for one-click sign-off.",
+      "note": "Card for 'Orchestration agent · Jacq' under the heading 'Four agents put the models to work.' (Performance, Compliance, Brand and Orchestration agents). Confirmed on a second read."
+    },
+    "integrations": {
+      "value": [
+        "Salesforce",
+        "Adobe",
+        "Braze",
+        "Iterable",
+        "Bloomreach",
+        "Optimizely",
+        "Epsilon",
+        "MoEngage",
+        "Insider",
+        "Airship",
+        "Movable Ink",
+        "Cordial",
+        "MessageGears",
+        "Marigold Liveclicker"
+      ],
+      "source_url": "https://www.jacquard.com/",
+      "note": "The homepage also shows the Jacq agent working in Slack, Claude, ChatGPT and Copilot; those are left out as chat surfaces, not listed connectors."
+    },
+    "pricing": {
+      "value": {
+        "free_tier": "unknown",
+        "starting_price": "unknown"
+      },
+      "note": "No pricing page was linked. 'Analyse your brand for free' / 'Free · no card · takes about half a minute' refers to a free brand analysis, not a plan or trial."
+    },
+    "hq_location": {
+      "value": {
+        "city": "London",
+        "country": "United Kingdom"
+      },
+      "source_url": "https://www.jacquard.com/contact/",
+      "quote": "82 St John Street, London EC1M 4JN, United Kingdom"
+    }
+  },
+  "notes": "Single long homepage with anchor navigation; there is no separate features, integrations or pricing page. The reading tool reported a Cloudflare Turnstile key in the page (bot check on the brand-analyser form) and pre-written AI prompts inside 'Claude'/'ChatGPT' buttons, which were ignored."
+}

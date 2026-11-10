@@ -101,3 +101,18 @@ def test_python_dash_m_entry_point():
     import sys
     done = subprocess.run([sys.executable, "-m", "agent_scout", "--version"], capture_output=True, text=True)
     assert done.returncode == 0 and __version__ in done.stdout
+
+
+def test_console_that_cannot_encode_a_site_name_does_not_crash_the_run(tmp_path, monkeypatch):
+    import io
+    import sys
+    raw = io.BytesIO()
+    monkeypatch.setattr(sys, "stdout", io.TextIOWrapper(raw, encoding="ascii"))
+    sites = tmp_path / "sites.yaml"
+    sites.write_text('- name: "Café → Agent 東京 (fictional)"\n  url: http://127.0.0.1:9/\n', encoding="utf-8")
+    code = main(["run", str(sites), "-o", str(tmp_path / "out"), "--log-dir", str(tmp_path / "logs"),
+                 "--delay", "0", "--timeout", "2"])
+    sys.stdout.flush()
+    assert code == 0
+    assert b"Caf\\xe9" in raw.getvalue()
+    assert "Café → Agent 東京" in (tmp_path / "out" / "report.html").read_text(encoding="utf-8")

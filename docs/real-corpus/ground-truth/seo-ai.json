@@ -1,0 +1,123 @@
+{
+  "slug": "seo-ai",
+  "name": "SEO.AI",
+  "url": "https://seo.ai/",
+  "asOf": "2026-11-10",
+  "pages_read": [
+    "https://seo.ai/",
+    "https://seo.ai/pricing"
+  ],
+  "fields": {
+    "one_liner": {
+      "value": "AI SEO agent that plans, writes, and publishes content for you.",
+      "source_url": "https://seo.ai/",
+      "kind": "meta description (first sentence)",
+      "also_acceptable": [
+        "SEO.AI is the AI SEO agent that creates ranking content, publishes it to your website, builds relevant backlinks, and keeps your visibility growing — 24/7."
+      ],
+      "note": "The meta description continues 'Grow organic traffic month by month - on autopilot, with … full control when needed.' (the reading tool cut the middle)."
+    },
+    "categories": {
+      "value": [
+        "seo",
+        "content generation"
+      ],
+      "source_url": "https://seo.ai/",
+      "quote": "Your AI agent continuously scans, plans, writes and improves your SEO",
+      "evidence": [
+        {
+          "item": "seo",
+          "source_url": "https://seo.ai/",
+          "quote": "Your AI agent continuously scans, plans, writes and improves your SEO"
+        },
+        {
+          "item": "content generation",
+          "source_url": "https://seo.ai/",
+          "quote": "It finds the search terms your customers already use, creates the content your website needs to rank"
+        }
+      ]
+    },
+    "target_user": {
+      "value": [
+        "agencies",
+        "small business"
+      ],
+      "source_url": "https://seo.ai/",
+      "quote": "SEO.AI is perfect for agencies and freelancers working on client SEO, and many of our customers are agencies.",
+      "evidence": [
+        {
+          "item": "agencies",
+          "source_url": "https://seo.ai/",
+          "quote": "SEO.AI is perfect for agencies and freelancers working on client SEO, and many of our customers are agencies."
+        },
+        {
+          "item": "small business",
+          "source_url": "https://seo.ai/",
+          "quote": "For business owners who don’t want to think about SEO"
+        }
+      ],
+      "note": "'small business' maps the site's phrase 'business owners' (a section heading); the site does not use the words 'small business'."
+    },
+    "tasks": {
+      "value": [
+        "seo optimization",
+        "write copy"
+      ],
+      "source_url": "https://seo.ai/",
+      "quote": "Everything is deeply researched, structured, written, linked, and optimized based on what it takes to rank.",
+      "evidence": [
+        {
+          "item": "seo optimization",
+          "source_url": "https://seo.ai/",
+          "quote": "Everything is deeply researched, structured, written, linked, and optimized based on what it takes to rank."
+        },
+        {
+          "item": "write copy",
+          "source_url": "https://seo.ai/",
+          "quote": "It finds the search terms your customers already use, creates the content your website needs to rank"
+        }
+      ]
+    },
+    "can_execute": {
+      "value": true,
+      "source_url": "https://seo.ai/",
+      "quote": "New articles go live automatically.",
+      "note": "Feature block 'Publish straight to your website', confirmed on a second read. Review is optional: 'You can choose between automatic publishing, saving as drafts, or reviewing directly in the platform.'"
+    },
+    "multi_agent": {
+      "value": "unknown",
+      "note": "The site speaks of a single 'AI agent'; the 'SEO specialists' it mentions are people."
+    },
+    "integrations": {
+      "value": [
+        "WordPress",
+        "Webflow",
+        "Wix",
+        "Squarespace",
+        "Shopify",
+        "Magento"
+      ],
+      "source_url": "https://seo.ai/",
+      "quote": "WordPress, Webflow, Wix, Squarespace, and many webshop systems such as Shopify, Magento, and more."
+    },
+    "pricing": {
+      "value": {
+        "free_tier": true,
+        "starting_price": "$149/month"
+      },
+      "source_url": "https://seo.ai/pricing",
+      "quote": "$149 /per month",
+      "note": "Single Site plan ('For one website in one language.'); Multi Site is $299 per month. 'Save 25% with annual payment. All prices exclude VAT.' free_tier is true because of a trial: 'Try 7-day trial'."
+    },
+    "hq_location": {
+      "value": {
+        "city": "Kongens Lyngby",
+        "country": "Denmark"
+      },
+      "source_url": "https://seo.ai/",
+      "quote": "SEO.AI Diplomvej 381 2800 Kongens Lyngby Denmark",
+      "note": "Footer address. Elsewhere the homepage says 'Built by a team of SEO nerds in Copenhagen.' (Kongens Lyngby is the stated address; Copenhagen is not given as an address)."
+    }
+  },
+  "notes": "Two-page marketing site (the 'Features' link points to the homepage); no about, contact or integrations page was linked."
+}

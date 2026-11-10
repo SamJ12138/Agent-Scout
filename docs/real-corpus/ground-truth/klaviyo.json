@@ -1,0 +1,200 @@
+{
+  "slug": "klaviyo",
+  "name": "Klaviyo",
+  "url": "https://www.klaviyo.com/",
+  "asOf": "2026-11-10",
+  "pages_read": [
+    "https://www.klaviyo.com/",
+    "https://www.klaviyo.com/composer",
+    "https://www.klaviyo.com/integrate",
+    "https://www.klaviyo.com/pricing",
+    "https://www.klaviyo.com/about"
+  ],
+  "fields": {
+    "one_liner": {
+      "value": "Klaviyo unifies AI-powered email marketing and SMS to drive growth, retention, and measurable results.",
+      "source_url": "https://www.klaviyo.com/",
+      "kind": "meta description",
+      "also_acceptable": [
+        "Your AI marketing agent, always a step ahead. Composer turns customer data into revenue. You approve the plan, and every result is measured."
+      ]
+    },
+    "categories": {
+      "value": [
+        "email marketing",
+        "sales & crm",
+        "customer support",
+        "analytics & reporting"
+      ],
+      "source_url": "https://www.klaviyo.com/",
+      "quote": "Klaviyo unifies AI-powered email marketing and SMS to drive growth, retention, and measurable results.",
+      "evidence": [
+        {
+          "item": "email marketing",
+          "source_url": "https://www.klaviyo.com/",
+          "quote": "Klaviyo unifies AI-powered email marketing and SMS to drive growth, retention, and measurable results."
+        },
+        {
+          "item": "sales & crm",
+          "source_url": "https://www.klaviyo.com/about",
+          "quote": "Klaviyo is the AI-first CRM built for B2C brands."
+        },
+        {
+          "item": "customer support",
+          "source_url": "https://www.klaviyo.com/",
+          "quote": "Customer Agent resolves 65% of questions autonomously."
+        },
+        {
+          "item": "analytics & reporting",
+          "source_url": "https://www.klaviyo.com/about",
+          "quote": "Klaviyo combines marketing automation, analytics, and customer service into one unified solution"
+        }
+      ]
+    },
+    "target_user": {
+      "value": [
+        "ecommerce brands",
+        "small business",
+        "enterprise",
+        "agencies",
+        "developers"
+      ],
+      "source_url": "https://www.klaviyo.com/",
+      "quote": "Retail and ecommerce",
+      "evidence": [
+        {
+          "item": "ecommerce brands",
+          "source_url": "https://www.klaviyo.com/",
+          "quote": "Retail and ecommerce"
+        },
+        {
+          "item": "small business",
+          "source_url": "https://www.klaviyo.com/",
+          "quote": "Small business marketing"
+        },
+        {
+          "item": "enterprise",
+          "source_url": "https://www.klaviyo.com/",
+          "quote": "Enterprise"
+        },
+        {
+          "item": "agencies",
+          "source_url": "https://www.klaviyo.com/",
+          "quote": "Agency and tech partners"
+        },
+        {
+          "item": "developers",
+          "source_url": "https://www.klaviyo.com/",
+          "quote": "Developers"
+        }
+      ],
+      "note": "All five are items of the site's 'Built for' list (labels, not sentences). The list also names restaurants and health & wellness, which the vocabulary does not cover."
+    },
+    "tasks": {
+      "value": [
+        "send email campaigns",
+        "personalization",
+        "analytics reporting",
+        "workflow automation",
+        "customer chat",
+        "write copy"
+      ],
+      "source_url": "https://www.klaviyo.com/composer",
+      "quote": "Create and optimize campaigns across email, SMS, push, and other supported channels",
+      "evidence": [
+        {
+          "item": "send email campaigns",
+          "source_url": "https://www.klaviyo.com/composer",
+          "quote": "Create and optimize campaigns across email, SMS, push, and other supported channels"
+        },
+        {
+          "item": "personalization",
+          "source_url": "https://www.klaviyo.com/composer",
+          "quote": "Describe it once and Composer builds personalized email and SMS."
+        },
+        {
+          "item": "analytics reporting",
+          "source_url": "https://www.klaviyo.com/composer",
+          "quote": "Composer analyzes your campaigns, flows, and customer data, then comes back with recommended next steps."
+        },
+        {
+          "item": "workflow automation",
+          "source_url": "https://www.klaviyo.com/composer",
+          "quote": "Automate repetitive work with scheduled tasks and reminders"
+        },
+        {
+          "item": "customer chat",
+          "source_url": "https://www.klaviyo.com/",
+          "quote": "Customer Agent resolves 65% of questions autonomously."
+        },
+        {
+          "item": "write copy",
+          "source_url": "https://www.klaviyo.com/composer",
+          "quote": "Composer can create content, recommend improvements, and prepare changes for your review."
+        }
+      ]
+    },
+    "can_execute": {
+      "value": true,
+      "source_url": "https://www.klaviyo.com/",
+      "quote": "Composer spots it in your customer data, then plans and launches personalized campaigns across every channel.",
+      "note": "Confirmed on a second read. The Composer page adds that it 'can create and update campaigns, flows, and other marketing experiences in Klaviyo' and that 'Customer-facing campaigns, flows, and messages require your approval before they're sent or published.' So it acts itself, after approval."
+    },
+    "multi_agent": {
+      "value": "unknown",
+      "note": "The homepage heading 'Your data, intelligence, and AI agents working as one' was re-read: it describes one platform, not agents collaborating with each other. Two named agents exist (Composer, Customer Agent) but no sentence says they work together."
+    },
+    "integrations": {
+      "value": [
+        "OpenAI",
+        "Shopify",
+        "Meta",
+        "TikTok",
+        "Canva",
+        "WooCommerce",
+        "Salesforce",
+        "Claude",
+        "HubSpot",
+        "Square",
+        "Magento",
+        "Gorgias",
+        "Stripe",
+        "Mindbody",
+        "Google Ads",
+        "Muse",
+        "BigCommerce",
+        "PrestaShop",
+        "Salesforce Commerce Cloud",
+        "Square Online",
+        "Wix",
+        "ChatGPT",
+        "Instagram"
+      ],
+      "source_url": "https://www.klaviyo.com/integrate",
+      "note": "Names readable as text on /integrate, in page order. The page claims '400+ apps'; a logo grid there had no readable names. It also names Snowflake, BigQuery and Azure as export targets, and the Composer FAQ names Asana."
+    },
+    "pricing": {
+      "value": {
+        "free_tier": true,
+        "starting_price": "$20/month"
+      },
+      "source_url": "https://www.klaviyo.com/pricing",
+      "quote": "Up to 250 active profiles and 500 emails per month.",
+      "also_acceptable": [
+        "$1/month"
+      ],
+      "note": "Free plan shown as '$0'. Email plan '$20/month' at the default 500-profile setting of a slider ('Select your number of active profiles'). A limited-time promotion shows the Marketing plan as '$1/month' for the first month (struck-through $25)."
+    },
+    "hq_location": {
+      "value": {
+        "city": "Boston",
+        "country": "United States"
+      },
+      "source_url": "https://www.klaviyo.com/about",
+      "quote": "Boston (Global Headquarters)",
+      "country_stated": false,
+      "note": "The address is written '125 Summer Street, Floor 6 / Boston, MA 02111'. No country word is printed next to it; 'United States' is derived from the state code and ZIP in that address."
+    }
+  },
+  "notes": "The about page lists offices in eight cities. Plan prices are driven by an interactive profile-count slider, so a plain fetcher may see only the default figures. Expected to be the hardest site in the set for a plain HTTP client (see README); the reading tool itself got full text on all five pages."
+}

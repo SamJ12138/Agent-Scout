@@ -24,3 +24,6 @@ Thumbs.db
 
 # Secrets
 .env
+
+# Full output of a corpus run (uploaded as a workflow artifact, not committed)
+/corpus-run/

@@ -1,0 +1,230 @@
+{
+  "slug": "sintra",
+  "name": "Sintra",
+  "url": "https://sintra.ai/",
+  "asOf": "2026-11-10",
+  "pages_read": [
+    "https://sintra.ai/",
+    "https://sintra.ai/ai-employees",
+    "https://sintra.ai/integrations",
+    "https://sintra.ai/pricing",
+    "https://sintra.ai/solutions/ai-agent-orchestrator"
+  ],
+  "fields": {
+    "one_liner": {
+      "value": "Build and scale your business with AI employees - smart AI workers designed to work around the clock.",
+      "source_url": "https://sintra.ai/",
+      "kind": "meta description (opening)",
+      "also_acceptable": [
+        "Finally, AI that knows you and your business. Now you really can do it all. Your Sintra AI Employees support you in the day-to-day of running a business."
+      ],
+      "note": "The reading tool returned only the opening of the meta description."
+    },
+    "categories": {
+      "value": [
+        "general agent platform",
+        "social media",
+        "email marketing",
+        "analytics & reporting",
+        "seo",
+        "customer support",
+        "content generation",
+        "ecommerce"
+      ],
+      "source_url": "https://sintra.ai/ai-employees",
+      "quote": "Sintra automates your socials, inbox, content, and business operations without adding extra headcount or management overhead.",
+      "evidence": [
+        {
+          "item": "general agent platform",
+          "source_url": "https://sintra.ai/ai-employees",
+          "quote": "Sintra automates your socials, inbox, content, and business operations without adding extra headcount or management overhead."
+        },
+        {
+          "item": "social media",
+          "source_url": "https://sintra.ai/",
+          "quote": "Write, create, and post content effortlessly with AI-powered solutions."
+        },
+        {
+          "item": "email marketing",
+          "source_url": "https://sintra.ai/integrations",
+          "quote": "Your email marketer uses Gmail to send campaigns; your data analyst pulls from Google Analytics for reports."
+        },
+        {
+          "item": "analytics & reporting",
+          "source_url": "https://sintra.ai/integrations",
+          "quote": "Your email marketer uses Gmail to send campaigns; your data analyst pulls from Google Analytics for reports."
+        },
+        {
+          "item": "seo",
+          "source_url": "https://sintra.ai/ai-employees",
+          "quote": "Find keywords"
+        },
+        {
+          "item": "customer support",
+          "source_url": "https://sintra.ai/ai-employees",
+          "quote": "Manage tickets"
+        },
+        {
+          "item": "content generation",
+          "source_url": "https://sintra.ai/ai-employees",
+          "quote": "Write copy"
+        },
+        {
+          "item": "ecommerce",
+          "source_url": "https://sintra.ai/ai-employees",
+          "quote": "Optimize listings"
+        }
+      ],
+      "note": "The last four quotes are task labels on the AI-employee role cards (SEO, customer support, copywriter, e-commerce roles), not sentences."
+    },
+    "target_user": {
+      "value": [
+        "small business",
+        "enterprise"
+      ],
+      "source_url": "https://sintra.ai/ai-employees",
+      "quote": "AI Employees for Small Business",
+      "evidence": [
+        {
+          "item": "small business",
+          "source_url": "https://sintra.ai/ai-employees",
+          "quote": "AI Employees for Small Business"
+        },
+        {
+          "item": "enterprise",
+          "source_url": "https://sintra.ai/solutions/ai-agent-orchestrator",
+          "quote": "For Enterprises"
+        }
+      ],
+      "note": "'enterprise' is a section heading on the orchestration page (next to 'For startups' and 'For SMBs'); the main audience named across the site is business owners and entrepreneurs."
+    },
+    "tasks": {
+      "value": [
+        "write copy",
+        "schedule social posts",
+        "send email campaigns",
+        "seo optimization",
+        "customer chat",
+        "analytics reporting",
+        "workflow automation"
+      ],
+      "source_url": "https://sintra.ai/ai-employees",
+      "quote": "Write copy",
+      "evidence": [
+        {
+          "item": "write copy",
+          "source_url": "https://sintra.ai/ai-employees",
+          "quote": "Write copy"
+        },
+        {
+          "item": "schedule social posts",
+          "source_url": "https://sintra.ai/integrations",
+          "quote": "Emails sent, posts scheduled, reports generated, meetings managed - all without switching tabs or repeating yourself"
+        },
+        {
+          "item": "send email campaigns",
+          "source_url": "https://sintra.ai/integrations",
+          "quote": "Your email marketer uses Gmail to send campaigns; your data analyst pulls from Google Analytics for reports."
+        },
+        {
+          "item": "seo optimization",
+          "source_url": "https://sintra.ai/ai-employees",
+          "quote": "Optimize pages"
+        },
+        {
+          "item": "customer chat",
+          "source_url": "https://sintra.ai/ai-employees",
+          "quote": "Once a decision is made, AI employees take action, whether it’s responding to a customer, processing an order, or generating reports."
+        },
+        {
+          "item": "analytics reporting",
+          "source_url": "https://sintra.ai/integrations",
+          "quote": "Your email marketer uses Gmail to send campaigns; your data analyst pulls from Google Analytics for reports."
+        },
+        {
+          "item": "workflow automation",
+          "source_url": "https://sintra.ai/solutions/ai-agent-orchestrator",
+          "quote": "Stop switching between tools and let Sintra AI run your workflows for you."
+        }
+      ],
+      "note": "'Write copy' and 'Optimize pages' are role-card task labels."
+    },
+    "can_execute": {
+      "value": true,
+      "source_url": "https://sintra.ai/integrations",
+      "quote": "Your email marketer uses Gmail to send campaigns; your data analyst pulls from Google Analytics for reports.",
+      "note": "FAQ answer on the integrations page, confirmed on a second read. Same page: 'Sintra integrations are read-write only for the tasks your specialists need.'"
+    },
+    "multi_agent": {
+      "value": true,
+      "source_url": "https://sintra.ai/solutions/ai-agent-orchestrator",
+      "quote": "Give the orchestrator a goal and it coordinates your agents through these steps.",
+      "note": "Body of the orchestration page, confirmed on a second read; its FAQ adds 'Sintra orchestrates its helpers to do this.' The homepage says 'One team with different AI agents as employees.'"
+    },
+    "integrations": {
+      "value": [
+        "Todoist",
+        "Google Tasks",
+        "WordPress",
+        "HubSpot",
+        "Trello",
+        "Salesforce",
+        "TikTok",
+        "Webflow",
+        "Google Workspace Admin",
+        "GitHub",
+        "Linear",
+        "Slack",
+        "Shopify",
+        "Meta",
+        "Meta Ads",
+        "YouTube",
+        "Outlook",
+        "Dropbox",
+        "QuickBooks",
+        "Google Analytics",
+        "Strava",
+        "Microsoft",
+        "Google Drive",
+        "Notion",
+        "Instagram"
+      ],
+      "source_url": "https://sintra.ai/integrations",
+      "overflow": [
+        "Facebook",
+        "Google Calendar",
+        "LinkedIn",
+        "Gmail",
+        "Xero"
+      ],
+      "note": "First 25 of the 29 names in the integrations-page grid, in page order; the remaining four and Xero (body text only) are in 'overflow'. On the homepage the integration logos are images only, with names visible just in file names."
+    },
+    "pricing": {
+      "value": {
+        "free_tier": false,
+        "starting_price": "$15.60/mo"
+      },
+      "source_url": "https://sintra.ai/pricing",
+      "quote": "We're not able to offer free trials at this time",
+      "also_acceptable": [
+        "$23.60/mo",
+        "$48.50/mo"
+      ],
+      "note": "No free plan is listed and the site says there are no free trials (there is a '14-day money-back guarantee'). Yearly plan '$15.60 /mo' (shown with '$52' and 'Save 70%'); quarterly '$23.60 /mo'; monthly '$48.50 /mo' (shown with '$97')."
+    },
+    "hq_location": {
+      "value": "unknown",
+      "note": "No address on the pages read; footers show 'Copyright © 2026 PlayOS, Inc. All rights reserved'."
+    }
+  },
+  "hq_external": {
+    "value": {
+      "city": "Vilnius",
+      "country": "Lithuania"
+    },
+    "source_url": "https://tech.eu/2025/06/10/lithuanian-ai-startup-sintra-secures-17m-seed-empowering-smbs-with-ai-helpers/",
+    "quote": "The team’s story began in 2018 in a garage in Vilnius, Lithuania",
+    "note": "Weaker than the other hq_external entries: the article (10 June 2025) calls Sintra a Lithuanian startup 'proudly built in Lithuania' but does not use the word headquarters. https://builtin.com/company/sintra lists offices in the United States and Lithuania without naming a headquarters, and the legal entity on the site is PlayOS, Inc."
+  },
+  "notes": "Homepage integration names exist only as logo images. Prices are shown as discounts against list prices, which invites a wrong starting price."
+}

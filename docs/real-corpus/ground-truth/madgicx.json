@@ -1,0 +1,141 @@
+{
+  "slug": "madgicx",
+  "name": "Madgicx",
+  "url": "https://madgicx.com/",
+  "asOf": "2026-11-10",
+  "pages_read": [
+    "https://madgicx.com/",
+    "https://madgicx.com/ai-marketer",
+    "https://madgicx.com/pricing",
+    "https://madgicx.com/about-us",
+    "https://madgicx.com/contact"
+  ],
+  "fields": {
+    "one_liner": {
+      "value": "You just found the #1 AI performance marketer that runs your Facebook ads autonomously.",
+      "source_url": "https://madgicx.com/",
+      "kind": "meta description (first sentence)",
+      "also_acceptable": [
+        "Dominate AI Ads Results. You just found Madgicx: the AI Ads Manager for Meta that 200,000+ advertisers use to audit accounts, launch ads and shift budget on their own."
+      ],
+      "note": "The meta description continues 'Agentic campaign management for ad ROI.' and 'Start your free trial.'"
+    },
+    "categories": {
+      "value": [
+        "advertising",
+        "analytics & reporting"
+      ],
+      "source_url": "https://madgicx.com/",
+      "quote": "You just found Madgicx: the AI Ads Manager for Meta that 200,000+ advertisers use to audit accounts, launch ads and shift budget on their own.",
+      "evidence": [
+        {
+          "item": "advertising",
+          "source_url": "https://madgicx.com/",
+          "quote": "You just found Madgicx: the AI Ads Manager for Meta that 200,000+ advertisers use to audit accounts, launch ads and shift budget on their own."
+        },
+        {
+          "item": "analytics & reporting",
+          "source_url": "https://madgicx.com/",
+          "quote": "Our AI Ad Analyzer cuts through the noise"
+        }
+      ]
+    },
+    "target_user": {
+      "value": [
+        "agencies",
+        "marketers"
+      ],
+      "source_url": "https://madgicx.com/ai-marketer",
+      "quote": "AI Marketer is for businesses and agencies running Meta ads.",
+      "evidence": [
+        {
+          "item": "agencies",
+          "source_url": "https://madgicx.com/ai-marketer",
+          "quote": "AI Marketer is for businesses and agencies running Meta ads."
+        },
+        {
+          "item": "marketers",
+          "source_url": "https://madgicx.com/",
+          "quote": "You just found Madgicx: the AI Ads Manager for Meta that 200,000+ advertisers use to audit accounts, launch ads and shift budget on their own."
+        }
+      ],
+      "note": "'marketers' maps the site's word 'advertisers'. E-commerce appears only in navigation labels ('E-commerce Ad Platform', 'Shopify marketing tools'), so 'ecommerce brands' is left out."
+    },
+    "tasks": {
+      "value": [
+        "manage ads",
+        "generate images or video",
+        "analytics reporting"
+      ],
+      "source_url": "https://madgicx.com/",
+      "quote": "You just found Madgicx: the AI Ads Manager for Meta that 200,000+ advertisers use to audit accounts, launch ads and shift budget on their own.",
+      "evidence": [
+        {
+          "item": "manage ads",
+          "source_url": "https://madgicx.com/",
+          "quote": "You just found Madgicx: the AI Ads Manager for Meta that 200,000+ advertisers use to audit accounts, launch ads and shift budget on their own."
+        },
+        {
+          "item": "generate images or video",
+          "source_url": "https://madgicx.com/",
+          "quote": "generates high-performing creatives instantly"
+        },
+        {
+          "item": "analytics reporting",
+          "source_url": "https://madgicx.com/ai-marketer",
+          "quote": "AI Marketer analyzes your ad account data and identifies optimization opportunities."
+        }
+      ],
+      "note": "The 'generate images or video' quote is a fragment of a homepage sentence about ad creatives."
+    },
+    "can_execute": {
+      "value": true,
+      "source_url": "https://madgicx.com/ai-marketer",
+      "quote": "You choose how AI Marketer operates: autonomous execution or a human-approved workflow.",
+      "note": "FAQ answer, confirmed on a second read. Body text on the same page: 'Audit your Facebook and Instagram campaigns, find optimization opportunities, and act on them' (with autonomous execution or approval)."
+    },
+    "multi_agent": {
+      "value": "unknown",
+      "note": "The AI Marketer page describes one agent and says 'Custom Agents are a separate workflow with their own capabilities and release schedule.' A link label 'Facebook Ads Orchestrator' exists with no description. Nothing says agents work together."
+    },
+    "integrations": {
+      "value": [
+        "Meta Ads",
+        "Google Ads",
+        "Google Analytics 4",
+        "Shopify",
+        "Klaviyo",
+        "TikTok"
+      ],
+      "source_url": "https://madgicx.com/pricing",
+      "note": "From the pricing-page FAQ about the One-Click Report: 'Meta Ads, Google Ads, Google Analytics 4, Shopify, Klaviyo, and TikTok.' There is no integrations page."
+    },
+    "pricing": {
+      "value": {
+        "free_tier": true,
+        "starting_price": "$29/mo"
+      },
+      "source_url": "https://madgicx.com/",
+      "quote": "accurate data analysis for $29/mo forever!",
+      "also_acceptable": [
+        "$49/mo",
+        "unknown"
+      ],
+      "confidence": "low",
+      "note": "Weak value. The pricing page hides the main plan price ('See price inside the app.', with a '$ 0 … /mo' placeholder in the text) and shows only an add-on, Tracking Pro, at '$49/mo'. The homepage shows '$29/mo' as an 'Early-Bird Offer'. free_tier is true because of a trial: 'Try 100% free for 7 days. Cancel Anytime'."
+    },
+    "hq_location": {
+      "value": "unknown",
+      "note": "No address, city or legal entity on the homepage, about, contact or pricing pages; the footer reads '© 2025 All rights reserved madgicx.com'."
+    }
+  },
+  "hq_external": {
+    "value": {
+      "city": "Tel Aviv",
+      "country": "Israel"
+    },
+    "source_url": "https://www.peakspancapital.com/portfolio/madgicx",
+    "quote": "Tel Aviv, Israel"
+  },
+  "notes": "The main plan price is not in the page text (a placeholder '$ 0' is), so it is probably filled in by JavaScript; a plain fetcher will not see a real plan price."
+}
