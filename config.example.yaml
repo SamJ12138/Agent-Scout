@@ -16,7 +16,8 @@ max_integrations: 25
 # the environment variable AGENT_SCOUT_LLM_API_KEY.
 llm:
   provider: null             # openai-compatible | anthropic
-  base_url: null             # e.g. https://api.deepseek.com/v1 for openai-compatible
+  base_url: null             # openai-compatible only, e.g. https://api.deepseek.com
   model: null
   timeout_seconds: 60
   max_chars_per_site: 24000  # cleaned page text sent per site
+  anthropic_version: "2023-06-01"   # anthropic-version request header

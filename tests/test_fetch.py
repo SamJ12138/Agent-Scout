@@ -268,3 +268,11 @@ def test_failed_request_is_logged_with_error_type(scripted, make_fetcher, events
     make_fetcher().get(scripted.base + "/", site="s1")
     fail = [e for e in events() if e["stage"] == "fetch" and e["event"] == "fail"]
     assert fail and fail[0]["error_type"] == "http_403"
+
+
+def test_politeness_wait_is_logged_but_not_counted_as_request_time(scripted, make_fetcher, events):
+    scripted.route("/a", body=OK_BODY)
+    make_fetcher(delay_seconds=30).get(scripted.base + "/a", site="s1")      # fake clock: no real waiting
+    fetch = [e for e in events() if e["stage"] == "fetch" and e["event"] == "success"][0]
+    assert fetch["context"]["waited_ms"] == 30000
+    assert fetch["duration_ms"] < 5000

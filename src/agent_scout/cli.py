@@ -47,7 +47,7 @@ def build_parser() -> argparse.ArgumentParser:
                      help="also ask a language model for each field; values whose quote is not on the "
                           "fetched pages are dropped (off by default; sends page text to the provider)")
     run.add_argument("--llm-provider", choices=["openai-compatible", "anthropic"], help="LLM API style")
-    run.add_argument("--llm-base-url", help="base URL of an openai-compatible API, e.g. https://api.deepseek.com/v1")
+    run.add_argument("--llm-base-url", help="base URL of an openai-compatible API, e.g. https://api.deepseek.com")
     run.add_argument("--llm-model", help="model name")
 
     report_log = commands.add_parser(

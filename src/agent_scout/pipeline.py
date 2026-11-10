@@ -91,7 +91,8 @@ class Progress:
         status = f"HTTP {policy.http_status}" if policy.http_status else "no answer"
         if policy.state == "ok":
             delay = f", Crawl-delay {policy.crawl_delay:g}s" if policy.crawl_delay else ""
-            note = f"{len(policy.rules)} rule{'s' if len(policy.rules) != 1 else ''} apply to agent-scout{delay}"
+            count = len(policy.rules)
+            note = f"{count} rule{' applies' if count == 1 else 's apply'} to agent-scout{delay}"
         elif policy.state == "missing":
             note = "no restrictions"
         else:

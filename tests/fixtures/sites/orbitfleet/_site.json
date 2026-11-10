@@ -5,5 +5,5 @@
   "redirects": {
     "/features": "/platform"
   },
-  "notes": "brotli responses; robots.txt blocks every crawler except agent-scout and sets Crawl-delay: 1; /features redirects to /platform; multi-agent claim; headquarters stated in a sentence; no public price"
+  "notes": "brotli responses; robots.txt blocks every crawler except agent-scout and sets Crawl-delay: 0.5; /features redirects to /platform; multi-agent claim; headquarters stated in a sentence; no public price"
 }

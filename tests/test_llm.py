@@ -111,7 +111,7 @@ def test_anthropic_request_shape():
     assert client(transport, provider="anthropic", base_url=None).complete("SYSTEM", "USER") == "{}"
     call = transport.calls[0]
     assert call["url"] == "https://api.anthropic.com/v1/messages"
-    assert call["headers"]["x-api-key"] == KEY and "anthropic-version" in call["headers"]
+    assert call["headers"]["x-api-key"] == KEY and call["headers"]["anthropic-version"] == "2023-06-01"
     assert "Authorization" not in call["headers"]
     assert call["json"]["system"] == "SYSTEM"
     assert call["json"]["messages"] == [{"role": "user", "content": "USER"}]
@@ -162,6 +162,14 @@ def test_server_error_and_unexpected_payload():
     with pytest.raises(llm.LLMError) as err:
         client(FakeTransport(FakeResponse(payload=None, text="<html>gateway</html>"))).complete("s", "u")
     assert err.value.error_type == "bad_response"
+
+
+def test_anthropic_version_header_is_a_setting():
+    transport = FakeTransport(anthropic_answer("{}"))
+    custom = settings(provider="anthropic", base_url=None)
+    custom.anthropic_version = "2026-10-21"
+    llm.LLMClient(custom, transport=transport).complete("s", "u")
+    assert transport.calls[0]["headers"]["anthropic-version"] == "2026-10-21"
 
 
 # ------------------------------------------------------------------ prompt

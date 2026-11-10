@@ -54,9 +54,9 @@ def test_specific_robots_group_crawl_delay_brotli_and_redirect(crawl, fake_time)
     redirected = next(r for r in result.records if r.final_url.endswith("/platform"))
     assert redirected.url.endswith("/features")
     assert all(record.encoding == "br" for record in result.records)
-    assert result.robots["crawl_delay"] == 1.0
+    assert result.robots["crawl_delay"] == 0.5
     # robots.txt, six pages and one redirect hop: seven waits of the Crawl-delay
-    assert fake_time.sleeps == [1.0] * 7
+    assert fake_time.sleeps == [0.5] * 7
     assert not any(path.startswith("/drafts") for path in site.paths())
 
 

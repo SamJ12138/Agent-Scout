@@ -26,10 +26,11 @@ class ConfigError(Exception):
 class LLMConfig:
     enabled: bool = False             # set by --llm only, never by the config file
     provider: str | None = None       # openai-compatible | anthropic
-    base_url: str | None = None       # e.g. https://api.deepseek.com/v1
+    base_url: str | None = None       # e.g. https://api.deepseek.com
     model: str | None = None
     timeout_seconds: float = 60.0
     max_chars_per_site: int = 24000   # cleaned page text sent per site
+    anthropic_version: str = "2023-06-01"   # anthropic-version header (anthropic provider only)
 
 
 @dataclass

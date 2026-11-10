@@ -197,19 +197,22 @@ class Fetcher:
         crawl_delay = policy.crawl_delay if policy and policy.crawl_delay else 0.0
         return max(self.config.delay_seconds, crawl_delay)
 
-    def _pace(self, url: str) -> None:
+    def _pace(self, url: str) -> float:
+        """Wait until this host may be asked again; returns the seconds waited."""
         host = urlsplit(url).netloc
         last = self._last_request.get(host)
-        if last is not None:
-            gap = max(self.delay_for(url), self._extra_wait.pop(host, 0.0))
-            wait = last + gap - self._clock()
-            if wait > 0:
-                self._sleep(wait)
+        if last is None:
+            return 0.0
+        gap = max(self.delay_for(url), self._extra_wait.pop(host, 0.0))
+        wait = last + gap - self._clock()
+        if wait <= 0:
+            return 0.0
+        self._sleep(wait)
+        return wait
 
     # ------------------------------------------------------------------ one request
     def _request(self, url: str) -> tuple[int, dict, bytes]:
         """One GET without redirects. Returns status, headers, raw body bytes."""
-        self._pace(url)
         try:
             response = self.session.get(url, headers=REQUEST_HEADERS, timeout=self.config.timeout_seconds,
                                         allow_redirects=False, stream=True)
@@ -261,7 +264,8 @@ class Fetcher:
         ``missing_ok``: a 4xx answer is a normal outcome (robots.txt absent).
         """
         for attempt in (1, 2):
-            with obs.span(stage, site=site, url=url, attempt=attempt) as span:
+            waited = self._pace(url)       # outside the span: its duration is the request alone
+            with obs.span(stage, site=site, url=url, attempt=attempt, waited_ms=int(round(waited * 1000))) as span:
                 try:
                     status, headers, raw = self._request(url)
                 except _Failure as failure:

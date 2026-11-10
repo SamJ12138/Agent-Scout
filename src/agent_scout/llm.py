@@ -14,9 +14,10 @@ The check in step 2 proves that the quote is on the page. It does not prove
 that the quote supports the value; the quote is shown next to the value so a
 reader can judge.
 
-Providers: ``openai-compatible`` (base URL + /chat/completions, Bearer key;
-this is how DeepSeek and similar APIs are reached) and ``anthropic``
-(/v1/messages). The key comes from the environment variable
+Providers: ``openai-compatible`` (POST <base URL>/chat/completions with a
+Bearer key; DeepSeek documents this format with the base URL
+https://api.deepseek.com) and ``anthropic`` (POST /v1/messages with the
+x-api-key and anthropic-version headers; the version is a setting). The key comes from the environment variable
 AGENT_SCOUT_LLM_API_KEY and is never written to logs, reports or errors.
 
 Page text is untrusted: a site can contain text addressed to language models.
@@ -43,7 +44,6 @@ from .textmatch import normalise_for_quote
 from .vocab import CATEGORIES, TARGET_USERS, TASKS
 
 ANTHROPIC_BASE_URL = "https://api.anthropic.com"
-ANTHROPIC_VERSION = "2023-06-01"
 MAX_OUTPUT_TOKENS = 2000
 MAX_RETRY_AFTER_SECONDS = 30.0
 DEFAULT_RETRY_SECONDS = 2.0
@@ -68,6 +68,7 @@ class LLMSettings:
     api_key: str = field(repr=False)
     timeout_seconds: float = 60.0
     max_chars_per_site: int = 24000
+    anthropic_version: str = "2023-06-01"
 
 
 def resolve_settings(config: LLMConfig) -> LLMSettings:
@@ -88,7 +89,8 @@ def resolve_settings(config: LLMConfig) -> LLMSettings:
     if not api_key:
         raise LLMError("llm_settings", "--llm needs an API key in the environment variable AGENT_SCOUT_LLM_API_KEY")
     return LLMSettings(provider=provider, base_url=base_url, model=model, api_key=api_key,
-                       timeout_seconds=config.timeout_seconds, max_chars_per_site=config.max_chars_per_site)
+                       timeout_seconds=config.timeout_seconds, max_chars_per_site=config.max_chars_per_site,
+                       anthropic_version=str(config.anthropic_version))
 
 
 def default_transport() -> Any:
@@ -107,7 +109,7 @@ class LLMClient:
         settings = self.settings
         if settings.provider == "anthropic":
             url = (settings.base_url or ANTHROPIC_BASE_URL).rstrip("/") + "/v1/messages"
-            headers = {"x-api-key": settings.api_key, "anthropic-version": ANTHROPIC_VERSION,
+            headers = {"x-api-key": settings.api_key, "anthropic-version": settings.anthropic_version,
                        "content-type": "application/json"}
             body = {"model": settings.model, "max_tokens": MAX_OUTPUT_TOKENS, "system": system,
                     "messages": [{"role": "user", "content": user}]}

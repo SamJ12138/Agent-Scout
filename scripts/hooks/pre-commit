@@ -1,0 +1,15 @@
+#!/bin/sh
+# Runs the test suite before every commit and stops the commit when it is red.
+# Install once with:  python scripts/install_hooks.py
+set -e
+cd "$(git rev-parse --show-toplevel)"
+if [ -x .venv/bin/python ]; then
+    python=.venv/bin/python
+elif [ -x .venv/Scripts/python.exe ]; then
+    python=.venv/Scripts/python.exe
+elif command -v python3 >/dev/null 2>&1; then
+    python=python3
+else
+    python=python
+fi
+exec "$python" -m pytest -q
