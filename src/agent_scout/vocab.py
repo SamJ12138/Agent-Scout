@@ -279,11 +279,14 @@ NOT_AVAILABLE: tuple[str, ...] = ("not available", "not offered", "not included"
 NOT_A_FREE_PLAN: tuple[str, ...] = ("fee", "fees", "setup", "onboarding", "shipping", "commission",
                                     "deposit", "tax")
 # An amount right after one of these words, or right before one of the second
-# list, is a saving, a credit or a funding round, not a price.
+# list, is not the price of a plan: a saving, a credit, a funding round, or
+# the price of an add-on ("Extra Brand ($5/month)", "each additional seat $9").
 NOT_A_PRICE_BEFORE: tuple[str, ...] = ("save", "saves", "saved", "saving", "savings", "worth", "up to",
-                                       "over", "raised", "raise")
+                                       "over", "raised", "raise", "extra", "add-on", "add-ons", "addon",
+                                       "additional", "overage")
 NOT_A_PRICE_AFTER: tuple[str, ...] = ("off", "discount", "credit", "credits", "million", "billion",
-                                      "in revenue", "in sales")
+                                      "in revenue", "in sales", "per additional", "per extra", "extra")
+NOT_A_PRICE_WINDOW = 4
 # Outside a pricing page a price only counts next to one of these.
 PRICE_CUES: tuple[str, ...] = ("starts at", "starting at", "start at", "starting from", "plans start",
                                "pricing starts", "plans from", "as low as", "from just", "priced at")

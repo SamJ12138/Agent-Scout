@@ -209,7 +209,7 @@ def test_pricing_table_with_free_row():
     ("<p>$99/mo billed monthly or $948/year.</p>", "$99/mo"),
     ("<p>€15 per user per month</p><p>€12/user/month billed yearly</p>", "€12/user/month"),
     ("<p>Plans cost $1,200 a year.</p>", "$1,200 a year"),
-    ("<h3>$19</h3><p>per month</p><h3>$49</h3>", "$19"),
+    ("<h3>$19</h3><p>per month</p><h3>$49</h3>", "$19 per month"),     # the period is in the next element
     ("<p>Talk to sales for a quote.</p>", UNKNOWN),
     ("<p>Get $50 off your first order and a $10 credit.</p>", UNKNOWN),
 ])

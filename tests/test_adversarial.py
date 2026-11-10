@@ -263,3 +263,44 @@ def test_a_long_alphabetical_directory_does_not_crowd_out_the_names_a_reader_kno
     assert len(result.value) == 25
     assert result.value[-2:] == ["HubSpot", "Slack"]                 # kept, in page order
     assert result.value[:23] == [f"Aardvark{n}" for n in range(23)]
+
+
+# ------------------------------------------------------------------ prices (corpus run 1)
+@pytest.mark.parametrize("body, expected", [
+    # a spend slider, not prices: "$2.5K" must not be read as "$2"
+    ("<p>Less than $1K $1K - $2.5K $2.5K - $5K $5K - $10K $10K - $20K $30K+</p>", UNKNOWN),
+    ("<p>Trusted with $1.5M of monthly ad spend.</p>", UNKNOWN),
+    # the currency after the amount
+    ("<table><tr><td>Essential 42€/ month billed annually</td><td>Pro 84€/ month per user</td></tr></table>", "42€/ month"),
+    ("<p>Starter 29 € per month</p><p>Team 99 € per month</p>", "29 € per month"),
+    ("<p>Team 49 EUR/month</p>", "49 EUR/month"),
+    ("<p>Jahresplan 1.299,00 € / year</p><p>Monatsplan 129,00 € / month</p>", "129,00 € / month"),
+    # an add-on is not the price of a plan
+    ("<p>Core $19 /month</p><p>Extra Brand ($5/month)</p>", "$19 /month"),
+    ("<p>Pro $49/month</p><p>Each additional seat costs $9/month.</p>", "$49/month"),
+    ("<p>Add-on: Tracking Pro $49/mo</p>", UNKNOWN),
+    # the amount and its period in neighbouring elements
+    ("<div><h3>$149</h3><p>per month</p></div><div><h3>$299</h3><p>per month</p></div>", "$149 per month"),
+    ("<div><span class='block'><p>$15</p></span><p>/mo</p></div>", "$15 /mo"),
+    ("<h3>$149</h3><p>Everything you need to rank.</p>", "$149"),
+    # a struck-through list price glued to the real one
+    ("<p>$25$1/month</p>", "$1/month"),
+])
+def test_starting_price_shapes_seen_on_real_sites(body, expected):
+    value = extract.extract_pricing([pricing_page(body)]).value
+    assert (value if value == UNKNOWN else value["starting_price"]) == expected
+
+
+def test_a_pricing_section_on_the_homepage_is_read_like_a_pricing_page():
+    body = ("<section><h2>Trusted by teams that raised $40 million</h2><p>Customers saved $5 each.</p></section>"
+            "<section><h2>Plans and pricing</h2><div><h3>Starter</h3><p>$29</p></div><div><h3>Pro</h3><p>$99</p></div></section>"
+            "<section><h2>FAQ</h2><p>Refunds of $10 are possible.</p></section>")
+    result = extract.extract_pricing([page(body)])
+    assert result.value == {"free_tier": UNKNOWN, "starting_price": "$29"}
+    assert result.evidence[0].quote == "$29"
+
+
+def test_the_period_is_quoted_with_the_price_it_was_joined_to():
+    body = "<div><h3>$149</h3><p>per month</p></div>"
+    result = extract.extract_pricing([pricing_page(body)])
+    assert [e.quote for e in result.evidence] == ["$149 per month"]

@@ -51,6 +51,9 @@ INTEGRATION_HEADING = re.compile(
     r"\b(integrat\w*|connectors?|works with|connects? (?:to|with)|plugs? into|your (?:tech )?stack)\b",
     re.IGNORECASE)
 INTEGRATION_CLASS = re.compile(r"integration|connector", re.IGNORECASE)
+# A heading with one of these words starts a section that shows plans and prices.
+PRICING_HEADING = re.compile(r"\b(pricing|plans|prices)\b", re.IGNORECASE)
+PRICING_CLASS = re.compile(r"pricing|price-?table|price-?card", re.IGNORECASE)
 
 _SENTENCE_END = re.compile(r"(?<=[.!?])\s+(?=[A-Z0-9“\"])")
 _NOT_A_SENTENCE_END = re.compile(r"\b(?:[A-Z]\.[A-Z]|Inc|Ltd|Co|Corp|No|vs|e\.g|i\.e|St|Dr|Mr|Ms)\.$")
@@ -91,6 +94,7 @@ class Snippet:
     zone: str            # head | main | header | nav | footer | quote | banner
     in_integration_section: bool = False
     level: int = 0       # 1-6 for a heading, otherwise 0
+    in_pricing_section: bool = False
 
 
 @dataclass
@@ -194,15 +198,19 @@ def _heading_level(tag: Tag) -> int:
     return int(tag.name[1])
 
 
-def _integration_containers(soup: BeautifulSoup) -> set[int]:
-    """ids of elements whose contents are presented as a list of integrations."""
+def _section_containers(soup: BeautifulSoup, heading_words: re.Pattern, class_words: re.Pattern) -> set[int]:
+    """ids of the elements that make up a section of one kind (a list of
+    integrations, a pricing block): elements whose class or id says so, and
+    what stands under a heading that says so."""
     containers: set[int] = set()
     for element in soup.find_all(True):
-        marker = " ".join(element.get("class") or []) + " " + (element.get("id") or "")
-        if INTEGRATION_CLASS.search(marker):
+        if element.name in ("body", "html"):
+            continue
+        marker = " ".join(element.get("class") or []) + " " + str(element.get("id") or "")
+        if class_words.search(marker):
             containers.add(id(element))
     for heading in soup.find_all(HEADINGS):
-        if not INTEGRATION_HEADING.search(heading.get_text(" ")):
+        if not heading_words.search(heading.get_text(" ")):
             continue
         parent = heading.parent
         sibling_headings = [h for h in parent.find_all(HEADINGS, recursive=False)] if parent else []
@@ -244,7 +252,11 @@ def parse_page(url: str, html: str, config: Config) -> Page:
 
     for comment in soup.find_all(string=lambda node: isinstance(node, Comment)):
         comment.extract()
-    containers = _integration_containers(soup)
+    containers = _section_containers(soup, INTEGRATION_HEADING, INTEGRATION_CLASS)
+    pricing_containers = _section_containers(soup, PRICING_HEADING, PRICING_CLASS)
+
+    def in_pricing(element: Tag) -> bool:
+        return any(id(parent) in pricing_containers for parent in [element, *element.parents])
     zone_cache: dict[int, str | None] = {}
 
     def zone_of(element: Tag) -> str:
@@ -299,14 +311,14 @@ def parse_page(url: str, html: str, config: Config) -> Page:
         if not text:
             return
         page.visible_chars += len(text)
-        zone, integ = zone_of(anchor), in_integration(anchor)
+        zone, integ, priced = zone_of(anchor), in_integration(anchor), in_pricing(anchor)
         if heading:
-            page.snippets.append(Snippet(text, "heading", zone, integ, level=_heading_level(anchor)))
+            page.snippets.append(Snippet(text, "heading", zone, integ, _heading_level(anchor), priced))
         elif link_only(nodes):
-            page.snippets.append(Snippet(text, "link", zone, integ))
+            page.snippets.append(Snippet(text, "link", zone, integ, 0, priced))
         else:
             for sentence in split_sentences(text):
-                page.snippets.append(Snippet(sentence, "sentence", zone, integ))
+                page.snippets.append(Snippet(sentence, "sentence", zone, integ, 0, priced))
 
     def visit(element: Tag) -> None:
         if element.name == "table":
@@ -317,7 +329,8 @@ def parse_page(url: str, html: str, config: Config) -> Page:
                     rows.append(cells)
                     text = " | ".join(cells)
                     page.visible_chars += sum(len(cell) for cell in cells)
-                    page.snippets.append(Snippet(text, "table", zone_of(element), in_integration(element)))
+                    page.snippets.append(Snippet(text, "table", zone_of(element), in_integration(element), 0,
+                                                 in_pricing(element)))
             if rows:
                 page.tables.append(rows)
             return

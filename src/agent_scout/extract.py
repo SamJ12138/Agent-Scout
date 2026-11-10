@@ -31,7 +31,7 @@ from .vocab import (AGENT_SUBJECTS, ASSIST_WORDS, AUDIENCE_COMPARISON_WINDOW, AU
                     AUTONOMY_MARKERS, CATEGORIES, CONSENT_HEADING_WORDS, DRAFT_ONLY_PHRASES, DRAFT_ONLY_VERBS,
                     EXECUTE_OBJECTS, EXECUTE_VERBS, FREE_TIER_PHRASES, GENERAL_OBJECTS, HQ_CUES,
                     INTEGRATION_TRIGGERS, KNOWN_INTEGRATIONS, LOGO_SUFFIXES, MULTI_AGENT_PHRASES, NEGATORS,
-                    FREE_NOUNS, NOT_A_CITY, NOT_A_FREE_PLAN, NOT_AVAILABLE, NOT_A_PRICE_AFTER, NOT_A_PRICE_BEFORE,
+                    FREE_NOUNS, NOT_A_CITY, NOT_A_FREE_PLAN, NOT_AVAILABLE, NOT_A_PRICE_AFTER, NOT_A_PRICE_BEFORE, NOT_A_PRICE_WINDOW,
                     NOT_A_PRODUCT, OFFER_NEGATIONS, OFFER_VERBS, PRICE_CUES, SELF_MARKERS, STRONG_HIT, TARGET_USERS, TASKS, THIRD_PARTIES,
                     THRESHOLDS, USER_SUBJECT_WINDOW, USER_SUBJECTS, WEAK_HIT)
 
@@ -342,13 +342,29 @@ def extract_integrations(pages: list[Page], site_name: str | None, limit: int) -
 
 
 # --------------------------------------------------------------------------- pricing
-PRICE = re.compile(
-    r"(?:US\$|[$€£])\s?(?P<amount>\d[\d,]*(?:\.\d+)?)(?!\s?(?:[kKmMbB]\b|\d))"
-    r"(?:\s?(?:USD|EUR|GBP))?"
-    r"(?:\s*(?:/|per|a)\s*(?:(?:user|seat|member|agent|editor|workspace|account)\s*(?:/|per|a)\s*)?"
-    r"(?P<period>month|mo|year|yr|annum|week)\b)?",
-    re.IGNORECASE)
+# A price as sites write it: "$49", "$49/month", "$1,200 a year", "€12/user/month",
+# and with the currency after the amount: "42€/ month", "29 € per month", "49 EUR/month".
+# "$2.5K" and "$40 million" are amounts of money, not prices.
+_AMOUNT = r"\d[\d.,]*\d|\d"
+_NOT_A_LARGER_NUMBER = r"(?![\d.,]*\d|\s?[kKmMbB]\b)"
+_PER = (r"(?:\s*(?:/|per|a)\s*(?:(?:user|seat|member|agent|editor|workspace|account)\s*(?:/|per|a)\s*)?"
+        r"(?P<period>month|mo|year|yr|annum|week)\b)?")
+PRICE = re.compile(rf"(?:US\$|[$€£])\s?(?P<amount>{_AMOUNT}){_NOT_A_LARGER_NUMBER}(?:\s?(?:USD|EUR|GBP))?{_PER}",
+                   re.IGNORECASE)
+PRICE_CURRENCY_AFTER = re.compile(
+    rf"(?<![\w.,$€£])(?P<amount>{_AMOUNT})\s?(?:[€£$]|EUR\b|USD\b|GBP\b)(?!\s?\d){_PER}", re.IGNORECASE)
+# The period standing alone at the start of the element after a bare price.
+_PERIOD_ALONE = re.compile(
+    r"\s*(?:/|per\b|a\b)\s*(?:(?:user|seat|member|agent|editor|workspace|account)\s*(?:/|per|a)\s*)?"
+    r"(?P<period>month|mo|year|yr|annum|week)\b", re.IGNORECASE)
 _PERIOD_RANK = {"month": 0, "mo": 0, None: 1, "week": 2, "year": 3, "yr": 3, "annum": 3}
+
+
+def _amount(text: str) -> float:
+    """'1,200' -> 1200.0, '15.60' -> 15.6, '1.299,00' (continental) -> 1299.0, '129,00' -> 129.0."""
+    if re.fullmatch(r"\d{1,3}(?:\.\d{3})*,\d{1,2}", text):
+        return float(text.replace(".", "").replace(",", "."))
+    return float(text.replace(",", ""))
 
 
 def _is_pricing_page(page: Page) -> bool:
@@ -356,9 +372,18 @@ def _is_pricing_page(page: Page) -> bool:
 
 
 def _not_a_price(text: str, match: re.Match) -> bool:
-    before = " ".join(re.findall(r"[\w']+", text[:match.start()])[-3:])
-    after = " ".join(re.findall(r"[\w']+", text[match.end():])[:2])
+    before = " ".join(re.findall(r"[\w'-]+", text[:match.start()])[-NOT_A_PRICE_WINDOW:])
+    after = " ".join(re.findall(r"[\w'-]+", text[match.end():])[:NOT_A_PRICE_WINDOW])
     return has_phrase(before, NOT_A_PRICE_BEFORE) or has_phrase(after, NOT_A_PRICE_AFTER)
+
+
+def _price_matches(text: str) -> list[re.Match]:
+    """Every price in a text, either notation, in text order, without overlaps."""
+    matches: list[re.Match] = []
+    for match in sorted([*PRICE.finditer(text), *PRICE_CURRENCY_AFTER.finditer(text)], key=lambda m: m.start()):
+        if not matches or match.start() >= matches[-1].end():
+            matches.append(match)
+    return matches
 
 
 def _offers(page: Page) -> Iterator[tuple[float, str, str]]:
@@ -413,30 +438,40 @@ def extract_pricing(pages: list[Page]) -> FieldResult:
     no_free: Evidence | None = None
     ordered = sorted(_readable(pages), key=lambda page: not _is_pricing_page(page))
     for page in ordered:
-        pricing_page = _is_pricing_page(page)
-        for snippet in _spoken(page, ("heading", "sentence", "link", "table")):
+        whole_page = _is_pricing_page(page)
+        spoken = _spoken(page, ("heading", "sentence", "link", "table"))
+        for index, snippet in enumerate(spoken):
             text = snippet.text
+            # a pricing page, or a pricing section of another page (a one-page site)
+            priced = whole_page or snippet.in_pricing_section
             if _denies_free_tier(text):
                 no_free = no_free or Evidence(page.url, text, snippet.method, item="free_tier")
             elif has_phrase(text, FREE_TIER_PHRASES):
                 free = free or Evidence(page.url, text, snippet.method, item="free_tier")
-            elif pricing_page and snippet.method in ("heading", "table") and \
+            elif priced and snippet.method in ("heading", "table") and \
                     text.split(" | ")[0].strip().lower() in ("free", "free plan"):
                 free = free or Evidence(page.url, text, snippet.method, item="free_tier")
-            for match in PRICE.finditer(text):
-                amount = float(match.group("amount").replace(",", ""))
+            for match in _price_matches(text):
+                amount = _amount(match.group("amount"))
                 if _not_a_price(text, match):
                     continue
                 if amount == 0:
-                    if pricing_page and _zero_is_a_free_plan(snippet):
+                    if priced and _zero_is_a_free_plan(snippet):
                         free = free or Evidence(page.url, text, snippet.method, item="free_tier")
                     continue
-                if not pricing_page and not has_phrase(text, PRICE_CUES):
+                if not priced and not has_phrase(text, PRICE_CUES):
                     continue
                 period = (match.group("period") or "").lower() or None
-                written = " ".join(match.group(0).split())
+                written, quote = " ".join(match.group(0).split()), text
+                if period is None and not text[match.end():].strip() and index + 1 < len(spoken):
+                    # "$149" in one element and "per month" in the next
+                    alone = _PERIOD_ALONE.match(spoken[index + 1].text)
+                    if alone and len(spoken[index + 1].text) <= 40:
+                        period = alone.group("period").lower()
+                        written = f"{written} {' '.join(alone.group(0).split())}"
+                        quote = f"{text} {spoken[index + 1].text}"
                 prices.append((_PERIOD_RANK[period], amount, len(prices), written,
-                               Evidence(page.url, text, snippet.method, item="starting_price")))
+                               Evidence(page.url, quote, snippet.method, item="starting_price")))
 
     evidence: list[Evidence] = []
     starting: str = UNKNOWN
