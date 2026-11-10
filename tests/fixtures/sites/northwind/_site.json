@@ -1,0 +1,5 @@
+{
+  "name": "Northwind Campaign Pilot (fictional)",
+  "content_encoding": "gzip",
+  "notes": "gzip responses; robots.txt disallows /customers/ and /internal/; JSON-LD address; integrations page; pricing table with a free tier"
+}

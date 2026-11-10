@@ -1,0 +1,7 @@
+# Fictional sample site for Agent Scout tests.
+User-agent: *
+Disallow: /
+
+User-agent: agent-scout
+Crawl-delay: 1
+Disallow: /drafts/

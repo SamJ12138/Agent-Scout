@@ -1,0 +1,6 @@
+{
+  "name": "Quillmate Draft Desk (fictional)",
+  "charset": "windows-1252",
+  "charset_header_except": ["/contact"],
+  "notes": "served as windows-1252 (source files are UTF-8 and transcoded by the fixture server; /contact declares the charset only in <meta>); states it only drafts; address in the footer; prices in pounds with a free trial; no integrations"
+}

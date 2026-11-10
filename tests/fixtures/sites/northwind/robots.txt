@@ -1,0 +1,5 @@
+# Fictional sample site for Agent Scout tests.
+User-agent: *
+Disallow: /customers/
+Disallow: /internal/
+Allow: /customers/public

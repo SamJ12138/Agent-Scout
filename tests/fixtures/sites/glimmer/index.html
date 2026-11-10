@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Glimmer Storefront Agent (fictional)</title>
+<meta name="description" content="Glimmer Storefront Agent writes product descriptions for online stores.">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>body{font-family:sans-serif;max-width:60rem;margin:auto;padding:1rem}.fixture-banner{background:#fde68a;padding:.5rem}</style>
+</head>
+<body>
+<p class="fixture-banner">Fictional sample site for Agent Scout tests. Not a real product or company.</p>
+<div id="root"></div>
+<noscript>This site needs JavaScript.</noscript>
+<script>
+// Fictional sample site for Agent Scout tests. Everything a visitor would read is built here, in the browser.
+(function () {
+  'use strict';
+  var SECTIONS = [
+    { id: 'hero', title: 'Product pages that write themselves', body: 'Glimmer is a multi-agent system that writes product descriptions and publishes them to your store automatically.' },
+    { id: 'features', title: 'What the agents do', body: 'The agents work together: one writes copy, one generates product images, one sends email campaigns.' },
+    { id: 'integrations', title: 'Integrations', body: 'Glimmer integrates with Shopify, WooCommerce and Klaviyo.' },
+    { id: 'pricing', title: 'Pricing', body: 'Start with the free plan. Paid plans start at $19/month.' },
+    { id: 'company', title: 'Company', body: 'Glimmer Labs is headquartered in Lisbon, Portugal.' },
+  ];
+
+  function el(tag, attrs, children) {
+    var node = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (name) { node.setAttribute(name, attrs[name]); });
+    (children || []).forEach(function (child) {
+      node.appendChild(typeof child === 'string' ? document.createTextNode(child) : child);
+    });
+    return node;
+  }
+
+  function renderHero(section) {
+    var heading = el('h2', { 'class': 'section-title section-title--hero' }, [section.title]);
+    var text = el('p', { 'class': 'section-body section-body--hero' }, [section.body]);
+    var wrap = el('section', { id: 'hero', 'data-section': 'hero' }, [heading, text]);
+    wrap.addEventListener('click', function () { wrap.classList.toggle('is-open'); });
+    return wrap;
+  }
+
+  function renderFeatures(section) {
+    var heading = el('h2', { 'class': 'section-title section-title--features' }, [section.title]);
+    var text = el('p', { 'class': 'section-body section-body--features' }, [section.body]);
+    var wrap = el('section', { id: 'features', 'data-section': 'features' }, [heading, text]);
+    wrap.addEventListener('click', function () { wrap.classList.toggle('is-open'); });
+    return wrap;
+  }
+
+  function renderIntegrations(section) {
+    var heading = el('h2', { 'class': 'section-title section-title--integrations' }, [section.title]);
+    var text = el('p', { 'class': 'section-body section-body--integrations' }, [section.body]);
+    var wrap = el('section', { id: 'integrations', 'data-section': 'integrations' }, [heading, text]);
+    wrap.addEventListener('click', function () { wrap.classList.toggle('is-open'); });
+    return wrap;
+  }
+
+  function renderPricing(section) {
+    var heading = el('h2', { 'class': 'section-title section-title--pricing' }, [section.title]);
+    var text = el('p', { 'class': 'section-body section-body--pricing' }, [section.body]);
+    var wrap = el('section', { id: 'pricing', 'data-section': 'pricing' }, [heading, text]);
+    wrap.addEventListener('click', function () { wrap.classList.toggle('is-open'); });
+    return wrap;
+  }
+
+  function renderCompany(section) {
+    var heading = el('h2', { 'class': 'section-title section-title--company' }, [section.title]);
+    var text = el('p', { 'class': 'section-body section-body--company' }, [section.body]);
+    var wrap = el('section', { id: 'company', 'data-section': 'company' }, [heading, text]);
+    wrap.addEventListener('click', function () { wrap.classList.toggle('is-open'); });
+    return wrap;
+  }
+
+  var RENDERERS = {
+    hero: renderHero,
+    features: renderFeatures,
+    integrations: renderIntegrations,
+    pricing: renderPricing,
+    company: renderCompany,
+  };
+
+  function nav() {
+    return el('nav', {}, SECTIONS.map(function (section) {
+      return el('a', { href: '/' + section.id }, [section.title]);
+    }));
+  }
+
+  function mount() {
+    var root = document.getElementById('root');
+    root.appendChild(nav());
+    SECTIONS.forEach(function (section) { root.appendChild(RENDERERS[section.id](section)); });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', mount);
+  } else {
+    mount();
+  }
+})();
+</script>
+<script src="/static/analytics.js" defer></script>
+</body>
+</html>
