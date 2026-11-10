@@ -8,8 +8,8 @@
 | `scores.md` | site status, and match / partial / mismatch / missing per site and field | the `corpus` workflow |
 | `report.html` | the HTML report of that run | the `corpus` workflow |
 
-Run it yourself (needs network access; about two minutes because requests to
-one host are spaced out):
+Run it yourself (needs network access; a few minutes, because requests to one
+host are spaced out):
 
     python scripts/run_corpus.py
 

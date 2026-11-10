@@ -13,7 +13,8 @@ BINARY = {".png", ".jpg", ".jpeg", ".gif", ".mp4", ".ico", ".woff", ".woff2", ".
 PERSONAL = [
     ("a local user name", re.compile("isa" + "mb", re.IGNORECASE)),
     ("a Windows home path", re.compile(r"C:\\+" + "Users", re.IGNORECASE)),
-    ("a macOS or Linux home path", re.compile(r"/(?:Users|home)/[a-z][\w.-]*/", re.IGNORECASE)),
+    # a filesystem path, not the path part of a URL such as https://site.example/home/pricing/
+    ("a macOS or Linux home path", re.compile(r"(?<![\w.:/-])/(?:Users|home)/[a-z][\w.-]*/", re.IGNORECASE)),
     ("a personal mail address", re.compile(r"[\w.+-]+@" + "gmail" + r"\.com", re.IGNORECASE)),
     ("a college mail address", re.compile(r"[\w.+-]*@?" + "gettys" + r"burg\.edu", re.IGNORECASE)),
 ]
@@ -23,6 +24,16 @@ ATTRIBUTION = [
     ("a generated-with line", re.compile("Generated " + r"with \[?Claude", re.IGNORECASE)),
     ("a session link", re.compile(r"claude\.ai/" + "code", re.IGNORECASE)),
 ]
+
+
+# Written by the corpus workflow from public websites. A contact address printed
+# on one of those sites may be quoted there, so the generic mail pattern is not
+# applied to these three files; every other pattern is.
+GENERATED_FROM_PUBLIC_SITES = {
+    "docs/real-corpus/results/latest.json",
+    "docs/real-corpus/report.html",
+    "docs/real-corpus/scores.md",
+}
 
 
 def git(*args: str) -> str | None:
@@ -50,7 +61,10 @@ def test_tracked_files_hold_no_personal_data_and_no_attribution():
         if path.suffix.lower() in BINARY:
             continue
         text = path.read_text(encoding="utf-8", errors="replace")
+        generated = path.relative_to(ROOT).as_posix() in GENERATED_FROM_PUBLIC_SITES
         for label, pattern in PERSONAL + ATTRIBUTION:
+            if generated and label == "a personal mail address":
+                continue
             match = pattern.search(text)
             if match:
                 problems.append(f"{path.relative_to(ROOT)}: {label} ({match.group(0)!r})")
@@ -69,6 +83,9 @@ def test_commit_messages_hold_no_personal_data():
 def test_the_word_gmail_alone_is_allowed():
     """Real ground truth lists Gmail as an integration; only addresses are personal data."""
     assert not any(pattern.search("Integrates with Gmail and Slack.") for _, pattern in PERSONAL)
+    assert not any(pattern.search('"url": "https://site.example/home/pricing/"') for _, pattern in PERSONAL)
+    assert any(pattern.search("saved to /home/" + "someone/notes.txt") for _, pattern in PERSONAL)
+    assert any(pattern.search("open /Users/" + "someone/notes.txt") for _, pattern in PERSONAL)
     assert any(pattern.search("write to someone@" + "gmail.com") for _, pattern in PERSONAL)
 
 
