@@ -1,5 +1,6 @@
 {
   "name": "Palisade Ads Autopilot (fictional)",
+  "order": 5,
   "status_all": 403,
   "notes": "every request, robots.txt included, is answered 403 with the body of denied.html"
 }

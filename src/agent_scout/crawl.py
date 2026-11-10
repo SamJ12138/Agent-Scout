@@ -18,6 +18,7 @@ against the page budget and do not make a site "partial".
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import Callable
 
 from . import obs
 from .config import Config
@@ -74,9 +75,16 @@ def _robots_detail(result: FetchResult) -> str:
     return f"robots.txt disallows {result.final_url}"
 
 
-def crawl_site(site: SiteInput, fetcher: Fetcher, config: Config) -> SiteCrawl:
+def crawl_site(site: SiteInput, fetcher: Fetcher, config: Config,
+               on_record: Callable[[PageRecord], None] | None = None) -> SiteCrawl:
+    """``on_record`` is called for every page record as it is made (progress output)."""
     crawl = SiteCrawl(site=site)
     slug = site.slug
+
+    def note(record: PageRecord) -> None:
+        crawl.records.append(record)
+        if on_record:
+            on_record(record)
 
     home = fetcher.get(site.url, site=slug)
     policy = fetcher.robots_for(home.final_url, site=slug)
@@ -86,16 +94,16 @@ def crawl_site(site: SiteInput, fetcher: Fetcher, config: Config) -> SiteCrawl:
             crawl.status, crawl.detail = "unreachable", "could not connect (the robots.txt request failed)"
         else:
             crawl.status, crawl.detail = "robots_disallowed", _robots_detail(home)
-        crawl.records.append(_record(home, "home", "robots_disallowed"))
+        note(_record(home, "home", "robots_disallowed"))
         return crawl
     if home.outcome == "blocked":
         crawl.status, crawl.detail = "blocked", _block_detail(home)
-        crawl.records.append(_record(home, "home", "blocked"))
+        note(_record(home, "home", "blocked"))
         return crawl
     if home.outcome != "ok":
         reason = f"HTTP {home.status}" if home.error_type == f"http_{home.status}" else home.error_type
         crawl.status, crawl.detail = "unreachable", f"the start URL could not be read ({reason})"
-        crawl.records.append(_record(home, "home", "error"))
+        note(_record(home, "home", "error"))
         return crawl
 
     crawl.final_url = home.final_url
@@ -104,9 +112,10 @@ def crawl_site(site: SiteInput, fetcher: Fetcher, config: Config) -> SiteCrawl:
     def add_page(result: FetchResult, topic: str) -> Page:
         with obs.span("parse", site=slug, url=result.final_url) as span:
             page = parse_page(result.final_url, result.text or "", config)
+            page.topic = topic
             span.context.update(visible_chars=page.visible_chars, needs_rendering=page.needs_rendering)
         crawl.pages.append(page)
-        crawl.records.append(_record(result, topic, "needs_rendering" if page.needs_rendering else "fetched"))
+        note(_record(result, topic, "needs_rendering" if page.needs_rendering else "fetched"))
         if page.needs_rendering:
             crawl.needs_rendering = True
             obs.emit("parse", "skip", site=slug, error_type="needs_rendering", url=result.final_url)
@@ -122,11 +131,11 @@ def crawl_site(site: SiteInput, fetcher: Fetcher, config: Config) -> SiteCrawl:
             continue
         result = fetcher.get(candidate.url, site=slug)
         if result.outcome == "robots_disallowed":
-            crawl.records.append(_record(result, candidate.topic, "robots_disallowed"))
+            note(_record(result, candidate.topic, "robots_disallowed"))
             continue
         requested += 1
         if result.outcome == "blocked":
-            crawl.records.append(_record(result, candidate.topic, "blocked"))
+            note(_record(result, candidate.topic, "blocked"))
             crawl.status, crawl.detail = "blocked", _block_detail(result)
             crawl.pages = []
             crawl.needs_rendering = False
@@ -135,7 +144,7 @@ def crawl_site(site: SiteInput, fetcher: Fetcher, config: Config) -> SiteCrawl:
             obs.emit("fetch", "skip", site=slug, error_type="offsite_redirect", url=result.final_url)
             result.outcome, result.error_type = "error", "offsite_redirect"
         if result.outcome != "ok":
-            crawl.records.append(_record(result, candidate.topic, "error"))
+            note(_record(result, candidate.topic, "error"))
             failures.append(result.error_type or "error")
             continue
         if page_identity(result.final_url) in fetched:
@@ -148,7 +157,8 @@ def crawl_site(site: SiteInput, fetcher: Fetcher, config: Config) -> SiteCrawl:
     notes = []
     if crawl.needs_rendering:
         shells = sum(1 for record in crawl.records if record.outcome == "needs_rendering")
-        notes.append(f"{shells} page{'s' if shells != 1 else ''} need JavaScript rendering and were not interpreted")
+        notes.append("1 page needs JavaScript rendering and was not interpreted" if shells == 1 else
+                     f"{shells} pages need JavaScript rendering and were not interpreted")
     if failures:
         notes.append(f"{len(failures)} page{'s' if len(failures) != 1 else ''} failed ({', '.join(sorted(set(failures)))})")
     crawl.status = "partial" if notes else "ok"

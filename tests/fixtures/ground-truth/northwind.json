@@ -1,0 +1,82 @@
+{
+  "slug": "northwind",
+  "name": "Northwind Campaign Pilot (fictional)",
+  "url": "fixture://northwind/",
+  "asOf": "2026-11-10",
+  "pages_read": [
+    "fixture://northwind/",
+    "fixture://northwind/features",
+    "fixture://northwind/integrations",
+    "fixture://northwind/pricing",
+    "fixture://northwind/about",
+    "fixture://northwind/contact"
+  ],
+  "fields": {
+    "one_liner": {
+      "value": "Northwind Campaign Pilot is an AI agent that plans, sends and optimizes email campaigns and paid ads for ecommerce brands.",
+      "source_url": "fixture://northwind/"
+    },
+    "categories": {
+      "value": [
+        "email marketing",
+        "advertising",
+        "ecommerce"
+      ],
+      "quote": "Northwind Campaign Pilot is an AI agent that plans, sends and optimizes email campaigns and paid ads for ecommerce brands.",
+      "source_url": "fixture://northwind/"
+    },
+    "target_user": {
+      "value": [
+        "ecommerce brands",
+        "agencies"
+      ],
+      "quote": "Built for ecommerce brands and the agencies that serve them.",
+      "source_url": "fixture://northwind/"
+    },
+    "tasks": {
+      "value": [
+        "write copy",
+        "send email campaigns",
+        "manage ads",
+        "personalization",
+        "analytics reporting"
+      ],
+      "quote": "Campaign Pilot drafts, schedules and sends email campaigns to each customer segment.",
+      "source_url": "fixture://northwind/features"
+    },
+    "can_execute": {
+      "value": true,
+      "quote": "Campaign Pilot writes the subject lines and body copy for every email, then sends each email campaign automatically at the hour each subscriber is most likely to open it.",
+      "source_url": "fixture://northwind/"
+    },
+    "multi_agent": {
+      "value": "unknown"
+    },
+    "integrations": {
+      "value": [
+        "Shopify",
+        "Klaviyo",
+        "Google Ads",
+        "Meta Ads",
+        "Slack",
+        "Fernleaf CRM"
+      ],
+      "source_url": "fixture://northwind/integrations"
+    },
+    "pricing": {
+      "value": {
+        "free_tier": true,
+        "starting_price": "$49/month"
+      },
+      "source_url": "fixture://northwind/pricing"
+    },
+    "hq_location": {
+      "value": {
+        "city": "Rotterdam",
+        "country": "Netherlands"
+      },
+      "source_url": "fixture://northwind/"
+    }
+  },
+  "notes": "Invented site. Reporting and personalization are features, not what the product is, so they are tasks and not categories. The sentence 'Campaign Pilot is not an SEO tool and it does not manage social media' must not produce seo or social media. /customers/stories and /internal/roadmap are disallowed by robots.txt and were not read; they carry a multi-agent claim that must not appear. 'Save $120 per year' is a discount, not a price. The Enterprise row of the pricing table names a plan, not an audience."
+}

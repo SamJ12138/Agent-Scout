@@ -1,0 +1,69 @@
+{
+  "slug": "quillmate",
+  "name": "Quillmate Draft Desk (fictional)",
+  "url": "fixture://quillmate/",
+  "asOf": "2026-11-10",
+  "pages_read": [
+    "fixture://quillmate/",
+    "fixture://quillmate/product",
+    "fixture://quillmate/pricing",
+    "fixture://quillmate/about",
+    "fixture://quillmate/contact"
+  ],
+  "fields": {
+    "one_liner": {
+      "value": "Quillmate drafts blog posts, product descriptions and social captions in your brand’s voice – for marketing teams and creators.",
+      "source_url": "fixture://quillmate/"
+    },
+    "categories": {
+      "value": [
+        "content generation",
+        "seo"
+      ],
+      "quote": "AI content generation that sounds like you",
+      "source_url": "fixture://quillmate/"
+    },
+    "target_user": {
+      "value": [
+        "marketers",
+        "creators"
+      ],
+      "quote": "Quillmate writes blog posts, product descriptions and social captions for marketing teams and independent creators.",
+      "source_url": "fixture://quillmate/"
+    },
+    "tasks": {
+      "value": [
+        "write copy",
+        "seo optimization"
+      ],
+      "quote": "Every draft is optimised for search, with keyword suggestions and a meta description.",
+      "source_url": "fixture://quillmate/"
+    },
+    "can_execute": {
+      "value": false,
+      "quote": "Unlike tools that publish automatically, Quillmate only drafts: it never sends or publishes anything, and a person on your team posts the final version.",
+      "source_url": "fixture://quillmate/"
+    },
+    "multi_agent": {
+      "value": "unknown"
+    },
+    "integrations": {
+      "value": "unknown"
+    },
+    "pricing": {
+      "value": {
+        "free_tier": true,
+        "starting_price": "£29 per month"
+      },
+      "source_url": "fixture://quillmate/pricing"
+    },
+    "hq_location": {
+      "value": {
+        "city": "Bristol",
+        "country": "United Kingdom"
+      },
+      "source_url": "fixture://quillmate/"
+    }
+  },
+  "notes": "Invented site, served as windows-1252: the one-liner contains a curly apostrophe and an en dash, the price a pound sign. 'Social captions' are copy the product writes; the site does not say it manages or schedules social media. 'publish automatically' appears only in a sentence about other tools."
+}

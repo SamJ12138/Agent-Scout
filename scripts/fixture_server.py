@@ -8,6 +8,7 @@ robots.txt and its own request pacing, exactly like a separate host.
 Site behaviour is declared in the site's ``_site.json``:
 
     name                   display name
+    order                  position in the list of sites
     content_encoding       "gzip" or "br": compress responses when the client
                            advertises that encoding
     charset                serve HTML transcoded to this charset (source files
@@ -157,7 +158,8 @@ class FixtureSites:
 
     def __init__(self, base_port: int | None = None):
         self.sites: list[RunningSite] = []
-        roots = sorted(path for path in SITES_DIR.iterdir() if (path / "_site.json").is_file())
+        roots = [path for path in SITES_DIR.iterdir() if (path / "_site.json").is_file()]
+        roots.sort(key=lambda path: json.loads((path / "_site.json").read_text(encoding="utf-8"))["order"])
         for index, root in enumerate(roots):
             port = 0 if base_port is None else base_port + index
             try:

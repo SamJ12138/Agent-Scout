@@ -1,4 +1,5 @@
 {
   "name": "Glimmer Storefront Agent (fictional)",
+  "order": 4,
   "notes": "JavaScript shell: the HTML carries a title, a meta description, an empty root element and scripts; every sentence about the product is inside the script"
 }

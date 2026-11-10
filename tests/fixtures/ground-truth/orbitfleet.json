@@ -1,0 +1,77 @@
+{
+  "slug": "orbitfleet",
+  "name": "Orbit Fleet Agents (fictional)",
+  "url": "fixture://orbitfleet/",
+  "asOf": "2026-11-10",
+  "pages_read": [
+    "fixture://orbitfleet/",
+    "fixture://orbitfleet/platform",
+    "fixture://orbitfleet/pricing",
+    "fixture://orbitfleet/about",
+    "fixture://orbitfleet/contact",
+    "fixture://orbitfleet/customers"
+  ],
+  "fields": {
+    "one_liner": {
+      "value": "Orbit Fleet is a multi-agent platform: a team of AI agents that plan, write, schedule and publish your social media posts.",
+      "source_url": "fixture://orbitfleet/"
+    },
+    "categories": {
+      "value": [
+        "social media",
+        "general agent platform"
+      ],
+      "quote": "An agent platform for the whole marketing team",
+      "source_url": "fixture://orbitfleet/"
+    },
+    "target_user": {
+      "value": [
+        "marketers",
+        "agencies",
+        "enterprise"
+      ],
+      "quote": "Made for social media managers at agencies and enterprise marketing teams.",
+      "source_url": "fixture://orbitfleet/"
+    },
+    "tasks": {
+      "value": [
+        "write copy",
+        "generate images or video",
+        "schedule social posts",
+        "workflow automation"
+      ],
+      "quote": "The writer agent writes captions and the publisher agent schedules social posts a month ahead.",
+      "source_url": "fixture://orbitfleet/platform"
+    },
+    "can_execute": {
+      "value": true,
+      "quote": "The publisher agent schedules and publishes posts to your channels automatically, around the clock.",
+      "source_url": "fixture://orbitfleet/"
+    },
+    "multi_agent": {
+      "value": true,
+      "quote": "A planner agent, a writer agent and a publisher agent work together as one team.",
+      "source_url": "fixture://orbitfleet/"
+    },
+    "integrations": {
+      "value": [
+        "Instagram",
+        "LinkedIn",
+        "TikTok",
+        "Slack"
+      ],
+      "source_url": "fixture://orbitfleet/"
+    },
+    "pricing": {
+      "value": "unknown"
+    },
+    "hq_location": {
+      "value": {
+        "city": "Toronto",
+        "country": "Canada"
+      },
+      "source_url": "fixture://orbitfleet/about"
+    }
+  },
+  "notes": "Invented site. /features redirects to /platform. The pricing page says to talk to sales: no price and no statement about a free plan. One sentence says a designer agent generates images and short videos: a task, but the site does not present itself as a video or creative tool. /drafts/ is disallowed for agent-scout and carries a price that must not appear."
+}

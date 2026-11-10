@@ -1,0 +1,37 @@
+{
+  "slug": "palisade",
+  "name": "Palisade Ads Autopilot (fictional)",
+  "url": "fixture://palisade/",
+  "asOf": "2026-11-10",
+  "pages_read": [],
+  "fields": {
+    "one_liner": {
+      "value": "unknown"
+    },
+    "categories": {
+      "value": "unknown"
+    },
+    "target_user": {
+      "value": "unknown"
+    },
+    "tasks": {
+      "value": "unknown"
+    },
+    "can_execute": {
+      "value": "unknown"
+    },
+    "multi_agent": {
+      "value": "unknown"
+    },
+    "integrations": {
+      "value": "unknown"
+    },
+    "pricing": {
+      "value": "unknown"
+    },
+    "hq_location": {
+      "value": "unknown"
+    }
+  },
+  "notes": "Invented site. Every request is answered 403, so nothing can be read and every field is unknown."
+}

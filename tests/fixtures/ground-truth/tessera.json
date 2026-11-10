@@ -1,0 +1,37 @@
+{
+  "slug": "tessera",
+  "name": "Tessera Reach Studio (fictional)",
+  "url": "fixture://tessera/",
+  "asOf": "2026-11-10",
+  "pages_read": [],
+  "fields": {
+    "one_liner": {
+      "value": "unknown"
+    },
+    "categories": {
+      "value": "unknown"
+    },
+    "target_user": {
+      "value": "unknown"
+    },
+    "tasks": {
+      "value": "unknown"
+    },
+    "can_execute": {
+      "value": "unknown"
+    },
+    "multi_agent": {
+      "value": "unknown"
+    },
+    "integrations": {
+      "value": "unknown"
+    },
+    "pricing": {
+      "value": "unknown"
+    },
+    "hq_location": {
+      "value": "unknown"
+    }
+  },
+  "notes": "Invented site. robots.txt answers 500, which rules the whole site out for the run (RFC 9309), so every field is unknown."
+}

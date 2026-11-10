@@ -1,6 +1,9 @@
 {
   "name": "Orbit Fleet Agents (fictional)",
+  "order": 3,
   "content_encoding": "br",
-  "redirects": {"/features": "/platform"},
+  "redirects": {
+    "/features": "/platform"
+  },
   "notes": "brotli responses; robots.txt blocks every crawler except agent-scout and sets Crawl-delay: 1; /features redirects to /platform; multi-agent claim; headquarters stated in a sentence; no public price"
 }

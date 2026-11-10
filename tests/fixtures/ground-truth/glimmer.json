@@ -1,0 +1,40 @@
+{
+  "slug": "glimmer",
+  "name": "Glimmer Storefront Agent (fictional)",
+  "url": "fixture://glimmer/",
+  "asOf": "2026-11-10",
+  "pages_read": [
+    "fixture://glimmer/"
+  ],
+  "fields": {
+    "one_liner": {
+      "value": "Glimmer Storefront Agent writes product descriptions for online stores.",
+      "source_url": "fixture://glimmer/"
+    },
+    "categories": {
+      "value": "unknown"
+    },
+    "target_user": {
+      "value": "unknown"
+    },
+    "tasks": {
+      "value": "unknown"
+    },
+    "can_execute": {
+      "value": "unknown"
+    },
+    "multi_agent": {
+      "value": "unknown"
+    },
+    "integrations": {
+      "value": "unknown"
+    },
+    "pricing": {
+      "value": "unknown"
+    },
+    "hq_location": {
+      "value": "unknown"
+    }
+  },
+  "notes": "Invented site. The homepage is a JavaScript shell: the HTML holds a title, a meta description and scripts. Everything else about the product (integrations, a price, a multi-agent claim, a headquarters) exists only inside the script, so without rendering the site states nothing more and every other field is unknown."
+}

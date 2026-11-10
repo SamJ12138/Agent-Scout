@@ -96,6 +96,7 @@ class Image:
 @dataclass
 class Page:
     url: str
+    topic: str = "home"      # which link topic led here: home | product | integrations | pricing | ...
     title: str = ""
     meta: dict[str, str] = field(default_factory=dict)
     json_ld: list[dict] = field(default_factory=list)
