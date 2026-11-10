@@ -17,22 +17,26 @@ from __future__ import annotations
 
 import json
 import re
+from dataclasses import dataclass
 from typing import Iterator
 from urllib.parse import urlsplit
 
 from . import obs
 from .config import Config
-from .geo import _POSTCODE_CITY_COUNTRY, country_name, parse_place, states_the_united_states
+from .geo import (_POSTCODE_CITY_COUNTRY, city_after_postcode, country_name, parse_place,
+                  states_the_united_states)
 from .model import FIELDS, UNKNOWN, Evidence, FieldResult, unknown_fields
 from .page import Page, Snippet, split_sentences
 from .textmatch import (find_all, find_phrase, has_phrase, is_rhetorical, normalise_quotes, phrase_regex,
                         preceded_by, words_before)
 from .vocab import (AGENT_SUBJECTS, ASSIST_WORDS, AUDIENCE_COMPARISON_WINDOW, AUDIENCE_COMPARISONS,
                     AUTONOMY_MARKERS, CATEGORIES, CONSENT_HEADING_WORDS, DRAFT_ONLY_PHRASES, DRAFT_ONLY_VERBS,
-                    EXECUTE_OBJECTS, EXECUTE_VERBS, FREE_TIER_PHRASES, GENERAL_OBJECTS, HQ_CUES,
+                    EXECUTE_OBJECTS, EXECUTE_VERBS, FREE_TIER_PHRASES, GENERAL_OBJECTS, HOSTING_CUES,
+                    HOSTING_LABEL_WORDS, HQ_CUES,
                     INTEGRATION_TRIGGERS, KNOWN_INTEGRATIONS, LOGO_SUFFIXES, MULTI_AGENT_PHRASES, NEGATORS,
                     FREE_NOUNS, NOT_A_CITY, NOT_A_FREE_PLAN, NOT_AVAILABLE, NOT_A_PRICE_AFTER, NOT_A_PRICE_BEFORE, NOT_A_PRICE_WINDOW,
-                    NOT_A_PRODUCT, OFFER_NEGATIONS, OFFER_VERBS, PRICE_CUES, SELF_MARKERS, STRONG_HIT, TARGET_USERS, TASKS, THIRD_PARTIES, THIRD_PARTY_WINDOW,
+                    NOT_A_PRODUCT, OFFER_NEGATIONS, OFFER_VERBS, OTHER_PARTY_CUES, PRICE_CUES, PUBLISHER_CUES,
+                    REGISTERED_OFFICE_CUES, SELF_MARKERS, STRONG_HIT, TARGET_USERS, TASKS, THIRD_PARTIES, THIRD_PARTY_WINDOW,
                     THRESHOLDS, USER_SUBJECT_WINDOW, USER_SUBJECTS, VENDOR_STAFF_MARKERS, VENDOR_STAFF_WINDOW,
                     WEAK_HIT)
 
@@ -549,6 +553,160 @@ def _place_after_cue(rest: str) -> tuple[str | None, str | None]:
     return None, None
 
 
+# ---- whose address is it? A legal notice, a footer or a contact page names the host and other parties too.
+@dataclass
+class _Piece:
+    """A line of a page, or the stretch of a line between two cues."""
+    snippet: Snippet
+    start: int                 # where the piece begins in the line
+    text: str
+    excluded: bool = False     # about the host or another named party, not about the company
+    registered: bool = False   # begins with a registered-office cue
+    rest: str = ""             # for a registered-office piece: the text after the cue
+    opens: bool = False        # a heading, a label or a cue begins here: an address does not run across it
+
+
+_LABEL = re.compile(r"^\s*([^:]{1,40}?)\s*:(?=\s|$)")      # "Host: ...", "Hébergeur : ..."
+
+
+def _marks(text: str, label: str | None) -> list[tuple[int, int, str]]:
+    """Cues in a line as (start, end, kind), in text order; kind is other | publisher | registered."""
+    others = [(m.start(), m.end()) for cue in (*HOSTING_CUES, *OTHER_PARTY_CUES) for m in phrase_regex(cue).finditer(text)]
+    if label and any(phrase_regex(word).search(label) for word in HOSTING_LABEL_WORDS):
+        others.append((0, 0))
+    marks = [(start, end, "other") for start, end in others]
+    for kind, cues in (("publisher", PUBLISHER_CUES), ("registered", REGISTERED_OFFICE_CUES)):
+        for cue in cues:
+            for m in phrase_regex(cue).finditer(text):
+                if not any(start < m.end() and m.start() < end for start, end in others):   # "publisher of the theme"
+                    marks.append((m.start(), m.end(), kind))
+    return sorted(marks)
+
+
+def _address_pieces(snippets: list[Snippet], legal: bool) -> list[_Piece]:
+    """Split the lines of a page into parts and say which belong to another party.
+
+    A hosting or third-party cue begins a part that is not about the company.
+    In a label, in a heading, or anywhere on a legal notice, that part runs on
+    over the following lines; a passing mention in other prose covers the rest
+    of its line only. A publisher cue ends it. So does a new zone of the page,
+    and a heading: any heading when a line began the part, a heading of the
+    same or a higher level when a heading did.
+    """
+    pieces: list[_Piece] = []
+    excluded, zone, opened_by = False, None, 0        # opened_by: level of the heading that began the part, 0 for a line
+    for snippet in snippets:
+        if snippet.zone != zone:
+            excluded, zone, opened_by = False, snippet.zone, 0
+        text = snippet.text
+        heading = snippet.method == "heading"
+        label = _LABEL.match(text)
+        marks = _marks(text, text if heading else label.group(1) if label else None)
+        if heading:
+            kinds = {kind for _, _, kind in marks}
+            if "other" in kinds:
+                excluded, opened_by = True, snippet.level
+            elif "publisher" in kinds or (excluded and (opened_by == 0 or snippet.level <= opened_by)):
+                excluded = False
+            registered = "registered" in kinds and not excluded
+            pieces.append(_Piece(snippet, 0, text, excluded, registered, "", opens=True))
+            continue
+        before = excluded                             # the state to return to after a passing mention
+        position = 0
+        for index, (start, end, kind) in enumerate(marks):
+            if start > position and text[position:start].strip():
+                pieces.append(_Piece(snippet, position, text[position:start], excluded, opens=bool(label) and not position))
+            if kind == "other":
+                if not excluded:
+                    opened_by = 0
+                excluded = True
+                if legal or (label and start < label.end()):
+                    before = True                     # a label, or a legal notice: it runs on
+            elif kind == "publisher":
+                excluded = before = False
+            stop = marks[index + 1][0] if index + 1 < len(marks) else len(text)
+            pieces.append(_Piece(snippet, start, text[start:stop], excluded, kind == "registered", text[end:stop],
+                                 opens=True))
+            position = stop
+        if position < len(text) and text[position:].strip():
+            pieces.append(_Piece(snippet, position, text[position:], excluded, opens=bool(label) and not position))
+        excluded = before if marks else excluded
+    return pieces
+
+
+def _about_another_party(pieces: list[_Piece], snippet: Snippet, position: int) -> bool:
+    for piece in reversed(pieces):
+        if piece.snippet is snippet and piece.start <= position:
+            return piece.excluded
+    return False
+
+
+# what stands between the cue and the place: "registered office [is located at] ...", "Head office: ..."
+_OFFICE_LEAD = re.compile(r"^(?P<label>\s*:)?[\s,–-]*(?:(?:is|are|was)\s+)?(?:(?:located|situated|established)\s+)?"
+                          r"(?P<word>(?:at|in)\s+)?", re.IGNORECASE)
+
+
+def _registered_office(pieces: list[_Piece], index: int) -> tuple[tuple[str | None, str | None], str] | None:
+    """The place after a registered-office cue, and the text it was read from."""
+    piece = pieces[index]
+    lines = [piece.rest]
+    for following in pieces[index + 1:index + 5]:     # the address may be on the lines below the cue
+        if following.excluded or following.opens or len(following.text) > 80:
+            break
+        lines.append(following.text)
+    first = index                                     # quote the company's part of the line, not the host's
+    while first and pieces[first - 1].snippet is piece.snippet and not pieces[first - 1].excluded:
+        first -= 1
+    own = piece.snippet.text[pieces[first].start:piece.start + len(piece.text)].strip()
+    best = None
+    for size in range(1, len(lines) + 1):
+        text = ", ".join(line.strip(" ,.") for line in lines[:size] if line.strip(" ,."))
+        lead = _OFFICE_LEAD.match(text)
+        text = text[lead.end():]
+        parts = text.split(",")
+        for count in range(len(parts), 0, -1):        # the address, then whatever the sentence goes on to say
+            candidate = ",".join(parts[:count]).strip()
+            city, country = parse_place(candidate)
+            if not city:
+                city, country = city_after_postcode(candidate), None
+            if city:
+                quote = ", ".join([own.strip(" ,")] + [line.strip(" ,") for line in lines[1:size]])
+                if country:
+                    return (city, country), quote
+                best = best or ((city, None), quote)
+                break
+        if size == 1 and best is None and "," not in text and (lead.group("label") or lead.group("word")):
+            city, country = _place_after_cue(text)    # "registered office in Lyon", "Head office: Lyon"
+            if city:
+                best = ((city, country), own)
+    return best
+
+
+def _plain_addresses(pieces: list[_Piece]) -> list[tuple[tuple[str, str], str]]:
+    """Addresses written out as plain text in the company's own parts: ((city, country), text)."""
+    found = []
+    for index, piece in enumerate(pieces):
+        if piece.excluded or piece.snippet.method != "sentence":
+            continue
+        for size in (1, 2, 3, 4):
+            group = pieces[index:index + size]
+            if len(group) < size or any(line.excluded or line.opens or len(line.text) > 80 for line in group[1:]):
+                break
+            text = ", ".join(line.text.strip(" ,") for line in group)
+            if len(re.findall(r"\d+", text)) < 2:
+                continue          # an address has a street number and a postcode; "© 2026 Acme" has one number
+            city, country = parse_place(text)
+            if city and country and (size > 1 or "," in text or _POSTCODE_CITY_COUNTRY.search(text)):
+                found.append(((city, country), text))
+    return found
+
+
+def _one_place(found: list) -> tuple | None:
+    """The single place that all candidates agree on, or None when there is none or more than one."""
+    places = {(city.lower() if city else None, country) for (city, country), _ in found}
+    return found[0] if len(places) == 1 else None
+
+
 def extract_hq(pages: list[Page]) -> FieldResult:
     for page in pages:                                  # head data: also from JavaScript shells
         typed = sorted(page.json_ld, key=lambda obj: not ({"Organization", "Corporation", "LocalBusiness"} & _types(obj)))
@@ -567,32 +725,35 @@ def extract_hq(pages: list[Page]) -> FieldResult:
             if city or country:
                 return FieldResult(_place(city, country), [Evidence(page.url, address, "sentence")])
     company_zones = (*SPEAKING_ZONES, "footer")      # a footer is where a company states its address
+    spoken = {id(page): [s for s in page.snippets if s.method in ("sentence", "heading") and s.zone in company_zones]
+              for page in readable}
+    parts = {id(page): _address_pieces(spoken[id(page)], legal=page.topic == "legal") for page in readable}
     for page in readable:
         candidates = [Snippet(page.meta["description"], "meta", "head")] if page.meta.get("description") else []
-        candidates += [s for s in page.snippets if s.method in ("sentence", "heading") and s.zone in company_zones]
-        for snippet in candidates:
+        for snippet in candidates + spoken[id(page)]:
             cue = find_phrase(snippet.text, HQ_CUES)
             if cue is None or preceded_by(snippet.text, cue.start(), THIRD_PARTIES, THIRD_PARTY_WINDOW):
                 continue                                   # "our customer X, based in ..." is not us
+            if _about_another_party(parts[id(page)], snippet, cue.start()):
+                continue                                   # "Host: X, headquartered in ..." is not us either
             place = _place(*_place_after_cue(snippet.text[cue.end():]))
             if place:
                 return FieldResult(place, [Evidence(page.url, snippet.text, snippet.method)])
     # An address written out as plain text: in a footer, or on an about, contact or legal page.
     # It may be one block or one element per line; up to four neighbouring lines are read together.
     for page in readable:
-        lines = [s for s in page.snippets if s.method == "sentence" and s.zone in company_zones
-                 and (s.zone == "footer" or page.topic in ("about", "contact", "legal"))]
-        for index, snippet in enumerate(lines):
-            for size in (1, 2, 3, 4):
-                group = lines[index:index + size]
-                if len(group) < size or any(len(line.text) > 80 for line in group[1:]):
-                    break
-                text = ", ".join(line.text.strip(" ,") for line in group)
-                if len(re.findall(r"\d+", text)) < 2:
-                    continue          # an address has a street number and a postcode; "© 2026 Acme" has one number
-                city, country = parse_place(text)
-                if city and country and (size > 1 or "," in text or _POSTCODE_CITY_COUNTRY.search(text)):
-                    return FieldResult(_place(city, country), [Evidence(page.url, text, "sentence")])
+        pieces = [piece for piece in parts[id(page)]
+                  if piece.snippet.zone == "footer" or page.topic in ("about", "contact", "legal")]
+        offices = [office for index, piece in enumerate(pieces) if piece.registered and not piece.excluded
+                   for office in [_registered_office(pieces, index)] if office]
+        if offices:                                    # the registered office, when the page names one
+            office = _one_place(offices)
+            if office:
+                return FieldResult(_place(*office[0]), [Evidence(page.url, office[1], "sentence")])
+            continue                                   # two registered offices that disagree
+        address = _one_place(_plain_addresses(pieces))    # several addresses and no cue: not known which
+        if address:
+            return FieldResult(_place(*address[0]), [Evidence(page.url, address[1], "sentence")])
     return FieldResult()
 
 

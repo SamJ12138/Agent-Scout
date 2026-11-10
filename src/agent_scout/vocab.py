@@ -336,6 +336,30 @@ THIRD_PARTIES: tuple[str, ...] = ("customer", "customers", "client", "clients", 
 # about something else ("customer success specialists work ..., with headquarters in Hamburg").
 THIRD_PARTY_WINDOW = 4
 
+# A legal notice, a footer or a contact page names more parties than the
+# company: the host, a data protection officer, the maker of the theme. The
+# text after one of these cues is about that party, so an address in it is
+# never the company's.
+HOSTING_CUES: tuple[str, ...] = ("host:", "hosting:", "hosted by", "hosting provider", "hosting company",
+                                 "web host", "web hosting", "hoster", "hosting anbieter",
+                                 "hébergeur", "hébergement", "alojamiento", "proveedor de alojamiento")
+# In a label ("Host : ...") or a heading ("Hosting and data") these words alone are enough.
+HOSTING_LABEL_WORDS: tuple[str, ...] = ("host", "hosting")
+OTHER_PARTY_CUES: tuple[str, ...] = ("data protection officer", "registered agent", "payment processor",
+                                     "payment provider", "publisher of the theme", "theme by", "designed by",
+                                     "developed by", "website by", "datenschutzbeauftragter",
+                                     "délégué à la protection des données")
+# These cues name the company itself; the text after one is the company's again.
+PUBLISHER_CUES: tuple[str, ...] = ("published by", "publisher", "publication manager", "publication director",
+                                   "operated by", "site owner", "website owner", "éditeur",
+                                   "directeur de la publication", "herausgeber", "diensteanbieter", "betreiber",
+                                   "titular")
+# An address introduced by one of these is the company's seat. It is preferred
+# over every other address on the page.
+REGISTERED_OFFICE_CUES: tuple[str, ...] = ("registered office", "registered address", "head office",
+                                           "headquartered", "headquarters", "siège social",
+                                           "sitz der gesellschaft", "domicilio social")
+
 # --------------------------------------------------------------------------
 # Parts of a page that are not the site speaking about its product. Matched
 # against the words of an element's class and id ("main-menu" -> main, menu).

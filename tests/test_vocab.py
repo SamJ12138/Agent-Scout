@@ -636,3 +636,45 @@ def test_offer_negations(negation):
 @pytest.mark.parametrize("phrase", vocab.NOT_AVAILABLE)
 def test_not_available(phrase):
     assert _free_tier(f"A free trial is {phrase}.") is False
+
+
+# ---- parties of a legal notice: whose address is it?
+def _legal(body):
+    return _page("<h1>Legal notice</h1>" + body, "https://acme.test/legal-notice", "legal")
+
+
+_HOSTWELL = "Hostwell, Inc., 398 11th Street, San Francisco, CA 94103, USA"
+_ZEDLY = "Zedly SAS, 12 rue de l'Exemple, 75004 Paris, France"
+_PARIS = {"city": "Paris", "country": "France"}
+
+
+@pytest.mark.parametrize("cue", vocab.HOSTING_CUES + vocab.OTHER_PARTY_CUES)
+def test_an_address_after_the_cue_of_another_party_is_not_the_companys(cue):
+    line = f"{cue.capitalize()} {_HOSTWELL}"
+    assert extract.extract_hq([_legal(f"<p>{line}</p>")]).value == UNKNOWN
+    assert extract.extract_hq([_legal(f"<p>{_ZEDLY}</p><p>{line}</p>")]).value == _PARIS
+    assert extract.extract_hq([_legal(f"<p>{_HOSTWELL}</p>")]).value == {"city": "San Francisco",
+                                                                        "country": "United States"}
+
+
+@pytest.mark.parametrize("word", vocab.HOSTING_LABEL_WORDS)
+def test_hosting_label_words_in_a_label_or_a_heading(word):
+    assert extract.extract_hq([_legal(f"<p>{word.capitalize()} : {_HOSTWELL}</p>")]).value == UNKNOWN
+    assert extract.extract_hq([_legal(f"<h2>{word.capitalize()} and data</h2><p>{_HOSTWELL}</p>")]).value == UNKNOWN
+    # in running text the word alone says nothing about whose address follows
+    assert extract.extract_hq([_legal(f"<p>We {word} nothing ourselves.</p><p>{_ZEDLY}</p>")]).value == _PARIS
+
+
+@pytest.mark.parametrize("cue", vocab.PUBLISHER_CUES)
+def test_publisher_cues_end_the_part_about_the_host(cue):
+    body = f"<p>Host: {_HOSTWELL}</p><p>{cue.capitalize()}: {_ZEDLY}</p>"
+    assert extract.extract_hq([_legal(body)]).value == _PARIS
+
+
+@pytest.mark.parametrize("cue", vocab.REGISTERED_OFFICE_CUES)
+def test_registered_office_cues_pick_one_of_two_addresses(cue):
+    other = "<p>Studio Quill Ltd, 1 High Street, London EC1A 1BB, United Kingdom</p>"
+    office = f"<p>{cue.capitalize()}: 12 rue de l'Exemple, 75004 Paris, France</p>"
+    assert extract.extract_hq([_legal(other + office)]).value == _PARIS
+    assert extract.extract_hq([_legal(office + other)]).value == _PARIS
+    assert extract.extract_hq([_legal(other + f"<p>{_ZEDLY}</p>")]).value == UNKNOWN

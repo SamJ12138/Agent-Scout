@@ -398,3 +398,124 @@ def test_hq_from_a_legal_notice_page():
     legal = page("<h1>Legal notice</h1><p>Zedly GmbH, Wulfsdorfer Weg 100, 22359 Hamburg, Germany</p>",
                  url="https://acme.test/imprint", topic="legal")
     assert extract.extract_hq([page("<p>Hello.</p>"), legal]).value == {"city": "Hamburg", "country": "Germany"}
+
+
+# ------------------------------------------------------------------ headquarters (corpus run 2)
+# A legal notice names several parties: the publisher, the host, sometimes a
+# data protection officer. Run 2 reported the hosting provider's address as the
+# headquarters. The lines below are the quote of that run with the names and the
+# registration number replaced by invented ones.
+PUBLISHER_LINES = [
+    "This site is published by Zedly., provided by ZEDCORP SAS (société par actions simplifiée), "
+    "with a capital of 1432, 80 €, registered with the RCS of Paris under the number 000 000 000, "
+    "whose registered office is located at 40 RUE DES BLANCS MANTEAUX 75004 PARIS.",
+    "Publication manager: ZEDCORP, 40 rue des Blancs Manteaux – 75004, Paris, Fr.",
+]
+HOST_LINES = ["Host: Hostwell, Inc.", "Address: 398 11th Street, Floor 2, San Francisco, CA 94103, USA"]
+PARIS = ({"city": "Paris", "country": UNKNOWN}, {"city": "Paris", "country": "France"})
+
+
+def legal_page(body):
+    return page("<h1>Legal notice</h1>" + body, url="https://acme.test/legal/legal-notice", topic="legal")
+
+
+def paragraphs(lines):
+    return "".join(f"<p>{line}</p>" for line in lines)
+
+
+@pytest.mark.parametrize("body", [
+    paragraphs(PUBLISHER_LINES + HOST_LINES),                       # as the site has it
+    paragraphs(HOST_LINES + PUBLISHER_LINES),                       # the host first
+    "<p>" + "<br>".join(PUBLISHER_LINES + HOST_LINES) + "</p>",     # one block, a line break per line
+    "<p>" + "<br>".join(HOST_LINES + PUBLISHER_LINES) + "</p>",
+], ids=["publisher-first", "host-first", "publisher-first-br", "host-first-br"])
+def test_the_hosting_provider_of_a_legal_notice_is_not_the_headquarters(body):
+    result = extract.extract_hq([page("<p>Hello.</p>"), legal_page(body)])
+    assert result.value in PARIS
+    assert "San Francisco" not in result.evidence[0].quote
+
+
+def test_a_legal_notice_that_only_gives_the_address_of_its_host_states_no_headquarters():
+    assert extract.extract_hq([legal_page(paragraphs(HOST_LINES))]).value == UNKNOWN
+
+
+ZEDLY_PARIS = "Zedly SAS, 12 rue de l'Exemple, 75004 Paris, France"
+HOSTWELL = "Hostwell, Inc., 398 11th Street, San Francisco, CA 94103, USA"
+STUDIO = "Studio Quill Ltd, 1 High Street, London EC1A 1BB, United Kingdom"
+
+
+@pytest.mark.parametrize("body, expected", [
+    # the address of a host or of another named party is not the company's, wherever it stands
+    (f"<p>{ZEDLY_PARIS}</p><p>Hosting: {HOSTWELL}</p>", {"city": "Paris", "country": "France"}),
+    (f"<p>Hosting: {HOSTWELL}</p>", UNKNOWN),
+    (f"<p>This website is hosted by {HOSTWELL}.</p>", UNKNOWN),
+    ("<p>This website is hosted by Hostwell, Inc.</p><p>398 11th Street</p><p>San Francisco, CA 94103, USA</p>", UNKNOWN),
+    (f"<p>Hébergeur : {HOSTWELL}</p><p>Éditeur du site : {ZEDLY_PARIS}</p>", {"city": "Paris", "country": "France"}),
+    (f"<p>Data protection officer: {STUDIO}</p>", UNKNOWN),
+    (f"<p>Publisher of the theme: {STUDIO}</p>", UNKNOWN),
+    # a heading is a label too; it holds until the next heading of its level
+    (f"<h2>Hosting</h2><p>{HOSTWELL}</p>", UNKNOWN),
+    ("<h2>Hosting</h2><p>Hostwell, Inc.</p><h3>Address</h3><p>398 11th Street, San Francisco, CA 94103, USA</p>",
+     UNKNOWN),
+    (f"<h2>Hosting</h2><p>{HOSTWELL}</p><h2>Contact</h2><p>{ZEDLY_PARIS}</p>", {"city": "Paris", "country": "France"}),
+    (f"<h2>Hosting</h2><p>{HOSTWELL}</p><h2>Publisher</h2><p>{ZEDLY_PARIS}</p>", {"city": "Paris", "country": "France"}),
+    # a cue sentence about the host is not about the company either
+    ("<p>Our hosting provider Hostwell is headquartered in San Francisco, CA 94103, USA.</p>", UNKNOWN),
+    ("<p>Host: Hostwell, Inc.</p><p>Headquartered in San Francisco, CA 94103, USA.</p>", UNKNOWN),
+    ("<p>Host: Hostwell, Inc. Its registered office is 398 11th Street, San Francisco, CA 94103, USA.</p>", UNKNOWN),
+    # two addresses and nothing that says which one is the registered office: unknown, not the first or the last
+    (f"<p>{ZEDLY_PARIS}</p><p>{STUDIO}</p>", UNKNOWN),
+    (f"<p>{STUDIO}</p><p>{ZEDLY_PARIS}</p>", UNKNOWN),
+    # ... unless one of them is introduced as the registered office
+    (f"<p>{STUDIO}</p><p>Registered office: 12 rue de l'Exemple, 75004 Paris, France</p>",
+     {"city": "Paris", "country": "France"}),
+    (f"<p>Siège social : 12 rue de l'Exemple, 75004 Paris, France</p><p>{STUDIO}</p>",
+     {"city": "Paris", "country": "France"}),
+    ("<h2>Registered office</h2><p>Zedly SAS</p><p>12 rue de l'Exemple</p><p>75004 Paris</p><p>France</p>"
+     f"<h2>Design</h2><p>{STUDIO}</p>", {"city": "Paris", "country": "France"}),
+    # two registered offices that disagree: unknown
+    ("<p>Registered office: 12 rue de l'Exemple, 75004 Paris, France</p>"
+     "<p>Registered office: 1 High Street, London EC1A 1BB, United Kingdom</p>", UNKNOWN),
+    # the same place written twice is one place
+    (f"<p>{ZEDLY_PARIS}</p><p>Postal address: 14 rue de l'Exemple, 75004 Paris, France</p>",
+     {"city": "Paris", "country": "France"}),
+    # a registered office without a country: the city is stated, the country is not
+    ("<p>Zedly GmbH has its registered office at Musterweg 100, 22359 Hamburg.</p>",
+     {"city": "Hamburg", "country": UNKNOWN}),
+    # a number and capitalised words after a cue are not always a postcode and a city
+    ("<p>Our registered office is at Suite 200, 1600 Exemplar Avenue.</p>", UNKNOWN),
+    # a city alone counts only when the sentence says "in" or "at", or the cue is a label
+    ("<p>Our registered office is in Lyon.</p>", {"city": "Lyon", "country": UNKNOWN}),
+    ("<p>Head office: Lyon</p>", {"city": "Lyon", "country": UNKNOWN}),
+    ("<p>Visit Our Headquarters Today</p>", UNKNOWN),
+    ("<p>Head Office Manager Jane Doe</p>", UNKNOWN),
+])
+def test_addresses_in_a_legal_notice(body, expected):
+    assert extract.extract_hq([legal_page(body)]).value == expected
+
+
+def test_a_passing_mention_of_hosting_in_prose_does_not_hide_a_later_statement():
+    body = ("<p>Every month we run a webinar hosted by our founders.</p><h2>About us</h2>"
+            "<p>Zedly is headquartered in Lisbon, Portugal.</p>")
+    assert extract.extract_hq([page(body, topic="about")]).value == {"city": "Lisbon", "country": "Portugal"}
+    same_paragraph = ("<p>Every month we run a webinar hosted by our founders.</p>"
+                      "<p>Zedly is headquartered in Lisbon, Portugal.</p>")
+    assert extract.extract_hq([page(same_paragraph, topic="about")]).value == {"city": "Lisbon", "country": "Portugal"}
+
+
+def test_the_footer_is_not_part_of_the_host_section_above_it():
+    body = f"<p>Host: {HOSTWELL}</p><footer><p>{ZEDLY_PARIS}</p></footer>"
+    assert extract.extract_hq([legal_page(body)]).value == {"city": "Paris", "country": "France"}
+
+
+@pytest.mark.parametrize("text, expected", [
+    ("40 RUE DES BLANCS MANTEAUX 75004 PARIS", "Paris"),
+    ("Musterweg 100, 22359 Hamburg", "Hamburg"),
+    ("Diplomvej 381, 2800 Kongens Lyngby.", "Kongens Lyngby"),
+    ("75004 PARIS", None),                         # no street: "2026 Zedly" is a year and a name
+    ("Suite 200, 1600 Exemplar Avenue", None),     # a street number and a street
+    ("12 Example Road, 2000 Happy Teams", "Happy Teams"),   # cannot be told apart; only read after a registered-office cue
+])
+def test_city_after_a_postcode(text, expected):
+    from agent_scout.geo import city_after_postcode
+    assert city_after_postcode(text) == expected

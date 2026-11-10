@@ -170,6 +170,28 @@ _POSTCODE_CITY_COUNTRY = re.compile(
     + r")\s*\.?$")
 
 
+# "40 Rue Exemple 75004 PARIS", "Musterweg 100, 22359 Hamburg": a street number, a postcode, then the city
+_STREET_POSTCODE_CITY = re.compile(
+    r"\d\D.*?[\s,]\d{4,5}[\s,]+(?P<city>(?:[A-Z][\w.'-]*\s+){0,2}[A-Z][\w.'-]*)\s*\.?$", re.DOTALL)
+_STREET_WORDS = frozenset({"street", "st", "avenue", "ave", "road", "rd", "boulevard", "blvd", "lane", "drive",
+                           "way", "suite", "floor", "rue", "strasse", "straße", "weg", "platz", "calle"})
+
+
+def city_after_postcode(text: str) -> str | None:
+    """The city of an address that ends 'postcode City' and names no country.
+
+    A number followed by capitalised words is not always a postcode and a
+    city, so this is only for text that a cue has already marked as an address.
+    """
+    found = _STREET_POSTCODE_CITY.search(text.strip())
+    if not found:
+        return None
+    city = found.group("city").rstrip(".")
+    if any(word.lower().strip(".") in _STREET_WORDS for word in city.split()):
+        return None
+    return city.title() if city.isupper() else city
+
+
 def parse_place(text: str) -> tuple[str | None, str | None]:
     """Read 'City, Country', 'City, ST 12345' or a full comma-separated address.
 
