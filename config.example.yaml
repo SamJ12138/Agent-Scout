@@ -11,10 +11,10 @@ min_visible_chars: 200       # pages with less visible text that load scripts
                              # are flagged needs_rendering
 max_integrations: 25
 
-# Optional LLM pass (only used with --llm). The API key is never read from this
-# file: set the environment variable AGENT_SCOUT_LLM_API_KEY.
+# Optional LLM pass. It runs only when --llm is given on the command line;
+# nothing here switches it on. The API key is never read from this file: set
+# the environment variable AGENT_SCOUT_LLM_API_KEY.
 llm:
-  enabled: false
   provider: null             # openai-compatible | anthropic
   base_url: null             # e.g. https://api.deepseek.com/v1 for openai-compatible
   model: null

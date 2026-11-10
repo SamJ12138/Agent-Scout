@@ -29,6 +29,7 @@ def test_file_values_then_overrides(tmp_path):
     ("surprise: 1\n", "surprise"),
     ("llm:\n  provider: other\n", "provider"),
     ("llm:\n  api_key: abc\n", "api_key"),
+    ("llm:\n  enabled: true\n", "--llm"),
     ("- a\n- b\n", "mapping"),
     ("page_budget: [1\n", "YAML"),
 ])

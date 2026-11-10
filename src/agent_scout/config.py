@@ -24,7 +24,7 @@ class ConfigError(Exception):
 
 @dataclass
 class LLMConfig:
-    enabled: bool = False
+    enabled: bool = False             # set by --llm only, never by the config file
     provider: str | None = None       # openai-compatible | anthropic
     base_url: str | None = None       # e.g. https://api.deepseek.com/v1
     model: str | None = None
@@ -102,6 +102,8 @@ def _apply_llm(llm: LLMConfig, data: Any, path: Path) -> None:
     for key, value in data.items():
         if key == "api_key":
             raise ConfigError("llm.api_key is not read from the config file; set AGENT_SCOUT_LLM_API_KEY")
+        if key == "enabled":
+            raise ConfigError("llm.enabled is not a config file setting; the LLM pass runs only with --llm")
         if key not in known:
             raise ConfigError(f"unknown setting in {path}: llm.{key}")
         setattr(llm, key, value)

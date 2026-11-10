@@ -43,6 +43,12 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--timeout", type=float, help="seconds per request (default 20)")
     run.add_argument("--log-dir", type=Path, default=Path("logs"), help="directory for run_<id>.jsonl (default: logs)")
     run.add_argument("--quiet", action="store_true", help="print nothing but errors")
+    run.add_argument("--llm", action="store_true",
+                     help="also ask a language model for each field; values whose quote is not on the "
+                          "fetched pages are dropped (off by default; sends page text to the provider)")
+    run.add_argument("--llm-provider", choices=["openai-compatible", "anthropic"], help="LLM API style")
+    run.add_argument("--llm-base-url", help="base URL of an openai-compatible API, e.g. https://api.deepseek.com/v1")
+    run.add_argument("--llm-model", help="model name")
 
     report_log = commands.add_parser(
         "report-log", help="summarise a run log: error counts and stage durations")
@@ -78,14 +84,43 @@ def _cmd_run(args: argparse.Namespace) -> int:
     try:
         with obs.span("input", path=str(args.sites)) as span:
             try:
-                config = load_config(args.config, {"page_budget": args.page_budget, "delay_seconds": args.delay,
-                                                   "timeout_seconds": args.timeout})
+                config = load_config(args.config, {
+                    "page_budget": args.page_budget, "delay_seconds": args.delay, "timeout_seconds": args.timeout,
+                    "llm_enabled": bool(args.llm), "llm_provider": args.llm_provider,
+                    "llm_base_url": args.llm_base_url, "llm_model": args.llm_model})
                 sites = load_sites(args.sites)
             except (ConfigError, InputError) as exc:
                 span.fail(type(exc).__name__)
                 raise CliError(str(exc)) from None
             span.context["sites"] = len(sites)
-        results = run_sites(sites, config, run_id, write=write)
+        after_site = None
+        llm_failures: list[str] = []
+        if config.llm.enabled:
+            from . import llm
+            try:
+                settings = llm.resolve_settings(config.llm)
+            except llm.LLMError as exc:
+                obs.emit("llm", "fail", error_type=exc.error_type)
+                raise CliError(str(exc)) from None
+            log.register_secret(settings.api_key)
+            config.llm.provider, config.llm.model = settings.provider, settings.model
+            client = llm.LLMClient(settings)
+
+            def after_site(result: dict) -> None:
+                pages = result.get("_pages") or []
+                if llm_failures and llm_failures[-1] == "auth":
+                    obs.emit("llm", "skip", site=result["slug"], error_type="auth_failed_earlier")
+                    result["llm"] = {"status": "skipped", "added": 0, "dropped": 0, "error_type": "auth_failed_earlier"}
+                    return
+                summary = llm.llm_pass(result, pages, client)
+                if summary["status"] == "failed":
+                    llm_failures.append(summary["error_type"])
+                if write:
+                    write({"ok": f"      llm: {summary['added']} added, {summary['dropped']} dropped (quote not verified)",
+                           "failed": f"      llm: failed ({summary['error_type']}); rule-based values kept",
+                           "skipped": "      llm: nothing sent"}[summary["status"]])
+
+        results = run_sites(sites, config, run_id, write=write, after_site=after_site)
         try:
             paths = write_all(results, args.out)
         except OSError as exc:
@@ -95,6 +130,10 @@ def _cmd_run(args: argparse.Namespace) -> int:
             write("")
             write("Reports: " + ", ".join(str(path) for path in paths))
             write(f"Log:     {log.path}")
+        if llm_failures:
+            raise CliError(f"the LLM pass failed ({', '.join(sorted(set(llm_failures)))}) for "
+                           f"{len(llm_failures)} site{'s' if len(llm_failures) != 1 else ''}; "
+                           f"the reports in {args.out} hold rule-based values for them")
         return 0
     finally:
         obs.set_current(None)
