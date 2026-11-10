@@ -206,3 +206,60 @@ def test_consent_container_and_testimonial_are_not_the_one_liner():
     body = ("<div class='cookie-consent'><h2>Cookies</h2><p>Accept all cookies to continue.</p></div>"
             "<blockquote><h3>Best tool ever</h3><p>It changed our week.</p></blockquote>")
     assert extract.extract_one_liner([page(body)]).value == UNKNOWN
+
+
+# ====================================================================== found on real sites (corpus run 1)
+# Each case below is a sentence shape seen in the first run on real websites,
+# rewritten with invented names. The rule it pins must hold on any site.
+
+# ------------------------------------------------------------------ an infinitive is a purpose, not an act
+@pytest.mark.parametrize("sentence", [
+    "Instant Ads scans your webpage to produce high-performing, ready-to-launch advertisements, automatically "
+    "tailored to engage your ideal audience.",
+    "Download ready-to-publish posts, generated automatically for your brand.",
+    "Ads that are ready to launch are created automatically.",
+    "Everything you need to send campaigns automatically.",
+])
+def test_an_infinitive_or_ready_to_compound_does_not_state_that_the_product_acts(sentence):
+    assert extract.extract_can_execute([page(f"<p>{sentence}</p>")]).value == UNKNOWN
+
+
+# ------------------------------------------------------------------ free plan or trial: denials
+@pytest.mark.parametrize("sentence, expected", [
+    ("We're not able to offer free trials at this time.", False),
+    ("We don't have a free plan yet.", False),
+    ("Zed no longer offers a free tier.", False),
+    ("Free trials are not available.", False),
+    ("There is no free plan.", False),
+    ("No free trial limits.", UNKNOWN),
+    ("Free trials are available on every plan.", True),
+])
+def test_free_tier_denials_need_a_verb_of_offering(sentence, expected):
+    value = extract.extract_pricing([pricing_page(f"<p>{sentence}</p>")]).value
+    assert (value if value == UNKNOWN else value["free_tier"]) == expected
+
+
+@pytest.mark.parametrize("sentence", [
+    "You do not need a credit card for the free trial.",
+    "No credit card is required for the free plan.",
+])
+def test_a_negation_about_something_else_is_not_a_denial_of_the_free_tier(sentence):
+    value = extract.extract_pricing([pricing_page(f"<p>{sentence}</p>")]).value
+    assert (value if value == UNKNOWN else value["free_tier"]) in (True, UNKNOWN)
+
+
+# ------------------------------------------------------------------ integrations: as written, known names first
+def test_integration_names_are_reported_as_the_site_writes_them():
+    body = ("<h1>Integrations</h1><img alt='Google BigQuery logo' src='a'><img alt='bigcommerce logo' src='b'>"
+            "<h3>Google Analytics 4</h3><img alt='BigQuery' src='c'>")
+    result = extract.extract_integrations([page(body, topic="integrations")], "Acme", 25)
+    assert result.value == ["Google BigQuery", "BigCommerce", "Google Analytics 4"]     # one entry per product
+
+
+def test_a_long_alphabetical_directory_does_not_crowd_out_the_names_a_reader_knows():
+    obscure = "".join(f"<img alt='Aardvark{n} logo' src='x{n}'>" for n in range(40))
+    body = "<h1>Integrations</h1>" + obscure + "<img alt='HubSpot logo' src='h'><img alt='Slack logo' src='s'>"
+    result = extract.extract_integrations([page(body, topic="integrations")], "Acme", 25)
+    assert len(result.value) == 25
+    assert result.value[-2:] == ["HubSpot", "Slack"]                 # kept, in page order
+    assert result.value[:23] == [f"Aardvark{n}" for n in range(23)]

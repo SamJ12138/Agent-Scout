@@ -255,15 +255,25 @@ KNOWN_INTEGRATIONS: dict[str, tuple[str, ...]] = {
 # --------------------------------------------------------------------------
 # Pricing.
 # --------------------------------------------------------------------------
-FREE_TIER_PHRASES: tuple[str, ...] = ("free plan", "free tier", "free forever", "free trial", "free version",
+FREE_TIER_PHRASES: tuple[str, ...] = ("free plan*", "free tier*", "free forever", "free trial*", "free version*",
                                       "free account", "start for free", "start free", "try for free",
                                       "try it free", "try free", "get started for free", "get started free",
                                       "free to start", "sign up free", "sign up for free", "freemium")
-# A denial only when the clause ends right after it ("There is no free plan."):
-# "No free trial limits." denies limits, not the trial.
-NO_FREE_TIER_PHRASES: tuple[str, ...] = ("no free plan", "no free trial", "no free tier", "no free version",
-                                         "not offer a free plan", "not offer a free trial",
-                                         "not offer a free tier", "not offer a free version")
+# The site denies a free plan or trial when it says so with a verb of
+# offering: a negation, then one of OFFER_VERBS, then one of FREE_NOUNS ("not
+# able to offer free trials", "no longer offers a free tier"); or "no" right
+# before the noun at the end of a clause ("There is no free plan."); or the
+# noun followed by "is/are not available". A negation about something else in
+# the sentence ("no credit card needed for the free trial", "No free trial
+# limits.") is not a denial.
+FREE_NOUNS: tuple[str, ...] = ("free plan", "free plans", "free trial", "free trials", "free tier",
+                               "free tiers", "free version", "free versions")
+OFFER_VERBS: tuple[str, ...] = ("offer", "offers", "offering", "have", "has", "provide", "provides",
+                                "include", "includes")
+OFFER_NEGATIONS: tuple[str, ...] = ("not", "never", "no longer", "unable to", "cannot", "don't", "doesn't",
+                                    "can't", "won't", "isn't", "aren't")
+NOT_AVAILABLE: tuple[str, ...] = ("not available", "not offered", "not included", "no longer available",
+                                  "no longer offered", "unavailable")
 # A price of zero next to one of these words is a fee that happens to be
 # zero, not a free plan ("Setup fee: $0").
 NOT_A_FREE_PLAN: tuple[str, ...] = ("fee", "fees", "setup", "onboarding", "shipping", "commission",

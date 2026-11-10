@@ -31,8 +31,8 @@ from .vocab import (AGENT_SUBJECTS, ASSIST_WORDS, AUDIENCE_COMPARISON_WINDOW, AU
                     AUTONOMY_MARKERS, CATEGORIES, CONSENT_HEADING_WORDS, DRAFT_ONLY_PHRASES, DRAFT_ONLY_VERBS,
                     EXECUTE_OBJECTS, EXECUTE_VERBS, FREE_TIER_PHRASES, GENERAL_OBJECTS, HQ_CUES,
                     INTEGRATION_TRIGGERS, KNOWN_INTEGRATIONS, LOGO_SUFFIXES, MULTI_AGENT_PHRASES, NEGATORS,
-                    NO_FREE_TIER_PHRASES, NOT_A_CITY, NOT_A_FREE_PLAN, NOT_A_PRICE_AFTER, NOT_A_PRICE_BEFORE,
-                    NOT_A_PRODUCT, PRICE_CUES, SELF_MARKERS, STRONG_HIT, TARGET_USERS, TASKS, THIRD_PARTIES,
+                    FREE_NOUNS, NOT_A_CITY, NOT_A_FREE_PLAN, NOT_AVAILABLE, NOT_A_PRICE_AFTER, NOT_A_PRICE_BEFORE,
+                    NOT_A_PRODUCT, OFFER_NEGATIONS, OFFER_VERBS, PRICE_CUES, SELF_MARKERS, STRONG_HIT, TARGET_USERS, TASKS, THIRD_PARTIES,
                     THRESHOLDS, USER_SUBJECT_WINDOW, USER_SUBJECTS, WEAK_HIT)
 
 VOCAB_TABLES = {"categories": CATEGORIES, "target_user": TARGET_USERS, "tasks": TASKS}
@@ -154,6 +154,8 @@ def _states_execution(text: str) -> bool:
         if not any(obj.end() <= verb.start() or obj.start() >= verb.end() for obj in objects):
             continue                                   # the verb needs an object of its own
         before = text[:verb.start()]
+        if re.search(r"\bto[\s-]+$", before):
+            continue                                   # "ready-to-launch", "to send": a purpose, not an act
         if has_phrase(before, ASSIST_WORDS):
             continue                                   # "helps you launch", "drafts ... to post"
         if set(words_before(text, verb.start(), USER_SUBJECT_WINDOW)) & set(USER_SUBJECTS):
@@ -257,7 +259,7 @@ def _names_after_trigger(rest: str) -> list[str]:
         while run:
             canonical = _KNOWN_LOOKUP.get(" ".join(run).lower())
             if canonical:
-                names.append((canonical, True))
+                names.append((" ".join(run), True))        # as the site writes it
                 break
             run.pop()
         if not run and full and _plausible_name(full):
@@ -271,16 +273,37 @@ def _is_integration_page(page: Page) -> bool:
     return page.topic == "integrations" or bool(re.search(r"integrat|connector", urlsplit(page.url).path.lower()))
 
 
+MAX_INTEGRATION_CANDIDATES = 2000     # how many names are considered before the limit is applied
+
+
+def _as_written(text: str) -> tuple[str, str] | None:
+    """(name to report, canonical key) for a known product, else None. The
+    site's own spelling is kept ("Google BigQuery", "Google Analytics 4");
+    only letter case is taken from the known list."""
+    name, _ = _strip_suffix(text)
+    canonical = _KNOWN_LOOKUP.get(name.strip().lower())
+    if canonical is None:
+        return None
+    return (canonical if name.strip().lower() == canonical.lower() else name.strip()), canonical.lower()
+
+
 def extract_integrations(pages: list[Page], site_name: str | None, limit: int) -> FieldResult:
-    found: dict[str, Evidence] = {}
+    found: dict[str, tuple[Evidence, bool]] = {}          # key -> (evidence, is a known product)
     own = {word.lower() for word in re.findall(r"\w+", site_name or "")}
 
-    def add(name: str, page: Page, quote: str, method: str) -> None:
+    def add(name: str, page: Page, quote: str, method: str, key: str | None = None) -> None:
         if name.lower() in own or name.lower() == (site_name or "").lower():
             return
-        key = name.lower()
-        if key not in found and len(found) < limit:
-            found[key] = Evidence(page.url, quote, method, item=name)
+        known = key is not None
+        key = key or name.lower()
+        if key not in found and len(found) < MAX_INTEGRATION_CANDIDATES:
+            found[key] = (Evidence(page.url, quote, method, item=name), known)
+
+    def add_known(text: str, page: Page, quote: str, method: str) -> bool:
+        written = _as_written(text)
+        if written:
+            add(written[0], page, quote, method, key=written[1])
+        return written is not None
 
     for page in _readable(pages):
         whole_page = _is_integration_page(page)
@@ -288,33 +311,34 @@ def extract_integrations(pages: list[Page], site_name: str | None, limit: int) -
             if image.zone != "main" or not (whole_page or image.in_integration_section):
                 continue
             name, had_suffix = _strip_suffix(image.alt)
-            canonical = known_integration(image.alt)
-            if canonical:
-                add(canonical, page, image.alt, "link")
-            elif had_suffix and _plausible_name(name):
+            if not add_known(image.alt, page, image.alt, "link") and had_suffix and _plausible_name(name):
                 add(name, page, image.alt, "link")
         for link in page.links:
             if link.zone == "main" and (whole_page or link.in_integration_section):
-                canonical = known_integration(link.text)
-                if canonical:
-                    add(canonical, page, link.text, "link")
+                add_known(link.text, page, link.text, "link")
         for snippet in page.snippets:
             if snippet.zone not in SPEAKING_ZONES:
                 continue
             if whole_page or snippet.in_integration_section:
                 cells = snippet.text.split(" | ") if snippet.method == "table" else [snippet.text]
                 for cell in cells:
-                    canonical = known_integration(cell)
-                    if canonical:
-                        add(canonical, page, snippet.text, snippet.method)
+                    add_known(cell, page, snippet.text, snippet.method)
             if snippet.method in ("sentence", "heading"):
                 trigger = find_phrase(snippet.text, INTEGRATION_TRIGGERS)
                 if trigger:
                     for name in _names_after_trigger(snippet.text[trigger.end():]):
-                        add(name, page, snippet.text, snippet.method)
+                        if not add_known(name, page, snippet.text, snippet.method):
+                            add(name, page, snippet.text, snippet.method)
     if not found:
         return FieldResult()
-    return FieldResult([e.item for e in found.values()], list(found.values()))
+    # Over the limit, names from the known list are kept before others: a
+    # directory of thousands of apps is alphabetical, and its first 25 entries
+    # say little. The names kept stay in page order.
+    order = list(found)
+    keep = [key for key in order if found[key][1]][:limit]
+    keep += [key for key in order if not found[key][1]][:limit - len(keep)]
+    chosen = [found[key][0] for key in order if key in set(keep)]
+    return FieldResult([evidence.item for evidence in chosen], chosen)
 
 
 # --------------------------------------------------------------------------- pricing
@@ -357,11 +381,22 @@ _CLAUSE_END = re.compile(r"\s*(?:[.,;:!?)]|$)")
 _ONLY_A_PRICE = re.compile(r"\s*(?:free\W*)?" + PRICE.pattern + r"\W*$", re.IGNORECASE)
 
 
+_FREE_NOUN = rf"(?:{_alternatives(FREE_NOUNS)})"
+_DENIALS = (
+    # "not able to offer free trials", "don't have a free plan", "no longer offers a free tier"
+    re.compile(rf"(?<![\w'])(?:{_alternatives(OFFER_NEGATIONS)})(?:\s+[\w']+){{0,3}}?\s+(?:{_alternatives(OFFER_VERBS)})"
+               rf"(?:\s+(?:a|any|the))?\s+{_FREE_NOUN}(?![\w'])", re.IGNORECASE),
+    # "There is no free plan."  (but not "No free trial limits.")
+    re.compile(rf"(?<![\w'])no\s+{_FREE_NOUN}\s*(?:[.,;:!?)]|$)", re.IGNORECASE),
+    # "Free trials are not available."
+    re.compile(rf"(?<![\w']){_FREE_NOUN}\s+(?:is|are)\s+(?:{_alternatives(NOT_AVAILABLE)})(?![\w'])", re.IGNORECASE),
+)
+
+
 def _denies_free_tier(text: str) -> bool:
-    """'There is no free plan.' yes; 'No free trial limits.' no: the clause must end there."""
+    """The sentence says the product has no free plan or trial (see OFFER_VERBS in vocab.py)."""
     text = normalise_quotes(text)
-    return any(_CLAUSE_END.match(text, match.end())
-               for phrase in NO_FREE_TIER_PHRASES for match in phrase_regex(phrase).finditer(text))
+    return any(pattern.search(text) for pattern in _DENIALS)
 
 
 def _zero_is_a_free_plan(snippet: Snippet) -> bool:

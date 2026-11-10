@@ -336,11 +336,11 @@ EXAMPLES = {
         "plugs into": "Plugs into Slack.",
     },
     "FREE_TIER_PHRASES": {
-        "free plan": "Start on the free plan.",
-        "free tier": "A generous free tier.",
+        "free plan*": "Start on the free plan.",
+        "free tier*": "A generous free tier.",
         "free forever": "Free forever for one user.",
-        "free trial": "14-day free trial.",
-        "free version": "Use the free version.",
+        "free trial*": "Free trials on every plan.",
+        "free version*": "Use the free version.",
         "free account": "Create a free account.",
         "start for free": "Start for free",
         "start free": "Start free",
@@ -353,16 +353,6 @@ EXAMPLES = {
         "sign up free": "Sign up free",
         "sign up for free": "Sign up for free",
         "freemium": "A freemium model.",
-    },
-    "NO_FREE_TIER_PHRASES": {
-        "no free plan": "There is no free plan.",
-        "no free trial": "We offer no free trial.",
-        "no free tier": "No free tier.",
-        "no free version": "No free version exists.",
-        "not offer a free plan": "We do not offer a free plan.",
-        "not offer a free trial": "We do not offer a free trial.",
-        "not offer a free tier": "We do not offer a free tier.",
-        "not offer a free version": "We do not offer a free version.",
     },
     "PRICE_CUES": {
         "starts at": "Pricing starts at $20/month.",
@@ -589,3 +579,30 @@ def test_class_words_set_the_zone(word, zone):
     page = _page(f"<div class='site-{word} wide'><p>Inside the block.</p></div><p>Outside the block.</p>")
     zones = {snippet.text: snippet.zone for snippet in page.snippets}
     assert zones["Inside the block."] == zone and zones["Outside the block."] == "main"
+
+
+def _free_tier(sentence):
+    value = extract.extract_pricing([_page(f"<p>{sentence}</p>", "https://acme.test/pricing", "pricing")]).value
+    return value if value == UNKNOWN else value["free_tier"]
+
+
+@pytest.mark.parametrize("noun", vocab.FREE_NOUNS)
+def test_free_nouns_can_be_denied_and_affirmed(noun):
+    assert _free_tier(f"We do not offer {noun}.") is False
+    assert _free_tier(f"There is no {noun}.") is False
+    assert _free_tier(f"Every account comes with {noun}.") is True
+
+
+@pytest.mark.parametrize("verb", vocab.OFFER_VERBS)
+def test_offer_verbs(verb):
+    assert _free_tier(f"Acme does not {verb} a free trial.") is False
+
+
+@pytest.mark.parametrize("negation", vocab.OFFER_NEGATIONS)
+def test_offer_negations(negation):
+    assert _free_tier(f"We {negation} offer a free plan.") is False
+
+
+@pytest.mark.parametrize("phrase", vocab.NOT_AVAILABLE)
+def test_not_available(phrase):
+    assert _free_tier(f"A free trial is {phrase}.") is False

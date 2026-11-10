@@ -149,10 +149,10 @@ def test_integration_page_logos_links_and_known_names():
             "<li><h3>Popular</h3></li></ul>"
             "<a href='/contact'>Request an integration</a>")
     result = integrations([page(body, url="https://acme.test/integrations", topic="integrations")])
-    assert result.value == ["HubSpot", "Fernleaf CRM", "Slack", "Google Analytics"]
+    assert result.value == ["HubSpot", "Fernleaf CRM", "Slack", "Google Analytics 4"]     # as the site writes it
     assert {e.item: (e.method, e.quote) for e in result.evidence} == {
         "HubSpot": ("link", "HubSpot logo"), "Fernleaf CRM": ("link", "Fernleaf CRM logo"),
-        "Slack": ("link", "Slack"), "Google Analytics": ("heading", "Google Analytics 4")}
+        "Slack": ("link", "Slack"), "Google Analytics 4": ("heading", "Google Analytics 4")}
 
 
 def test_integration_section_on_the_homepage_and_customer_logos_elsewhere():
