@@ -64,7 +64,7 @@ def _record(result: FetchResult, topic: str, outcome: str) -> PageRecord:
 
 def _block_detail(result: FetchResult) -> str:
     what = "a challenge page" if result.error_type == "challenge_page" else f"HTTP {result.status}"
-    return f"{what} at {result.final_url}; no attempt is made to get around it"
+    return f"{what} at {result.final_url}; the tool does not try to get around it"
 
 
 def _robots_detail(result: FetchResult) -> str:
