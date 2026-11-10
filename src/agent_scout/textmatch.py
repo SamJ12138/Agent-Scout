@@ -16,18 +16,27 @@ from __future__ import annotations
 import re
 from functools import lru_cache
 
-from .vocab import NEGATION_WINDOW, NEGATIONS, OTHERS_SUBJECTS, POST_NEGATIONS, RHETORICAL_OPENERS
+from .vocab import (NEGATION_WINDOW, NEGATIONS, OTHERS_NOUNS, OTHERS_QUANTIFIERS, OTHERS_SUBJECTS, POST_NEGATIONS,
+                    RHETORICAL_OPENERS)
 
 
 @lru_cache(maxsize=None)
 def phrase_regex(phrase: str) -> re.Pattern:
     words = []
     for word in phrase.split():
-        if word.endswith("*"):
+        if word == "~":                      # up to two words in between
+            words.append(None)
+        elif word.endswith("*"):
             words.append(re.escape(word[:-1]) + r"\w*")
         else:
             words.append(re.escape(word))
-    return re.compile(r"(?<![\w$])" + r"[\s-]+".join(words) + r"(?!\w)", re.IGNORECASE)
+    pattern = ""
+    for index, word in enumerate(words):
+        if word is None:
+            pattern += r"(?:[\s-]+[\w'$%.]+){0,2}"
+        else:
+            pattern += (r"[\s-]+" if index else "") + word
+    return re.compile(r"(?<![\w$])" + pattern + r"(?!\w)", re.IGNORECASE)
 
 
 def normalise_quotes(text: str) -> str:
@@ -53,6 +62,11 @@ _POST_NEGATION = re.compile(r"\s*(?:" + "|".join(re.escape(p).replace(r"\ ", r"\
                             + r")(?![\w'])", re.IGNORECASE)
 
 
+# "other tools", "most SEO tools", "many other AI assistants": somebody else's product
+_OTHERS = re.compile(r"(?<![\w'])(?:" + "|".join(OTHERS_QUANTIFIERS) + r")(?:\s+[\w'-]+){0,2}\s+(?:"
+                     + "|".join(OTHERS_NOUNS) + r")(?![\w'])", re.IGNORECASE)
+
+
 def is_negated(text: str, start: int, end: int | None = None) -> bool:
     """True when the phrase at ``start``..``end`` is denied or is about others."""
     text = normalise_quotes(text)
@@ -63,8 +77,16 @@ def is_negated(text: str, start: int, end: int | None = None) -> bool:
             return True
     if any(word.endswith("n't") for word in words):
         return True
-    clause = clause_before(text, start)
-    if any(phrase_regex(subject).search(clause) for subject in OTHERS_SUBJECTS):
+    # a clause about somebody else: the subject may start before the phrase or contain it
+    # ("Most SEO tools give you dashboards": neither SEO nor dashboards is claimed)
+    breaks = [m.end() for m in re.finditer(r"[.;:!?]", text[:start])]
+    clause_start = breaks[-1] if breaks else 0
+    following = re.search(r"[.;:!?]", text[start:])
+    clause = text[clause_start:start + following.start() if following else len(text)]
+    offset = start - clause_start
+    subjects = [*_OTHERS.finditer(clause), *(m for subject in OTHERS_SUBJECTS
+                                             for m in phrase_regex(subject).finditer(clause))]
+    if any(subject.start() <= offset for subject in subjects):
         return True
     return end is not None and bool(_POST_NEGATION.match(text[end:]))
 

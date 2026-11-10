@@ -375,7 +375,7 @@ def test_cli_llm_run_merges_verified_values_and_never_writes_the_key(tmp_path, f
     results = json.loads((tmp_path / "out" / "results.json").read_text(encoding="utf-8"))
     northwind, palisade = results["sites"]
     assert northwind["llm"] == {"status": "ok", "added": 1, "dropped": 1, "error_type": None}
-    assert northwind["fields"]["categories"]["value"] == ["email marketing", "advertising", "ecommerce", "analytics & reporting"]
+    assert northwind["fields"]["categories"]["value"] == ["email marketing", "advertising", "analytics & reporting"]
     assert "market research" not in northwind["fields"]["tasks"]["value"]
     assert northwind["fields"]["categories"]["evidence"][-1]["method"] == "llm"
     assert northwind["fields"]["can_execute"]["evidence"][0]["method"] == "meta"      # already known by rule: unchanged

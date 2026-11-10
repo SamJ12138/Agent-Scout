@@ -33,7 +33,8 @@ from .vocab import (AGENT_SUBJECTS, ASSIST_WORDS, AUDIENCE_COMPARISON_WINDOW, AU
                     INTEGRATION_TRIGGERS, KNOWN_INTEGRATIONS, LOGO_SUFFIXES, MULTI_AGENT_PHRASES, NEGATORS,
                     FREE_NOUNS, NOT_A_CITY, NOT_A_FREE_PLAN, NOT_AVAILABLE, NOT_A_PRICE_AFTER, NOT_A_PRICE_BEFORE, NOT_A_PRICE_WINDOW,
                     NOT_A_PRODUCT, OFFER_NEGATIONS, OFFER_VERBS, PRICE_CUES, SELF_MARKERS, STRONG_HIT, TARGET_USERS, TASKS, THIRD_PARTIES,
-                    THRESHOLDS, USER_SUBJECT_WINDOW, USER_SUBJECTS, WEAK_HIT)
+                    THRESHOLDS, USER_SUBJECT_WINDOW, USER_SUBJECTS, VENDOR_STAFF_MARKERS, VENDOR_STAFF_WINDOW,
+                    WEAK_HIT)
 
 VOCAB_TABLES = {"categories": CATEGORIES, "target_user": TARGET_USERS, "tasks": TASKS}
 DESCRIBING_TYPES = {"SoftwareApplication", "WebApplication", "Product", "Organization", "Corporation",
@@ -126,12 +127,16 @@ def extract_vocab(pages: list[Page], field: str) -> FieldResult:
     scores: dict[str, int] = {}
     evidence: dict[str, tuple[int, Evidence]] = {}
     for page, snippet in _statements(pages):
+        if snippet.text.rstrip().endswith("?"):
+            continue                             # a question ("Is it a chatbot?") asserts nothing
         weight = STRONG_HIT if snippet.method in ("meta", "heading") else WEAK_HIT
         for label, phrases in table.items():
             matches = find_all(snippet.text, phrases)
-            if field == "target_user":           # "cheaper than an agency" names no audience
-                matches = [m for m in matches if not preceded_by(snippet.text, m.start(), AUDIENCE_COMPARISONS,
-                                                                 AUDIENCE_COMPARISON_WINDOW)]
+            if field == "target_user":
+                # "cheaper than an agency" and "contact our sales team" name no audience
+                matches = [m for m in matches
+                           if not preceded_by(snippet.text, m.start(), AUDIENCE_COMPARISONS, AUDIENCE_COMPARISON_WINDOW)
+                           and not preceded_by(snippet.text, m.start(), VENDOR_STAFF_MARKERS, VENDOR_STAFF_WINDOW)]
             if not matches:
                 continue
             scores[label] = scores.get(label, 0) + weight

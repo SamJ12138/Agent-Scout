@@ -304,3 +304,66 @@ def test_the_period_is_quoted_with_the_price_it_was_joined_to():
     body = "<div><h3>$149</h3><p>per month</p></div>"
     result = extract.extract_pricing([pricing_page(body)])
     assert [e.quote for e in result.evidence] == ["$149 per month"]
+
+
+# ------------------------------------------------------------------ vocabulary extras (corpus run 1)
+def _vocab(body, field):
+    return extract.extract_vocab([page(body)], field).value
+
+
+@pytest.mark.parametrize("body, field, unwanted", [
+    # a question asserts nothing (FAQ headings)
+    ("<h3>Is Zedly a chatbot?</h3>", "tasks", "customer chat"),
+    ("<h3>Is Zedly a chatbot?</h3><h3>Is this a customer service chatbot?</h3>", "categories", "customer support"),
+    ("<h3>Do I need developers to get started?</h3>", "target_user", "developers"),
+    ("<p>Do newsletters even work these days?</p>", "tasks", "send email campaigns"),
+    # a clause about other products, with a word between the quantifier and the noun
+    ("<p>Most SEO tools give you dashboards, warnings, keyword lists, and recommendations.</p>", "tasks", "analytics reporting"),
+    ("<p>Traditional marketing platforms send newsletters on a fixed schedule.</p>", "tasks", "send email campaigns"),
+    ("<p>Many other AI assistants stop at keyword research.</p>", "tasks", "seo optimization"),
+    # "personality" is not personalisation
+    ("<p>Values, personality, and motivation as the foundation of every response.</p>", "tasks", "personalization"),
+    # the vendor's own staff are not the audience
+    ("<p>Contact Zedly's sales team to customise the Business plan.</p>", "target_user", "sales teams"),
+    ("<p>Talk to our sales team about volume pricing.</p>", "target_user", "sales teams"),
+    ("<p>Today an international team of engineers and researchers works across three continents.</p>", "target_user", "developers"),
+    ("<p>A team of marketers and linguists built the technology.</p>", "target_user", "marketers"),
+    # one firm in a story is not an audience; sellers on a marketplace are not sales teams
+    ("<p>Brightside Media, an Orlando-based digital marketing agency, wrote forty posts in a month.</p>", "target_user", "agencies"),
+    ("<p>This enabled the agency to stay ahead of the competition.</p>", "target_user", "agencies"),
+    ("<p>Join thousands of sellers who rely on Zedly every day.</p>", "target_user", "sales teams"),
+    # who it is for, or what it connects to, is not what kind of work it does
+    ("<h2>Built for E-Commerce Brands</h2>", "categories", "ecommerce"),
+    ("<h2>Connect your Shopify store</h2><p>These include ad accounts and Shopify stores.</p>", "categories", "ecommerce"),
+    # a kind of content it writes is not a channel it manages or schedules
+    ("<p>Zedly handles articles, emails, ads, social posts, and more.</p>", "tasks", "schedule social posts"),
+    ("<p>Zedly handles articles, emails, ads, social posts, and more.</p><p>Write social posts in seconds.</p>", "categories", "social media"),
+    # naming an ad platform, or ad spend as data, does not say the product manages ads
+    ("<p>Trained on patterns learned from $35B in ad spend data.</p>", "tasks", "manage ads"),
+    ("<h3>Facebook Ads</h3><p>Square and story formats.</p>", "tasks", "manage ads"),
+    ("<p>Writes your Facebook ads.</p>", "tasks", "manage ads"),
+    # the vendor's support channel is not a product feature
+    ("<p>To request a refund, reach out via live chat or email.</p>", "tasks", "customer chat"),
+    ("<p>Free training + live chat support</p>", "tasks", "customer chat"),
+])
+def test_extras_seen_on_real_sites_are_not_reported(body, field, unwanted):
+    value = _vocab(body, field)
+    assert value == UNKNOWN or unwanted not in value, value
+
+
+@pytest.mark.parametrize("body, field, wanted", [
+    ("<p>Built for agencies and in-house teams.</p>", "target_user", "agencies"),
+    ("<p>Run your agency on one platform.</p>", "target_user", "agencies"),
+    ("<p>Our platform helps marketers ship faster.</p>", "target_user", "marketers"),
+    ("<h2>Built for E-Commerce Brands</h2>", "target_user", "ecommerce brands"),
+    ("<h2>Ecommerce marketing on autopilot</h2>", "categories", "ecommerce"),
+    ("<p>Runs your Facebook ads autonomously.</p>", "tasks", "manage ads"),
+    ("<p>Builds and optimizes Google Ads.</p>", "tasks", "manage ads"),
+    ("<p>Agentic campaign management for ad ROI.</p>", "tasks", "manage ads"),
+    ("<h3>Social posts and autoposting</h3>", "tasks", "schedule social posts"),
+    ("<p>Personalised subject lines for every reader.</p>", "tasks", "personalization"),
+    ("<p>A chatbot that answers every visitor.</p>", "tasks", "customer chat"),
+])
+def test_the_tightened_rules_still_find_plain_statements(body, field, wanted):
+    value = _vocab(body, field)
+    assert value != UNKNOWN and wanted in value, value

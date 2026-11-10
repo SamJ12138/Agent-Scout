@@ -43,9 +43,7 @@ EXAMPLES = {
         "search rankings": "Improve your search rankings.",
         "answer engine optimi*": "Answer engine optimization for AI search.",
         "social media": "Social media handled for you.",
-        "social posts": "A month of social posts in an hour.",
         "social scheduling": "Social scheduling without the spreadsheet.",
-        "social content": "Social content your audience shares.",
         "crm": "A CRM that updates itself.",
         "sales outreach": "Sales outreach that feels personal.",
         "sales pipeline": "Fill your sales pipeline.",
@@ -66,13 +64,13 @@ EXAMPLES = {
         "help desk": "An AI help desk.",
         "support agent*": "AI support agents for your store.",
         "chatbot*": "Chatbots that sell.",
-        "ecommerce": "Built for ecommerce.",
-        "e-commerce": "The e-commerce growth agent.",
-        "online store*": "Grow your online store.",
-        "shopify": "Made for Shopify.",
         "product listings": "Better product listings.",
+        "ecommerce marketing": "Ecommerce marketing on autopilot.",
+        "e-commerce marketing": "E-commerce marketing for small shops.",
+        "ecommerce platform": "An ecommerce platform with agents built in.",
+        "e-commerce platform": "The e-commerce platform for brands.",
+        "product feed*": "Optimise your product feeds.",
         "abandoned cart*": "Recover abandoned carts.",
-        "dtc": "The DTC marketing agent.",
         "video generation": "Video generation for ads.",
         "video editing": "Video editing by AI.",
         "ai video*": "AI videos in minutes.",
@@ -120,7 +118,9 @@ EXAMPLES = {
         "retailers": "Retailers of all sizes.",
         "store owners": "Store owners save time.",
         "agencies": "For agencies with many clients.",
-        "agency": "Run your agency on one platform.",
+        "your agency": "Run your agency on one platform.",
+        "agency owners": "Made for agency owners.",
+        "agency teams": "Agency teams deliver faster.",
         "enterprises": "Enterprises trust us.",
         "enterprise teams": "Enterprise teams collaborate here.",
         "enterprise marketing": "Enterprise marketing, simplified.",
@@ -146,7 +146,6 @@ EXAMPLES = {
         "sales reps": "Sales reps save two hours a day.",
         "sdrs": "SDRs book more meetings.",
         "revenue teams": "Revenue teams align here.",
-        "sellers": "Sellers focus on selling.",
         "account executives": "Account executives prepare in minutes.",
         "sales leaders": "Sales leaders see the pipeline.",
         "revops": "RevOps keeps data clean.",
@@ -194,16 +193,23 @@ EXAMPLES = {
         "email automation": "Email automation included.",
         "drip campaigns": "Sets up drip campaigns.",
         "email flows": "Builds email flows.",
-        "ad campaigns": "Launches ad campaigns.",
-        "manage* ads": "It manages ads across networks.",
         "ad budgets": "Shifts ad budgets daily.",
-        "bids": "Adjusts bids every hour.",
-        "ad spend": "Optimises ad spend.",
-        "google ads": "Runs your Google Ads.",
-        "meta ads": "Manages Meta Ads.",
-        "facebook ads": "Optimises Facebook Ads.",
-        "paid ads": "Handles paid ads.",
-        "ppc campaigns": "Manages PPC campaigns.",
+        "manage* ~ ads": "It manages your search ads.",
+        "manage* ~ ad campaigns": "Manages all ad campaigns.",
+        "optimi* ~ ads": "Builds and optimizes Google Ads.",
+        "optimi* ~ ad campaigns": "Optimises your ad campaigns daily.",
+        "run* ~ ads": "Runs your Facebook ads autonomously.",
+        "run* ~ ad campaigns": "Runs ad campaigns end to end.",
+        "launch* ~ ads": "Launches new ads every morning.",
+        "launch* ~ ad campaigns": "Launch ad campaigns in a click.",
+        "scale* ~ ads": "Scales winning ads.",
+        "adjust* ~ bids": "Adjusts your bids every hour.",
+        "ad management": "Ad management without the busywork.",
+        "ads management": "Ads management for small teams.",
+        "ads manager": "The AI ads manager.",
+        "campaign management": "Agentic campaign management.",
+        "bid management": "Automatic bid management.",
+        "ppc management": "PPC management by an agent.",
         "media buying": "Automated media buying.",
         "ad optimi*": "Continuous ad optimization.",
         "seo": "Handles SEO.",
@@ -220,9 +226,9 @@ EXAMPLES = {
         "social media scheduling": "Social media scheduling for teams.",
         "publish* posts": "Publishes posts to every channel.",
         "post* to social": "Posts to social networks.",
-        "social posts": "Creates social posts.",
         "content calendar": "Fills your content calendar.",
         "auto-post*": "Auto-posting to all networks.",
+        "autopost*": "Social posts and autoposting.",
         "lead qualification": "Lead qualification in real time.",
         "qualif* leads": "Qualifies leads as they arrive.",
         "qualified leads": "Hands over qualified leads.",
@@ -234,7 +240,6 @@ EXAMPLES = {
         "lead gen": "Lead gen without forms.",
         "lead enrichment": "Lead enrichment from public data.",
         "chatbot*": "A chatbot for your store.",
-        "live chat": "Live chat handled by AI.",
         "customer chat": "Customer chat on every page.",
         "chat widget": "Add the chat widget.",
         "conversational ai": "Conversational AI for sales.",
@@ -258,9 +263,11 @@ EXAMPLES = {
         "automate* tasks": "Automates tasks you repeat.",
         "automations": "Build automations in minutes.",
         "no-code automation": "No-code automation.",
-        "personali*": "Personalized messages for each shopper.",
-        "hyper-personali*": "Hyper-personalised outreach.",
         "one-to-one": "One-to-one messaging at scale.",
+        "personaliz*": "Personalized messages for each shopper.",
+        "personalis*": "Personalised subject lines.",
+        "hyper-personaliz*": "Hyper-personalized outreach.",
+        "hyper-personalis*": "Hyper-personalised outreach.",
         "tailored to each": "Offers tailored to each visitor.",
         "market research": "Market research in minutes.",
         "competitor analysis": "Competitor analysis on demand.",
@@ -439,6 +446,8 @@ def test_assist_words(word):
     ("Enterprise-grade security.", "TARGET_USERS", "enterprise"),
     ("The copywriters on our team.", "TASKS", "write copy"),
     ("Welcome flows go out daily.", "TASKS", "workflow automation"),
+    ("Values, personality and motivation.", "TASKS", "personalization"),
+    ("Square formats for Facebook Ads.", "TASKS", "manage ads"),
     ("Social captions in your voice.", "CATEGORIES", "social media"),
 ])
 def test_phrases_do_not_match_lookalikes(text, table, unwanted):
@@ -459,6 +468,12 @@ def test_negation(text, phrase, negated):
     match = phrase_regex(phrase).search(text)
     assert match and is_negated(text, match.start()) is negated
     assert has_phrase(text, [phrase]) is (not negated)
+
+
+def test_tilde_allows_up_to_two_words_in_between():
+    assert has_phrase("It runs ads for you.", ["run* ~ ads"])
+    assert has_phrase("It runs your Facebook ads.", ["run* ~ ads"])
+    assert not has_phrase("It runs all of your Facebook ads.", ["run* ~ ads"])      # three words in between
 
 
 def test_hyphen_and_space_are_interchangeable():
@@ -512,6 +527,21 @@ def test_post_negations_cancel_the_phrase_before_them(negation):
 @pytest.mark.parametrize("subject", vocab.OTHERS_SUBJECTS)
 def test_a_clause_about_others_claims_nothing_for_the_product(subject):
     assert labels_in(f"{subject.capitalize()} offer keyword research and call it a day.", vocab.TASKS) == []
+
+
+@pytest.mark.parametrize("quantifier", vocab.OTHERS_QUANTIFIERS)
+@pytest.mark.parametrize("noun", vocab.OTHERS_NOUNS)
+def test_every_quantifier_and_noun_pair_marks_a_clause_about_others(quantifier, noun):
+    assert labels_in(f"{quantifier.capitalize()} {noun} offer keyword research.", vocab.TASKS) == []
+    assert labels_in(f"{quantifier.capitalize()} SEO {noun} offer keyword research.", vocab.TASKS) == []
+    assert "seo optimization" in labels_in(f"Our {noun} offer keyword research.", vocab.TASKS)
+
+
+@pytest.mark.parametrize("marker", vocab.VENDOR_STAFF_MARKERS)
+def test_vendor_staff_markers(marker):
+    text = f"You can always {marker} engineers." if marker != "our" else "Ask our engineers anything."
+    assert extract.extract_vocab([_page(f"<p>{text}</p>")], "target_user").value == UNKNOWN
+    assert extract.extract_vocab([_page("<p>Loved by engineers.</p>")], "target_user").value == ["developers"]
 
 
 @pytest.mark.parametrize("comparison", vocab.AUDIENCE_COMPARISONS)

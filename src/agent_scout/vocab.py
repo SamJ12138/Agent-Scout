@@ -5,7 +5,14 @@ tests/test_vocab.py has an example sentence for every entry, and fails when an
 entry is added without one.
 
 Phrases are matched case-insensitively on word boundaries; a trailing ``*``
-allows any word ending ("optimi*" matches optimize, optimise, optimization).
+allows any word ending ("optimi*" matches optimize, optimise, optimization);
+a ``~`` between two words allows up to two words in between ("run* ~ ads"
+matches "runs your Facebook ads").
+
+The tables are not frozen. They were first written without any real site in
+view, then adjusted twice: after an adversarial review, and after the first
+run on the real-site corpus (docs/real-corpus/run-1/scores.md). Each
+adjustment has a case in tests/test_adversarial.py with the reason for it.
 """
 
 from __future__ import annotations
@@ -50,15 +57,19 @@ CATEGORIES: dict[str, tuple[str, ...]] = {
                     "ppc", "paid media", "paid social", "ad spend", "performance marketing"),
     "seo": ("seo", "search engine optimi*", "organic traffic", "keyword research", "search rankings",
             "answer engine optimi*"),
-    "social media": ("social media", "social posts", "social scheduling", "social content"),
+    # "social posts" and "social content" are kinds of content a product may write; they are
+    # not here because writing them is not managing social media
+    "social media": ("social media", "social scheduling"),
     "sales & crm": ("crm", "sales outreach", "sales pipeline", "lead generation", "sales engagement",
                     "prospecting", "outbound", "sales development"),
     "analytics & reporting": ("analytics", "attribution", "dashboards", "marketing reporting",
                               "marketing intelligence", "data analysis"),
     "customer support": ("customer support", "customer service", "support tickets", "help desk",
                          "support agent*", "chatbot*"),
-    "ecommerce": ("ecommerce", "e-commerce", "online store*", "shopify", "product listings",
-                  "abandoned cart*", "dtc"),
+    # ecommerce WORK. "for ecommerce brands" names an audience (TARGET_USERS) and "Shopify"
+    # a platform it connects to; neither says what kind of work the product does
+    "ecommerce": ("ecommerce marketing", "e-commerce marketing", "ecommerce platform",
+                  "e-commerce platform", "product listings", "product feed*", "abandoned cart*"),
     "video & creative": ("video generation", "video editing", "ai video*", "image generation",
                          "creative generation", "creative studio", "video ads", "ugc video*", "ai avatars"),
     "general agent platform": ("agent platform", "agent builder", "build ai agents", "build custom agents",
@@ -73,14 +84,15 @@ TARGET_USERS: dict[str, tuple[str, ...]] = {
                          "e-commerce businesses", "ecommerce teams", "online stores", "online retailers",
                          "shopify merchants", "shopify stores", "dtc brands", "merchants", "retailers",
                          "store owners"),
-    "agencies": ("agencies", "agency"),
+    # the plural names a group; "an agency" or "the agency" is one firm in a story or a comparison
+    "agencies": ("agencies", "your agency", "agency owners", "agency teams"),
     "enterprise": ("enterprises", "enterprise teams", "enterprise marketing", "enterprise brands",
                    "enterprise companies", "for enterprise", "large organizations", "fortune 500",
                    "global brands"),
     "small business": ("small business*", "smbs", "small and medium", "startups", "solopreneurs",
                        "small teams", "local businesses", "entrepreneurs"),
     "developers": ("developers", "engineers", "engineering teams", "dev teams"),
-    "sales teams": ("sales team*", "sales reps", "sdrs", "revenue teams", "sellers", "account executives",
+    "sales teams": ("sales team*", "sales reps", "sdrs", "revenue teams", "account executives",
                     "sales leaders", "revops"),
     "creators": ("creators", "content creators", "influencers", "bloggers"),
 }
@@ -96,25 +108,31 @@ TASKS: dict[str, tuple[str, ...]] = {
     "send email campaigns": ("email campaign*", "send* emails", "email sequences", "newsletters",
                              "cold emails", "email outreach", "outreach emails", "email automation",
                              "drip campaigns", "email flows"),
-    "manage ads": ("ad campaigns", "manage* ads", "ad budgets", "bids", "ad spend", "google ads",
-                   "meta ads", "facebook ads", "paid ads", "ppc campaigns", "media buying",
-                   "ad optimi*"),
+    # a verb of managing next to ads, or a noun that means managing them. The name of an ad
+    # platform alone ("Facebook Ads") does not say the product manages ads: it may only write them
+    "manage ads": ("manage* ~ ads", "manage* ~ ad campaigns", "optimi* ~ ads", "optimi* ~ ad campaigns",
+                   "run* ~ ads", "run* ~ ad campaigns", "launch* ~ ads", "launch* ~ ad campaigns",
+                   "scale* ~ ads", "adjust* ~ bids", "ad budgets", "ad management", "ads management",
+                   "ads manager", "campaign management", "bid management", "media buying", "ad optimi*",
+                   "ppc management"),
     "seo optimization": ("seo", "search engine optimi*", "keyword research", "keyword suggestions",
                          "optimi* for search", "meta descriptions", "backlinks", "on-page"),
     "schedule social posts": ("schedul* posts", "schedul* social", "social scheduling",
                               "social media scheduling", "publish* posts", "post* to social",
-                              "social posts", "content calendar", "auto-post*"),
+                              "content calendar", "auto-post*", "autopost*"),
     "lead qualification": ("lead qualification", "qualif* leads", "qualified leads", "lead scoring",
                            "score* leads", "book* meetings", "prospecting", "lead generation", "lead gen",
                            "lead enrichment"),
-    "customer chat": ("chatbot*", "live chat", "customer chat", "chat widget", "conversational ai",
+    # "live chat" is not here: on most sites it is how to reach the vendor's own support
+    "customer chat": ("chatbot*", "customer chat", "chat widget", "conversational ai",
                       "customer conversations", "customer questions", "support tickets"),
     "analytics reporting": ("analytics", "performance report*", "reporting", "reports", "dashboards",
                             "attribution", "kpis"),
     "workflow automation": ("workflow automation", "automat* workflow*", "workflows", "ai workflow*",
                             "agentic workflow*", "any workflow", "automation platform", "automate* tasks",
                             "automations", "no-code automation"),
-    "personalization": ("personali*", "hyper-personali*", "one-to-one", "tailored to each"),
+    "personalization": ("personaliz*", "personalis*", "hyper-personaliz*", "hyper-personalis*",
+                        "one-to-one", "tailored to each"),
     "market research": ("market research", "competitor analysis", "competitive analysis",
                         "competitor research", "competitive intelligence", "audience research",
                         "customer research", "trend analysis", "social listening"),
@@ -132,17 +150,21 @@ THRESHOLDS = {"categories": 2, "target_user": 1, "tasks": 1}
 # - one of NEGATIONS stands within NEGATION_WINDOW words before it in the same
 #   clause ("is not an SEO tool"),
 # - one of POST_NEGATIONS follows it directly ("SEO is not something we do"),
-# - the clause is about somebody else: one of OTHERS_SUBJECTS stands before it
-#   ("Other tools send campaigns automatically").
+# - the clause is about somebody else: one of OTHERS_SUBJECTS stands before
+#   it, or one of OTHERS_QUANTIFIERS followed within two words by one of
+#   OTHERS_NOUNS ("Other tools send campaigns automatically", "Most SEO tools
+#   give you dashboards").
 NEGATIONS: tuple[str, ...] = ("not", "no", "never", "without", "unlike", "isn't", "doesn't", "don't",
                               "won't", "can't", "cannot", "instead of", "rather than", "nor")
 NEGATION_WINDOW = 6
 POST_NEGATIONS: tuple[str, ...] = ("is not", "are not", "was not", "were not", "isn't", "aren't",
                                    "wasn't", "weren't", "is no longer", "are no longer", "is never",
                                    "are never")
-OTHERS_SUBJECTS: tuple[str, ...] = ("other tools", "other platforms", "other products", "other agents",
-                                    "other vendors", "most tools", "most platforms", "most products",
-                                    "competitors", "traditional tools", "legacy tools", "unlike")
+OTHERS_SUBJECTS: tuple[str, ...] = ("competitors", "unlike")
+OTHERS_QUANTIFIERS: tuple[str, ...] = ("other", "most", "many", "traditional", "legacy", "typical",
+                                       "conventional", "generic")
+OTHERS_NOUNS: tuple[str, ...] = ("tools", "platforms", "products", "agents", "vendors", "solutions",
+                                 "software", "apps", "assistants", "chatbots", "systems", "providers")
 
 # A sentence that opens with one of these words, or ends with a question mark,
 # asks or frames something ("Why multi-agent systems fail"); it does not assert
@@ -155,6 +177,10 @@ RHETORICAL_OPENERS: tuple[str, ...] = ("why", "how", "what", "when", "which", "w
 AUDIENCE_COMPARISONS: tuple[str, ...] = ("than", "replace*", "replacing", "hire", "hiring", "instead of",
                                          "alternative to", "like having", "like a", "like an")
 AUDIENCE_COMPARISON_WINDOW = 5
+# An audience word right after one of these names the vendor's own people
+# ("contact our sales team", "a team of engineers built it"), not an audience.
+VENDOR_STAFF_MARKERS: tuple[str, ...] = ("our", "contact", "talk to", "speak to", "speak with", "team of")
+VENDOR_STAFF_WINDOW = 2
 
 # --------------------------------------------------------------------------
 # can_execute (three-valued) and multi_agent (true or unknown).
