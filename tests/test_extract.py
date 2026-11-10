@@ -109,7 +109,8 @@ def test_tasks_are_reported_when_stated_once():
     ("It writes posts automatically.", UNKNOWN),                         # writing is not acting in a channel
     ("Automatically generated insights every week.", UNKNOWN),
     ("It only drafts; you press send.", False),
-    ("The assistant never sends anything without you.", False),
+    ("The assistant never sends anything without you.", UNKNOWN),    # a condition, not "only drafts"
+    ("The assistant never sends anything.", False),
     ("Unlike tools that publish posts automatically, we only suggest.", UNKNOWN),
 ])
 def test_can_execute_three_values(sentence, expected):
@@ -257,6 +258,16 @@ def test_hq_from_json_ld_address_with_iso_country_code():
     assert result.evidence[0].method == "json-ld" and "Rotterdam" in result.evidence[0].quote
 
 
+def test_hq_from_json_ld_region_alone_does_not_state_the_country():
+    def with_address(fields):
+        return page("<p>x</p>", head='<script type="application/ld+json">{"@type": "Organization", "address": {'
+                    + fields + '}}</script>')
+    bare = hq([with_address('"addressLocality": "Perth", "addressRegion": "WA"')])
+    assert bare.value == {"city": "Perth", "country": UNKNOWN}
+    zipped = hq([with_address('"addressLocality": "Seattle", "addressRegion": "WA", "postalCode": "98101"')])
+    assert zipped.value == {"city": "Seattle", "country": "United States"}
+
+
 def test_hq_from_json_ld_country_object_and_us_region():
     head = ('<script type="application/ld+json">{"@type": "Corporation", "address": {"addressLocality": "Austin", '
             '"addressRegion": "TX", "addressCountry": {"@type": "Country", "name": "USA"}}}</script>')
@@ -271,7 +282,9 @@ def test_hq_from_address_element():
 
 @pytest.mark.parametrize("sentence, expected", [
     ("Acme Inc. is headquartered in Toronto, Canada.", {"city": "Toronto", "country": "Canada"}),
-    ("We are based in San Francisco, CA and hiring.", {"city": "San Francisco", "country": "United States"}),
+    ("We are based in San Francisco, CA and hiring.", {"city": "San Francisco", "country": UNKNOWN}),
+    ("We are based in San Francisco, California and hiring.", {"city": "San Francisco", "country": "United States"}),
+    ("Headquarters: 500 Howard St, San Francisco, CA 94105", {"city": "San Francisco", "country": "United States"}),
     ("Headquarters: Tel Aviv, Israel", {"city": "Tel Aviv", "country": "Israel"}),
     ("Based in Berlin.", {"city": "Berlin", "country": UNKNOWN}),
     ("We are based in Germany.", {"city": UNKNOWN, "country": "Germany"}),

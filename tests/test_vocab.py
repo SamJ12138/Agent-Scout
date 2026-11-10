@@ -298,18 +298,10 @@ EXAMPLES = {
         "drafts only": "Drafts only: you publish.",
         "only suggests": "It only suggests changes.",
         "suggestions only": "Suggestions only, never actions.",
-        "never sends": "It never sends anything.",
-        "never publishes": "It never publishes for you.",
-        "never posts": "It never posts on your behalf.",
-        "does not send": "The assistant does not send emails.",
-        "does not publish": "It does not publish.",
-        "does not post": "It does not post.",
-        "doesn't send": "It doesn't send messages.",
-        "doesn't publish": "It doesn't publish.",
-        "doesn't post": "It doesn't post.",
-        "won't send": "It won't send without you.",
-        "won't publish": "It won't publish anything.",
-        "a human must": "A human must press send.",
+        "a human must send": "A human must send each message.",
+        "a human must publish": "A human must publish the post.",
+        "a human must post": "A human must post it.",
+        "a human must press send": "A human must press send.",
         "does not take action*": "It does not take actions in your accounts.",
         "never takes action*": "It never takes action on its own.",
     },
@@ -367,6 +359,10 @@ EXAMPLES = {
         "no free trial": "We offer no free trial.",
         "no free tier": "No free tier.",
         "no free version": "No free version exists.",
+        "not offer a free plan": "We do not offer a free plan.",
+        "not offer a free trial": "We do not offer a free trial.",
+        "not offer a free tier": "We do not offer a free tier.",
+        "not offer a free version": "We do not offer a free version.",
     },
     "PRICE_CUES": {
         "starts at": "Pricing starts at $20/month.",
@@ -497,3 +493,99 @@ def test_link_topic_tables_are_disjoint():
             assert keyword not in seen, f"{keyword} is in {seen.get(keyword)} and {topic}"
             assert keyword not in vocab.LINK_EXCLUDED_SEGMENTS
             seen[keyword] = topic
+
+
+# ------------------------------------------------------------------ tables added after an adversarial review:
+# every entry is exercised through the behaviour it exists for
+from agent_scout import extract  # noqa: E402
+from agent_scout.config import Config  # noqa: E402
+from agent_scout.model import UNKNOWN  # noqa: E402
+from agent_scout.page import parse_page  # noqa: E402
+from agent_scout.textmatch import is_rhetorical  # noqa: E402
+
+FILLER = "<p>" + "Ordinary words that say nothing in particular. " * 6 + "</p>"
+
+
+def _page(body, url="https://acme.test/", topic="home"):
+    html = f"<!doctype html><html><head><title>Acme</title></head><body>{body}{FILLER}</body></html>"
+    page = parse_page(url, html, Config())
+    page.topic = topic
+    return page
+
+
+@pytest.mark.parametrize("negation", vocab.POST_NEGATIONS)
+def test_post_negations_cancel_the_phrase_before_them(negation):
+    assert "customer chat" not in labels_in(f"Chatbots {negation} part of the product.", vocab.TASKS)
+    assert "customer chat" in labels_in("Chatbots that answer every visitor.", vocab.TASKS)
+
+
+@pytest.mark.parametrize("subject", vocab.OTHERS_SUBJECTS)
+def test_a_clause_about_others_claims_nothing_for_the_product(subject):
+    assert labels_in(f"{subject.capitalize()} offer keyword research and call it a day.", vocab.TASKS) == []
+
+
+@pytest.mark.parametrize("comparison", vocab.AUDIENCE_COMPARISONS)
+def test_audience_comparisons(comparison):
+    text = f"It works {comparison.rstrip('*')} an agency."
+    assert extract.extract_vocab([_page(f"<p>{text}</p>")], "target_user").value == UNKNOWN
+
+
+@pytest.mark.parametrize("opener", vocab.RHETORICAL_OPENERS)
+def test_rhetorical_openers(opener):
+    assert is_rhetorical(f"{opener.capitalize()} a team of agents sends campaigns automatically")
+    assert not is_rhetorical("A team of agents sends campaigns automatically.")
+
+
+@pytest.mark.parametrize("negator", vocab.NEGATORS)
+@pytest.mark.parametrize("verb", vocab.DRAFT_ONLY_VERBS)
+def test_every_negator_and_verb_pair_is_a_draft_only_statement(negator, verb):
+    third_person = verb + ("es" if verb.endswith("sh") else "s")
+    form = third_person if negator == "never" else verb
+    assert extract._states_draft_only(f"The assistant {negator} {form}.")
+    assert not extract._states_draft_only(f"The assistant {negator} {form} duplicate things.")
+
+
+@pytest.mark.parametrize("thing", vocab.GENERAL_OBJECTS)
+def test_general_objects(thing):
+    assert extract._states_draft_only(f"It never sends {thing}.")
+    assert not extract._states_draft_only(f"It never sends {thing} without your approval.")
+
+
+@pytest.mark.parametrize("marker", vocab.SELF_MARKERS)
+def test_self_markers(marker):
+    assert extract._states_draft_only(f"It does not post {marker}.")
+
+
+@pytest.mark.parametrize("subject", vocab.USER_SUBJECTS)
+def test_user_subjects(subject):
+    sentence = f"With one click {subject} team sends campaigns automatically." if subject == "your" \
+        else f"With one click {subject} send campaigns automatically."
+    assert not extract._states_execution(sentence)
+    assert extract._states_execution("With one click it sends campaigns automatically.")
+
+
+@pytest.mark.parametrize("word", vocab.THIRD_PARTIES)
+def test_third_parties_before_a_headquarters_cue(word):
+    body = f"<p>One {word} of ours, based in Oslo, Norway, likes it.</p>"
+    assert extract.extract_hq([_page(body)]).value == UNKNOWN
+
+
+@pytest.mark.parametrize("word", vocab.NOT_A_FREE_PLAN)
+def test_a_zero_fee_is_not_a_free_plan(word):
+    body = f"<table><tr><td>{word.capitalize()}</td><td>$0</td></tr></table>"
+    assert extract.extract_pricing([_page(body, "https://acme.test/pricing", "pricing")]).value == UNKNOWN
+
+
+@pytest.mark.parametrize("word", vocab.CONSENT_HEADING_WORDS)
+def test_consent_headings_are_not_the_hero(word):
+    body = f"<h2>Your {word} choices</h2><p>Decide what we may store.</p>"
+    assert extract.extract_one_liner([_page(body)]).value == UNKNOWN
+
+
+@pytest.mark.parametrize("word, zone", [(w, "nav") for w in sorted(vocab.NAVIGATION_CLASS_WORDS)]
+                         + [(w, "quote") for w in sorted(vocab.TESTIMONIAL_CLASS_WORDS)]
+                         + [(w, "banner") for w in sorted(vocab.CONSENT_CLASS_WORDS)])
+def test_class_words_set_the_zone(word, zone):
+    page = _page(f"<div class='site-{word} wide'><p>Inside the block.</p></div><p>Outside the block.</p>")
+    zones = {snippet.text: snippet.zone for snippet in page.snippets}
+    assert zones["Inside the block."] == zone and zones["Outside the block."] == "main"

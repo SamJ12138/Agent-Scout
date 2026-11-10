@@ -128,17 +128,49 @@ STRONG_HIT = 2
 WEAK_HIT = 1
 THRESHOLDS = {"categories": 2, "target_user": 1, "tasks": 1}
 
-# A vocabulary phrase is ignored when one of these appears in the same
-# sentence within NEGATION_WINDOW words before it ("is not an SEO tool").
+# A phrase is not read as a statement about the product when
+# - one of NEGATIONS stands within NEGATION_WINDOW words before it in the same
+#   clause ("is not an SEO tool"),
+# - one of POST_NEGATIONS follows it directly ("SEO is not something we do"),
+# - the clause is about somebody else: one of OTHERS_SUBJECTS stands before it
+#   ("Other tools send campaigns automatically").
 NEGATIONS: tuple[str, ...] = ("not", "no", "never", "without", "unlike", "isn't", "doesn't", "don't",
                               "won't", "can't", "cannot", "instead of", "rather than", "nor")
 NEGATION_WINDOW = 6
+POST_NEGATIONS: tuple[str, ...] = ("is not", "are not", "was not", "were not", "isn't", "aren't",
+                                   "wasn't", "weren't", "is no longer", "are no longer", "is never",
+                                   "are never")
+OTHERS_SUBJECTS: tuple[str, ...] = ("other tools", "other platforms", "other products", "other agents",
+                                    "other vendors", "most tools", "most platforms", "most products",
+                                    "competitors", "traditional tools", "legacy tools", "unlike")
+
+# A sentence that opens with one of these words, or ends with a question mark,
+# asks or frames something ("Why multi-agent systems fail"); it does not assert
+# that the product acts by itself or uses several agents.
+RHETORICAL_OPENERS: tuple[str, ...] = ("why", "how", "what", "when", "which", "who", "should", "do",
+                                       "does", "is", "are", "can", "could", "will", "would")
+
+# An audience word after one of these is something the product is compared
+# with or replaces ("cheaper than an agency", "faster than hiring engineers").
+AUDIENCE_COMPARISONS: tuple[str, ...] = ("than", "replace*", "replacing", "hire", "hiring", "instead of",
+                                         "alternative to", "like having", "like a", "like an")
+AUDIENCE_COMPARISON_WINDOW = 5
 
 # --------------------------------------------------------------------------
 # can_execute (three-valued) and multi_agent (true or unknown).
+#
 # TRUE needs one sentence with an action verb, an object in another system or
 # channel, and either an autonomy marker or an agent as the acting subject.
-# FALSE needs a phrase that says the product only drafts or suggests.
+# The verb does not count when "you"/"your" stands just before it ("for you to
+# send", "so you can publish"): then the person acts.
+#
+# FALSE needs an unambiguous statement that the product only drafts:
+# - one of DRAFT_ONLY_PHRASES, or
+# - a negated action (NEGATORS + DRAFT_ONLY_VERBS) about everything: the verb
+#   is followed by nothing, by a general object (GENERAL_OBJECTS), or by one of
+#   SELF_MARKERS, and then the clause ends. "never sends duplicate emails"
+#   (a specific object) and "never sends anything without your approval"
+#   (a condition) are not such statements.
 # --------------------------------------------------------------------------
 EXECUTE_VERBS: tuple[str, ...] = ("send*", "publish*", "schedul*", "launch*", "post*", "adjust*",
                                   "optimi*", "update*", "paus*", "execut*", "deploy*", "repl*",
@@ -154,11 +186,22 @@ AGENT_SUBJECTS: tuple[str, ...] = ("agent", "agents")
 # With an agent as subject, these words mean the person still does the action.
 ASSIST_WORDS: tuple[str, ...] = ("help*", "let*", "assist*", "suggest*", "recommend*", "draft*",
                                  "you can", "so you can", "enabl*", "empower*")
+# The person is the one acting when one of these stands within
+# USER_SUBJECT_WINDOW words before the verb.
+USER_SUBJECTS: tuple[str, ...] = ("you", "your")
+USER_SUBJECT_WINDOW = 3
+
 DRAFT_ONLY_PHRASES: tuple[str, ...] = ("only drafts", "drafts only", "only suggests", "suggestions only",
-                                       "never sends", "never publishes", "never posts", "does not send",
-                                       "does not publish", "does not post", "doesn't send",
-                                       "doesn't publish", "doesn't post", "won't send", "won't publish",
-                                       "a human must", "does not take action*", "never takes action*")
+                                       "a human must send", "a human must publish", "a human must post",
+                                       "a human must press send", "does not take action*",
+                                       "never takes action*")
+NEGATORS: tuple[str, ...] = ("never", "does not", "doesn't", "do not", "don't", "will not", "won't",
+                             "cannot", "can't")
+DRAFT_ONLY_VERBS: tuple[str, ...] = ("send", "publish", "post", "launch", "schedule", "execute")
+GENERAL_OBJECTS: tuple[str, ...] = ("anything", "emails", "email", "posts", "campaigns", "messages",
+                                    "content", "ads", "it", "them")
+SELF_MARKERS: tuple[str, ...] = ("for you", "on your behalf", "by itself", "on its own", "automatically",
+                                 "itself")
 
 MULTI_AGENT_PHRASES: tuple[str, ...] = ("multi agent", "multiagent", "multiple agents", "team of agents",
                                         "team of ai agents", "team of specialized agents",
@@ -216,7 +259,15 @@ FREE_TIER_PHRASES: tuple[str, ...] = ("free plan", "free tier", "free forever", 
                                       "free account", "start for free", "start free", "try for free",
                                       "try it free", "try free", "get started for free", "get started free",
                                       "free to start", "sign up free", "sign up for free", "freemium")
-NO_FREE_TIER_PHRASES: tuple[str, ...] = ("no free plan", "no free trial", "no free tier", "no free version")
+# A denial only when the clause ends right after it ("There is no free plan."):
+# "No free trial limits." denies limits, not the trial.
+NO_FREE_TIER_PHRASES: tuple[str, ...] = ("no free plan", "no free trial", "no free tier", "no free version",
+                                         "not offer a free plan", "not offer a free trial",
+                                         "not offer a free tier", "not offer a free version")
+# A price of zero next to one of these words is a fee that happens to be
+# zero, not a free plan ("Setup fee: $0").
+NOT_A_FREE_PLAN: tuple[str, ...] = ("fee", "fees", "setup", "onboarding", "shipping", "commission",
+                                    "deposit", "tax")
 # An amount right after one of these words, or right before one of the second
 # list, is a saving, a credit or a funding round, not a price.
 NOT_A_PRICE_BEFORE: tuple[str, ...] = ("save", "saves", "saved", "saving", "savings", "worth", "up to",
@@ -234,6 +285,28 @@ PRICE_CUES: tuple[str, ...] = ("starts at", "starting at", "start at", "starting
 HQ_CUES: tuple[str, ...] = ("headquartered in", "headquarters in", "headquarters are in",
                             "head office in", "head office is in", "based in", "based out of",
                             "hq in", "hq:", "headquarters:")
+# A cue after one of these words is about somebody else's office ("Our
+# customer Fjordline, based in Berlin, ...").
+THIRD_PARTIES: tuple[str, ...] = ("customer", "customers", "client", "clients", "partner", "partners",
+                                  "investor", "investors", "user", "users", "agency", "agencies",
+                                  "reseller", "resellers", "brand", "brands")
+
+# --------------------------------------------------------------------------
+# Parts of a page that are not the site speaking about its product. Matched
+# against the words of an element's class and id ("main-menu" -> main, menu).
+# --------------------------------------------------------------------------
+NAVIGATION_CLASS_WORDS: frozenset[str] = frozenset({
+    "nav", "navbar", "navigation", "menu", "menus", "breadcrumb", "breadcrumbs", "megamenu",
+})
+TESTIMONIAL_CLASS_WORDS: frozenset[str] = frozenset({
+    "testimonial", "testimonials", "review", "reviews", "quote", "quotes", "blockquote",
+})
+CONSENT_CLASS_WORDS: frozenset[str] = frozenset({
+    "cookie", "cookies", "consent", "gdpr", "onetrust", "cookiebot", "cmp",
+})
+# A heading with one of these words belongs to a consent banner, not to the product.
+CONSENT_HEADING_WORDS: tuple[str, ...] = ("cookie", "cookies", "privacy", "consent")
+
 # Words that follow a cue without being a city.
 NOT_A_CITY: frozenset[str] = frozenset({
     "europe", "asia", "africa", "america", "north america", "south america", "latin america", "emea",

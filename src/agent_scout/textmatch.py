@@ -4,6 +4,11 @@ A phrase is a few lower-case words. Words are matched whole and
 case-insensitively; a space in the phrase also matches a hyphen in the text
 ("multi agent" finds "multi-agent"); a word ending in ``*`` matches any
 ending ("optimi*" finds optimize, optimised, optimization).
+
+A match is discarded when the text around it shows that the sentence does not
+claim the thing for the product: a negation before it, a negation right after
+it, or a clause about other products (see NEGATIONS, POST_NEGATIONS and
+OTHERS_SUBJECTS in vocab.py).
 """
 
 from __future__ import annotations
@@ -11,7 +16,7 @@ from __future__ import annotations
 import re
 from functools import lru_cache
 
-from .vocab import NEGATION_WINDOW, NEGATIONS
+from .vocab import NEGATION_WINDOW, NEGATIONS, OTHERS_SUBJECTS, POST_NEGATIONS, RHETORICAL_OPENERS
 
 
 @lru_cache(maxsize=None)
@@ -29,46 +34,69 @@ def normalise_quotes(text: str) -> str:
     return text.replace("’", "'").replace("‘", "'")
 
 
-def find_phrase(text: str, phrases) -> re.Match | None:
-    """First match of any phrase in ``text`` that is not negated."""
+def clause_before(text: str, position: int) -> str:
+    """The part of the sentence before ``position``, back to the last clause break."""
+    return re.split(r"[.;:!?]", normalise_quotes(text[:position]).lower())[-1]
+
+
+def words_before(text: str, position: int, count: int) -> list[str]:
+    return re.findall(r"[\w']+", clause_before(text, position))[-count:]
+
+
+def preceded_by(text: str, position: int, phrases, window: int) -> bool:
+    """True when one of ``phrases`` stands within ``window`` words before ``position``."""
+    recent = " ".join(words_before(text, position, window))
+    return any(phrase_regex(phrase).search(recent) for phrase in phrases)
+
+
+_POST_NEGATION = re.compile(r"\s*(?:" + "|".join(re.escape(p).replace(r"\ ", r"\s+") for p in POST_NEGATIONS)
+                            + r")(?![\w'])", re.IGNORECASE)
+
+
+def is_negated(text: str, start: int, end: int | None = None) -> bool:
+    """True when the phrase at ``start``..``end`` is denied or is about others."""
     text = normalise_quotes(text)
-    best = None
-    for phrase in phrases:
-        for match in phrase_regex(phrase).finditer(text):
-            if not is_negated(text, match.start()):
-                if best is None or match.start() < best.start():
-                    best = match
-                break
-    return best
+    words = words_before(text, start, NEGATION_WINDOW)
+    window = " ".join(words)
+    for negation in NEGATIONS:
+        if re.search(rf"(?<![\w']){re.escape(negation)}(?![\w'])", window):
+            return True
+    if any(word.endswith("n't") for word in words):
+        return True
+    clause = clause_before(text, start)
+    if any(phrase_regex(subject).search(clause) for subject in OTHERS_SUBJECTS):
+        return True
+    return end is not None and bool(_POST_NEGATION.match(text[end:]))
 
 
 def find_all(text: str, phrases) -> list[re.Match]:
-    """Every non-negated match of every phrase, in text order."""
+    """Every match of every phrase that is not negated, in text order."""
     text = normalise_quotes(text)
     matches = [match for phrase in phrases for match in phrase_regex(phrase).finditer(text)
-               if not is_negated(text, match.start())]
+               if not is_negated(text, match.start(), match.end())]
     return sorted(matches, key=lambda match: match.start())
+
+
+def find_phrase(text: str, phrases) -> re.Match | None:
+    """First match of any phrase in ``text`` that is not negated."""
+    matches = find_all(text, phrases)
+    return matches[0] if matches else None
 
 
 def has_phrase(text: str, phrases) -> bool:
     return find_phrase(text, phrases) is not None
 
 
-def is_negated(text: str, position: int) -> bool:
-    """True when a negation stands within NEGATION_WINDOW words before ``position``."""
-    before = normalise_quotes(text[:position]).lower()
-    clause = re.split(r"[.;:!?]", before)[-1]
-    words = re.findall(r"[\w']+", clause)[-NEGATION_WINDOW:]
-    window = " ".join(words)
-    for negation in NEGATIONS:
-        if re.search(rf"(?<![\w']){re.escape(negation)}(?![\w'])", window):
-            return True
-    return any(word.endswith("n't") for word in words)
-
-
 def labels_in(text: str, table: dict[str, tuple[str, ...]]) -> list[str]:
     """Vocabulary labels whose phrases occur (not negated) in ``text``."""
     return [label for label, phrases in table.items() if has_phrase(text, phrases)]
+
+
+def is_rhetorical(text: str) -> bool:
+    """A question, or a heading that opens like one ("Why ... fail")."""
+    stripped = text.strip()
+    first = re.match(r"[A-Za-z']+", stripped)
+    return stripped.endswith("?") or bool(first and first.group(0).lower() in RHETORICAL_OPENERS)
 
 
 def normalise_for_quote(text: str) -> str:

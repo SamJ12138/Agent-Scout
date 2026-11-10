@@ -8,6 +8,17 @@ Only two kinds of content are kept:
 
 Scripts, styles, <noscript> and <template> content are never text. A page
 with almost no visible text that loads scripts is flagged ``needs_rendering``.
+
+Every snippet, link and image carries a zone. Only ``main`` and ``header``
+are the site speaking about its product:
+
+    nav      <nav>, role=navigation, or a class/id word such as menu, navbar
+    footer   <footer>
+    quote    <blockquote>, <cite>, <q>, or a class/id word such as testimonial:
+             a customer speaking, not the site
+    banner   a cookie or consent notice
+    header   <header>
+    main     everything else
 """
 
 from __future__ import annotations
@@ -21,6 +32,7 @@ from bs4 import BeautifulSoup, Comment, NavigableString, Tag
 
 from . import obs
 from .config import Config
+from .vocab import CONSENT_CLASS_WORDS, NAVIGATION_CLASS_WORDS, TESTIMONIAL_CLASS_WORDS
 
 HEADINGS = ("h1", "h2", "h3", "h4", "h5", "h6")
 BLOCK_TAGS = frozenset(HEADINGS + (
@@ -29,7 +41,9 @@ BLOCK_TAGS = frozenset(HEADINGS + (
     "ol", "p", "pre", "section", "summary", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "ul",
 ))
 INVISIBLE_TAGS = ("script", "style", "noscript", "template", "svg", "iframe", "head", "title")
-ZONE_TAGS = {"nav": "nav", "footer": "footer", "header": "header"}
+ZONE_TAGS = {"nav": "nav", "footer": "footer", "header": "header", "blockquote": "quote", "cite": "quote",
+             "q": "quote"}
+ZONE_PRIORITY = ("quote", "banner", "nav", "footer", "header")     # first match wins; otherwise "main"
 INLINE_SCRIPT_SHELL_CHARS = 2000   # inline script size that counts as "ships large scripts"
 
 # A heading with one of these phrases starts a section that lists integrations.
@@ -74,8 +88,9 @@ def split_sentences(text: str) -> list[str]:
 class Snippet:
     text: str
     method: str          # meta | heading | sentence | link | table
-    zone: str            # head | nav | header | footer | main
+    zone: str            # head | main | header | nav | footer | quote | banner
     in_integration_section: bool = False
+    level: int = 0       # 1-6 for a heading, otherwise 0
 
 
 @dataclass
@@ -129,10 +144,49 @@ def _flatten_json_ld(node, out: list[dict]) -> None:
                 _flatten_json_ld(value, out)
 
 
-def _zone(element: Tag) -> str:
+def _class_words(element: Tag) -> set[str]:
+    marker = " ".join(element.get("class") or []) + " " + str(element.get("id") or "")
+    return {word for word in re.split(r"[^a-z0-9]+", marker.lower()) if word}
+
+
+def _own_zone(element: Tag) -> str | None:
+    """The zone an element starts, judged by its tag, role, class and id."""
+    if element.name in ZONE_TAGS:
+        return ZONE_TAGS[element.name]
+    if element.name in ("body", "html", "main"):
+        return None                     # page-level classes ("menu-open") describe state, not content
+    role = str(element.get("role") or "").lower()
+    if role == "navigation":
+        return "nav"
+    words = _class_words(element)
+    if not words:
+        return None
+    for zone, vocabulary in (("quote", TESTIMONIAL_CLASS_WORDS), ("banner", CONSENT_CLASS_WORDS),
+                             ("nav", NAVIGATION_CLASS_WORDS)):
+        if words & vocabulary:
+            # A wrapper around the whole page is not a menu or a testimonial.
+            if element.find(["main", "h1"]) is not None:
+                return None
+            return zone
+    return None
+
+
+def _zone(element: Tag, cache: dict[int, str | None] | None = None) -> str:
+    found = set()
     for parent in [element, *element.parents]:
-        if isinstance(parent, Tag) and parent.name in ZONE_TAGS:
-            return ZONE_TAGS[parent.name]
+        if not isinstance(parent, Tag):
+            continue
+        if cache is not None:
+            if id(parent) not in cache:
+                cache[id(parent)] = _own_zone(parent)
+            zone = cache[id(parent)]
+        else:
+            zone = _own_zone(parent)
+        if zone:
+            found.add(zone)
+    for zone in ZONE_PRIORITY:
+        if zone in found:
+            return zone
     return "main"
 
 
@@ -191,6 +245,10 @@ def parse_page(url: str, html: str, config: Config) -> Page:
     for comment in soup.find_all(string=lambda node: isinstance(node, Comment)):
         comment.extract()
     containers = _integration_containers(soup)
+    zone_cache: dict[int, str | None] = {}
+
+    def zone_of(element: Tag) -> str:
+        return _zone(element, zone_cache)
 
     def in_integration(element: Tag) -> bool:
         return any(id(parent) in containers for parent in [element, *element.parents])
@@ -198,7 +256,7 @@ def parse_page(url: str, html: str, config: Config) -> Page:
     for image in soup.find_all("img"):
         alt = clean(image.get("alt") or "")
         if alt:
-            page.images.append(Image(alt=alt, zone=_zone(image), in_integration_section=in_integration(image)))
+            page.images.append(Image(alt=alt, zone=zone_of(image), in_integration_section=in_integration(image)))
 
     for anchor in soup.find_all("a", href=True):
         href = anchor["href"].strip()
@@ -215,7 +273,7 @@ def parse_page(url: str, html: str, config: Config) -> Page:
         if not text:
             inner = anchor.find("img")
             text = clean((inner.get("alt") if inner else None) or anchor.get("aria-label") or anchor.get("title") or "")
-        page.links.append(Link(url=absolute, text=text, zone=_zone(anchor),
+        page.links.append(Link(url=absolute, text=text, zone=zone_of(anchor),
                                in_integration_section=in_integration(anchor)))
 
     for element in soup.find_all(INVISIBLE_TAGS):
@@ -241,9 +299,9 @@ def parse_page(url: str, html: str, config: Config) -> Page:
         if not text:
             return
         page.visible_chars += len(text)
-        zone, integ = _zone(anchor), in_integration(anchor)
+        zone, integ = zone_of(anchor), in_integration(anchor)
         if heading:
-            page.snippets.append(Snippet(text, "heading", zone, integ))
+            page.snippets.append(Snippet(text, "heading", zone, integ, level=_heading_level(anchor)))
         elif link_only(nodes):
             page.snippets.append(Snippet(text, "link", zone, integ))
         else:
@@ -259,7 +317,7 @@ def parse_page(url: str, html: str, config: Config) -> Page:
                     rows.append(cells)
                     text = " | ".join(cells)
                     page.visible_chars += sum(len(cell) for cell in cells)
-                    page.snippets.append(Snippet(text, "table", _zone(element), in_integration(element)))
+                    page.snippets.append(Snippet(text, "table", zone_of(element), in_integration(element)))
             if rows:
                 page.tables.append(rows)
             return
@@ -269,7 +327,7 @@ def parse_page(url: str, html: str, config: Config) -> Page:
             if address:
                 page.addresses.append(address)
                 page.visible_chars += len(address)
-                page.snippets.append(Snippet(address, "sentence", _zone(element), False))
+                page.snippets.append(Snippet(address, "sentence", zone_of(element), False))
             return
         if element.name in HEADINGS:
             emit_text([element], element, heading=True)

@@ -1,8 +1,16 @@
 """Reference data for reading addresses: countries and US states.
 
-Used only to recognise a country that a site wrote down (by name, by a common
-short form, or as an ISO 3166-1 alpha-2 code in JSON-LD). Nothing here infers
-a country from a city name.
+Used only to recognise a country that a site wrote down. Nothing here infers
+a country from a city name, and nothing guesses between two readings:
+
+- a country name or common short form ("Germany", "UK", "USA") states the country;
+- a US state with a ZIP code ("Austin, TX 78701") or a US state written out
+  ("San Francisco, California") states the United States;
+- a bare two-letter code after a city does NOT state the United States:
+  "Toronto, CA", "Berlin, DE", "Bengaluru, IN" and "Perth, WA" are not in the
+  US. If the code is an ISO country code and not also a US state code
+  ("Lyon, FR") it states that country; otherwise the country stays unknown;
+- "Georgia" alone is a country and a US state, so it states neither.
 """
 
 from __future__ import annotations
@@ -120,12 +128,29 @@ def country_name(text: str, allow_code: bool = False) -> str | None:
     return None
 
 
+US_STATE_CODES_THAT_ARE_ALSO_COUNTRY_CODES = frozenset(
+    "AL AR AZ CA CO DE GA ID IL IN KY LA MA MD ME MN MO MS MT NC NE PA SC SD TN VA".split())
+AMBIGUOUS_STATE_NAMES = frozenset({"georgia"})        # also a country
+_ZIP = re.compile(r"\s+\d{5}(?:-\d{4})?$")
+
+
 def us_state(text: str) -> str | None:
-    """'CA', 'CA 94105' or 'California' -> the state code; anything else -> None."""
-    stripped = re.sub(r"\s+\d{5}(?:-\d{4})?$", "", text.strip().strip(".,;"))
+    """'CA', 'CA 94105' or 'California' -> the state code; anything else -> None.
+    Says what a token could be; whether it states the country is decided by the caller."""
+    stripped = _ZIP.sub("", text.strip().strip(".,;"))
     if stripped in US_STATE_BY_CODE:
         return stripped
     return US_STATE_NAMES.get(stripped.lower())
+
+
+def states_the_united_states(text: str) -> bool:
+    """True for a state with a ZIP code, or a state name that is not also a country."""
+    token = text.strip().strip(".,;")
+    if us_state(token) is None:
+        return False
+    if _ZIP.search(token):
+        return True
+    return token.lower() in US_STATE_NAMES and token.lower() not in AMBIGUOUS_STATE_NAMES
 
 
 def strip_postcode(text: str) -> str:
@@ -141,32 +166,37 @@ def _looks_like_city(text: str) -> bool:
 def parse_place(text: str) -> tuple[str | None, str | None]:
     """Read 'City, Country', 'City, ST 12345' or a full comma-separated address.
 
-    Returns (city, country); either may be None. The country is only reported
-    when the text names it, or names a US state (which states the country).
+    Returns (city, country); either may be None. See the module docstring for
+    what counts as stating a country.
     """
     parts = [part.strip() for part in re.split(r"[,\n|•·]+", text) if part.strip()]
     country = None
-    index = len(parts)
+    index = len(parts)                       # position of the country or region part
     for position in range(len(parts) - 1, -1, -1):
         candidate = strip_postcode(parts[position]) or parts[position]
         found = country_name(candidate)
         if found:
             country, index = found, position
             break
-    region_index = index - 1
-    if region_index >= 0 and us_state(parts[region_index]) and (country in (None, "United States")):
-        country = "United States"
-        index = region_index
-    elif country is None:
-        for position in range(len(parts) - 1, 0, -1):
-            if us_state(parts[position]) and re.search(r"\d{5}", parts[position]) or parts[position].strip(".") in US_STATE_BY_CODE:
-                country, index = "United States", position
-                break
-    if country is None:
-        return None, None
+    if country == "United States" and index >= 1 and us_state(parts[index - 1]):
+        index -= 1                           # "Austin, TX, USA": the city is before the state
+    elif country is None and parts:
+        last = parts[-1].strip(".;")
+        if states_the_united_states(last):
+            country, index = "United States", len(parts) - 1
+        elif len(last) == 2 and last.isupper():
+            index = len(parts) - 1           # a bare code: a region or a country
+            if last not in US_STATE_BY_CODE and last in COUNTRY_BY_CODE:
+                country = COUNTRY_BY_CODE[last]
+        elif last.lower() in AMBIGUOUS_STATE_NAMES:
+            index = len(parts) - 1
+        else:
+            return None, None
     city = None
-    if index - 1 >= 0:
+    if 1 <= index <= len(parts):
         candidate = strip_postcode(parts[index - 1])
         if _looks_like_city(candidate):
             city = candidate
+    if country is None and city is None:
+        return None, None
     return city, country

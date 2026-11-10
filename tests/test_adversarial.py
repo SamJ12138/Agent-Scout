@@ -1,0 +1,208 @@
+"""Sentences and pages written to make the extractors say something false.
+
+They come from an independent review of the tool. The rule they enforce: a
+field may come out "unknown", but it must not come out as a wrong true, a
+wrong false or a list of things the site never claimed. Add to this file
+whenever a wrong value is found; never delete from it.
+"""
+
+import pytest
+
+from agent_scout import extract
+from agent_scout.config import Config
+from agent_scout.geo import parse_place
+from agent_scout.model import FIELDS, UNKNOWN
+from agent_scout.page import parse_page
+
+from conftest import html_page
+
+CFG = Config()
+FILLER = "<p>" + "Ordinary words that say nothing in particular. " * 6 + "</p>"
+
+
+def page(body, head="", title="Acme", url="https://acme.test/", topic="home", filler=True):
+    parsed = parse_page(url, html_page(body + (FILLER if filler else ""), title=title, head=head), CFG)
+    parsed.topic = topic
+    return parsed
+
+
+def pricing_page(body):
+    return page(body, url="https://acme.test/pricing", topic="pricing")
+
+
+# ------------------------------------------------------------------ can_execute
+@pytest.mark.parametrize("sentence, allowed", [
+    # a negated verb with a specific object is not "it only drafts"
+    ("Relaywise never sends duplicate emails to a subscriber.", [UNKNOWN]),
+    ("Zed does not publish fake reviews.", [UNKNOWN]),
+    ("It never posts off-brand content.", [UNKNOWN]),
+    # an approval step is not "a human must do the action"
+    ("A human must approve the first campaign; after that the agent sends campaigns automatically.", [True, UNKNOWN]),
+    ("Our agents never send anything without your approval.", [True, UNKNOWN]),
+    ("The assistant never sends anything unless you say so.", [True, UNKNOWN]),
+    # the person does the sending
+    ("Quillon writes emails for you to send.", [UNKNOWN]),
+    ("Drafts are ready so you can publish posts automatically from your own tool.", [UNKNOWN]),
+    ("You never send a campaign late again.", [UNKNOWN]),
+    # a statement about other products
+    ("Other tools send campaigns automatically and hope for the best.", [UNKNOWN]),
+    ("Most platforms publish posts automatically without a second look.", [UNKNOWN]),
+    # a question or a rhetorical heading asserts nothing
+    ("Should an agent send campaigns automatically?", [UNKNOWN]),
+    # unambiguous statements still work
+    ("Pennabright does not send emails for you.", [False]),
+    ("It never sends or publishes anything, and a person on your team posts the final version.", [False]),
+    ("The tool only drafts.", [False]),
+    ("It sends each email campaign automatically.", [True]),
+])
+def test_can_execute(sentence, allowed):
+    assert extract.extract_can_execute([page(f"<p>{sentence}</p>")]).value in allowed
+
+
+def test_can_execute_competitor_sentence_followed_by_own_description():
+    body = "<p>Other tools send campaigns automatically and hope for the best. Calmpost shows you every message first.</p>"
+    assert extract.extract_can_execute([page(body)]).value == UNKNOWN
+
+
+# ------------------------------------------------------------------ multi_agent
+@pytest.mark.parametrize("body", [
+    "<h2>Why multi-agent systems fail</h2><p>Most of them collapse under their own complexity. Solowing is one assistant.</p>",
+    "<p>We are not a multi-agent system. Brightdesk is a single assistant that answers one question at a time.</p>",
+    "<h2>Do you need a team of agents?</h2><p>Probably not.</p>",
+    "<p>Other platforms sell a team of AI agents; we sell one that works.</p>",
+    "<blockquote><p>Their multi-agent setup replaced three tools for us.</p><cite>A customer</cite></blockquote>",
+])
+def test_multi_agent_is_not_claimed(body):
+    assert extract.extract_multi_agent([page(body)]).value == UNKNOWN
+
+
+# ------------------------------------------------------------------ integrations
+@pytest.mark.parametrize("body", [
+    "<h2>Connect to Customers Faster</h2><p>Works with Marketing Teams of any size.</p>",
+    "<p>Integrates with Your Brand Guidelines and Every Channel.</p>",
+    "<h2>What customers say</h2><blockquote><p>“We connected it to Salesforce and HubSpot in a day, and it works with "
+    "Slack out of the box.”</p><cite>Dana Whitlow, Operations lead at Corvid Supply</cite></blockquote>",
+    "<div class='testimonial-card'><p>It works with Slack and Notion, which sold us.</p></div>",
+])
+def test_integrations_are_not_invented(body):
+    assert extract.extract_integrations([page(body)], "Acme", 25).value == UNKNOWN
+
+
+# ------------------------------------------------------------------ vocabulary fields
+@pytest.mark.parametrize("body, field", [
+    ("<p>Cheaper than an agency. Faster than hiring engineers.</p>", "target_user"),
+    ("<p>Like having a team of developers, without the payroll.</p>", "target_user"),
+    ("<p>SEO is not something we do. Chatbots are not part of the product either.</p>", "tasks"),
+    ("<p>SEO is not something we do. Chatbots are not part of the product either.</p>", "categories"),
+    ("<p>Other tools do keyword research and call it a day.</p>", "tasks"),
+    ("<blockquote><p>We used to pay $5,000 a month for an agency.</p><cite>Priya N., founder</cite></blockquote>", "target_user"),
+    ("<blockquote><p>The SEO reports alone are worth it.</p></blockquote>", "tasks"),
+    ("<div id='cookie-banner'><h2>We use analytics cookies</h2><p>Analytics and advertising partners help us.</p></div>", "tasks"),
+    ("<div id='cookie-banner'><h2>We use analytics cookies</h2><p>Analytics and advertising partners help us.</p></div>", "categories"),
+])
+def test_vocabulary_values_are_not_invented(body, field):
+    assert extract.extract_vocab([page(body)], field).value == UNKNOWN
+
+
+# ------------------------------------------------------------------ headquarters
+@pytest.mark.parametrize("sentence, expected", [
+    ("Our customer Fjordline, based in Berlin, Germany, doubled its sign-ups in a quarter.", UNKNOWN),
+    ("We work with agencies headquartered in London, UK.", UNKNOWN),
+    ("Zed is headquartered in Tbilisi, Georgia.", {"city": "Tbilisi", "country": UNKNOWN}),
+    ("We are a remote team based in Berlin, DE.", {"city": "Berlin", "country": UNKNOWN}),
+    ("Headquartered in Toronto, CA.", {"city": "Toronto", "country": UNKNOWN}),
+    ("Headquartered in Austin, TX 78701.", {"city": "Austin", "country": "United States"}),
+])
+def test_hq(sentence, expected):
+    assert extract.extract_hq([page(f"<p>{sentence}</p>")]).value == expected
+
+
+def test_hq_is_not_read_from_a_testimonial():
+    body = "<blockquote><p>Our team, based in Oslo, Norway, saved a day a week.</p><cite>Customer</cite></blockquote>"
+    assert extract.extract_hq([page(body)]).value == UNKNOWN
+
+
+@pytest.mark.parametrize("text, expected", [
+    ("Berlin, DE", ("Berlin", None)),                 # DE is Germany and Delaware
+    ("Toronto, CA", ("Toronto", None)),               # CA is Canada and California
+    ("Bengaluru, IN", ("Bengaluru", None)),           # IN is India and Indiana
+    ("Tbilisi, Georgia", ("Tbilisi", None)),          # a country and a state
+    ("Perth, WA", ("Perth", None)),                   # Western Australia, not Washington
+    ("Portland, OR", ("Portland", None)),             # a bare state code states no country
+    ("Lyon, FR", ("Lyon", "France")),                 # an ISO country code that is not a state code
+    ("Portland, OR 97204", ("Portland", "United States")),
+    ("Atlanta, GA 30301", ("Atlanta", "United States")),
+    ("Toronto, CA, USA", ("Toronto", "United States")),   # explicit marker: the site said so
+    ("San Francisco, California", ("San Francisco", "United States")),
+    ("Toronto, Canada", ("Toronto", "Canada")),
+])
+def test_places_are_never_guessed(text, expected):
+    assert parse_place(text) == expected
+
+
+# ------------------------------------------------------------------ pricing
+@pytest.mark.parametrize("body, expected", [
+    ("<p>No free trial limits. Use the Starter plan as long as you like.</p>", UNKNOWN),
+    ("<p>Setup fee: $0. The Team plan is $99/month.</p><p>Customers earn back $3 for every $1 spent on Ledgerly.</p>",
+     {"free_tier": UNKNOWN, "starting_price": "$99/month"}),
+    ("<table><tr><td>Onboarding</td><td>$0</td></tr><tr><td>Pro</td><td>$49/month</td></tr></table>",
+     {"free_tier": UNKNOWN, "starting_price": "$49/month"}),
+    ("<section><h2>Starter</h2><p>$99/month</p></section><section><h2>Scale</h2><p>$299/month</p></section>"
+     "<blockquote><p>“We used to pay $40/month for a scheduling tool and $5,000 a month for an agency.”</p>"
+     "<cite>Priya N., founder</cite></blockquote>", {"free_tier": UNKNOWN, "starting_price": "$99/month"}),
+    ("<p>There is no free plan. Paid plans start at $99 per month.</p>",
+     {"free_tier": False, "starting_price": "$99 per month"}),
+    ("<p>We do not offer a free plan.</p><p>Team: $30 per user per month. Extra seats are $5.</p>",
+     {"free_tier": False, "starting_price": "$30 per user per month"}),
+    ("<blockquote><p>The free trial convinced us in a day.</p></blockquote><p>Talk to sales.</p>", UNKNOWN),
+])
+def test_pricing(body, expected):
+    assert extract.extract_pricing([pricing_page(body)]).value == expected
+
+
+# ------------------------------------------------------------------ navigation is never a statement
+NAV_ONLY = """
+<header><div class="menu"><ul>
+<li><a href="/seo">SEO</a></li><li><a href="/email">Email marketing</a></li><li><a href="/agencies">For agencies</a></li>
+<li><a href="/x"><strong>Chatbots</strong> <span>Answer customer questions around the clock</span></a></li>
+<li><button>Integrations</button></li><li><a href="/slack">Slack</a></li><li><a href="/hubspot">HubSpot</a></li>
+<li><a href="/free">Start free</a></li></ul></div></header>
+<nav><a href="/a">Social media scheduling</a> <a href="/b">Multi-agent teams</a> <a href="/c">Plans from $19/month</a></nav>
+<footer><a href="/terms">Terms</a> <a href="/privacy">Privacy</a> <p>Free trial available. Based in Oslo, Norway.</p></footer>
+"""
+
+
+def test_a_page_that_is_only_navigation_states_nothing_about_the_product():
+    fields = extract.extract_fields([page(NAV_ONLY, filler=False)], "Acme", CFG)
+    for name in FIELDS:
+        if name == "hq_location":
+            continue                     # a footer may state where the company is
+        assert fields[name].value == UNKNOWN, (name, fields[name].value)
+    assert fields["hq_location"].value == {"city": "Oslo", "country": "Norway"}
+
+
+@pytest.mark.parametrize("wrapper", [
+    "<nav>{}</nav>", "<div role='navigation'>{}</div>", "<div class='site-navbar'>{}</div>",
+    "<ul class='main-menu'>{}</ul>", "<div id='breadcrumbs'>{}</div>",
+])
+def test_navigation_is_recognised_by_tag_role_or_class(wrapper):
+    body = wrapper.format("<a href='/a'>Start your free trial</a> <a href='/b'>Plans from $19/month</a>")
+    assert extract.extract_pricing([pricing_page(body)]).value == UNKNOWN
+
+
+def test_a_class_on_the_page_wrapper_does_not_turn_the_whole_page_into_navigation():
+    body = "<div class='has-nav menu-open'><main><h1>Acme</h1><p>Every plan starts with a 14-day free trial.</p></main></div>"
+    assert extract.extract_pricing([pricing_page(body)]).value == {"free_tier": True, "starting_price": UNKNOWN}
+
+
+# ------------------------------------------------------------------ one_liner
+def test_cookie_banner_is_not_the_one_liner():
+    body = ("<h2>We value your privacy</h2><p>We use cookies to improve your experience.</p>"
+            "<h1>Zed runs your ads</h1><p>Zed is an ads agent.</p>")
+    assert extract.extract_one_liner([page(body)]).value == "Zed runs your ads: Zed is an ads agent."
+
+
+def test_consent_container_and_testimonial_are_not_the_one_liner():
+    body = ("<div class='cookie-consent'><h2>Cookies</h2><p>Accept all cookies to continue.</p></div>"
+            "<blockquote><h3>Best tool ever</h3><p>It changed our week.</p></blockquote>")
+    assert extract.extract_one_liner([page(body)]).value == UNKNOWN

@@ -2,11 +2,15 @@
 
 Each function returns a FieldResult: a value (or "unknown") plus the evidence
 it rests on (page URL, verbatim quote, method). Nothing is inferred beyond
-what a quote states; a field no page states stays "unknown".
+what a quote states; a field no page states stays "unknown". When a rule
+cannot tell whether a sentence makes a claim about the product, the answer is
+"unknown": a wrong true or false is worse than a missing value.
 
-From a page flagged ``needs_rendering`` only head data is used (meta tags for
-the one-liner, JSON-LD for address and offers). Keyword tables are never run
-on such a page: its visible text is a loading shell.
+What is read: text in the page's main content and header. Navigation,
+customer quotes (blockquotes, testimonial blocks), consent banners and, except
+for the company address, footers are not the site describing its product and
+are never read. From a page flagged ``needs_rendering`` only head data is used
+(meta tags for the one-liner, JSON-LD for address and offers).
 """
 
 from __future__ import annotations
@@ -18,15 +22,18 @@ from urllib.parse import urlsplit
 
 from . import obs
 from .config import Config
-from .geo import country_name, parse_place, us_state
+from .geo import country_name, parse_place, states_the_united_states
 from .model import FIELDS, UNKNOWN, Evidence, FieldResult, unknown_fields
 from .page import Page, Snippet, split_sentences
-from .textmatch import find_all, find_phrase, has_phrase
-from .vocab import (AGENT_SUBJECTS, ASSIST_WORDS, AUTONOMY_MARKERS, CATEGORIES, DRAFT_ONLY_PHRASES,
-                    EXECUTE_OBJECTS, EXECUTE_VERBS, FREE_TIER_PHRASES, HQ_CUES, INTEGRATION_TRIGGERS,
-                    KNOWN_INTEGRATIONS, LOGO_SUFFIXES, MULTI_AGENT_PHRASES, NO_FREE_TIER_PHRASES,
-                    NOT_A_CITY, NOT_A_PRICE_AFTER, NOT_A_PRICE_BEFORE, NOT_A_PRODUCT, PRICE_CUES,
-                    STRONG_HIT, TARGET_USERS, TASKS, THRESHOLDS, WEAK_HIT)
+from .textmatch import (find_all, find_phrase, has_phrase, is_rhetorical, normalise_quotes, phrase_regex,
+                        preceded_by, words_before)
+from .vocab import (AGENT_SUBJECTS, ASSIST_WORDS, AUDIENCE_COMPARISON_WINDOW, AUDIENCE_COMPARISONS,
+                    AUTONOMY_MARKERS, CATEGORIES, CONSENT_HEADING_WORDS, DRAFT_ONLY_PHRASES, DRAFT_ONLY_VERBS,
+                    EXECUTE_OBJECTS, EXECUTE_VERBS, FREE_TIER_PHRASES, GENERAL_OBJECTS, HQ_CUES,
+                    INTEGRATION_TRIGGERS, KNOWN_INTEGRATIONS, LOGO_SUFFIXES, MULTI_AGENT_PHRASES, NEGATORS,
+                    NO_FREE_TIER_PHRASES, NOT_A_CITY, NOT_A_FREE_PLAN, NOT_A_PRICE_AFTER, NOT_A_PRICE_BEFORE,
+                    NOT_A_PRODUCT, PRICE_CUES, SELF_MARKERS, STRONG_HIT, TARGET_USERS, TASKS, THIRD_PARTIES,
+                    THRESHOLDS, USER_SUBJECT_WINDOW, USER_SUBJECTS, WEAK_HIT)
 
 VOCAB_TABLES = {"categories": CATEGORIES, "target_user": TARGET_USERS, "tasks": TASKS}
 DESCRIBING_TYPES = {"SoftwareApplication", "WebApplication", "Product", "Organization", "Corporation",
@@ -44,20 +51,27 @@ def _readable(pages: list[Page]) -> list[Page]:
     return [page for page in pages if not page.needs_rendering]
 
 
+SPEAKING_ZONES = ("main", "header")      # where the site itself describes its product
+
+
+def _spoken(page: Page, methods: tuple[str, ...] = ("heading", "sentence")) -> list[Snippet]:
+    """Snippets of a page in which the site speaks about its product."""
+    return [s for s in page.snippets if s.zone in SPEAKING_ZONES and s.method in methods]
+
+
 def _statements(pages: list[Page]) -> Iterator[tuple[Page, Snippet]]:
     """What the site says about the product: head descriptions, headings and
-    sentences of the main content. Navigation, footers, link-only text, table
-    rows and anything presented as a list of integrations are left out, and a
-    text repeated across pages is yielded once."""
+    sentences of the main content. Navigation, footers, customer quotes,
+    consent banners, link-only text, table rows and anything presented as a
+    list of integrations are left out, and a text repeated across pages is
+    yielded once."""
     seen: set[str] = set()
     for page in _readable(pages):
         if page.topic == "integrations":
             continue
         head = [page.meta.get("description"), page.meta.get("og:description"), page.title]
         candidates = [Snippet(text, "meta", "head") for text in head if text]
-        candidates += [s for s in page.snippets
-                       if s.method in ("heading", "sentence") and s.zone not in ("nav", "footer")
-                       and not s.in_integration_section]
+        candidates += [s for s in _spoken(page) if not s.in_integration_section]
         for snippet in candidates:
             key = snippet.text.lower()
             if key not in seen:
@@ -91,18 +105,18 @@ def extract_one_liner(pages: list[Page]) -> FieldResult:
             return FieldResult(text, [Evidence(home.url, text, "json-ld")])
     if home.needs_rendering:
         return FieldResult()
-    body = [s for s in home.snippets if s.zone not in ("nav", "footer")]
-    for index, snippet in enumerate(body):
-        if snippet.method != "heading":
-            continue
-        following = next((s for s in body[index + 1:] if s.method in ("sentence", "heading")), None)
-        if following is None or following.method != "sentence":
-            return FieldResult()
-        joiner = " " if snippet.text[-1] in ".!?:" else ": "
-        return FieldResult(_trim(f"{snippet.text}{joiner}{following.text}"),
-                           [Evidence(home.url, snippet.text, "heading"),
-                            Evidence(home.url, following.text, "sentence")])
-    return FieldResult()
+    # Hero: the first <h1> (else the first heading) and the sentence right after it.
+    body = [s for s in _spoken(home) if not (s.method == "heading" and has_phrase(s.text, CONSENT_HEADING_WORDS))]
+    headings = [index for index, snippet in enumerate(body) if snippet.method == "heading"]
+    first_h1 = next((index for index in headings if body[index].level == 1), None)
+    start = first_h1 if first_h1 is not None else (headings[0] if headings else None)
+    if start is None or start + 1 >= len(body) or body[start + 1].method != "sentence":
+        return FieldResult()
+    heading, following = body[start], body[start + 1]
+    joiner = " " if heading.text[-1] in ".!?:" else ": "
+    return FieldResult(_trim(f"{heading.text}{joiner}{following.text}"),
+                       [Evidence(home.url, heading.text, "heading"),
+                        Evidence(home.url, following.text, "sentence")])
 
 
 # --------------------------------------------------------------------------- vocabulary fields
@@ -114,7 +128,11 @@ def extract_vocab(pages: list[Page], field: str) -> FieldResult:
     for page, snippet in _statements(pages):
         weight = STRONG_HIT if snippet.method in ("meta", "heading") else WEAK_HIT
         for label, phrases in table.items():
-            if not has_phrase(snippet.text, phrases):
+            matches = find_all(snippet.text, phrases)
+            if field == "target_user":           # "cheaper than an agency" names no audience
+                matches = [m for m in matches if not preceded_by(snippet.text, m.start(), AUDIENCE_COMPARISONS,
+                                                                 AUDIENCE_COMPARISON_WINDOW)]
+            if not matches:
                 continue
             scores[label] = scores.get(label, 0) + weight
             if label not in evidence or weight > evidence[label][0]:
@@ -127,6 +145,9 @@ def extract_vocab(pages: list[Page], field: str) -> FieldResult:
 
 # --------------------------------------------------------------------------- can_execute / multi_agent
 def _states_execution(text: str) -> bool:
+    """The sentence says the product itself acts in another system or channel."""
+    if is_rhetorical(text):
+        return False
     objects = find_all(text, EXECUTE_OBJECTS)
     autonomous = has_phrase(text, AUTONOMY_MARKERS)
     for verb in find_all(text, EXECUTE_VERBS):
@@ -135,7 +156,34 @@ def _states_execution(text: str) -> bool:
         before = text[:verb.start()]
         if has_phrase(before, ASSIST_WORDS):
             continue                                   # "helps you launch", "drafts ... to post"
+        if set(words_before(text, verb.start(), USER_SUBJECT_WINDOW)) & set(USER_SUBJECTS):
+            continue                                   # "for you to send", "so you can publish": the person acts
         if autonomous or has_phrase(before, AGENT_SUBJECTS):
+            return True
+    return False
+
+
+def _alternatives(words) -> str:
+    return "|".join(re.escape(word).replace(r"\ ", r"\s+") for word in sorted(words, key=len, reverse=True))
+
+
+_NEGATED_ACTION = re.compile(
+    rf"(?<![\w'])(?:{_alternatives(NEGATORS)})\s+(?:{_alternatives(DRAFT_ONLY_VERBS)})(?:e?s)?"
+    rf"(?:\s*(?:,|or|and|nor)\s*(?:{_alternatives(DRAFT_ONLY_VERBS)})(?:e?s)?)*(?![\w'])", re.IGNORECASE)
+_GENERAL_TAIL = re.compile(
+    rf"(?:\s+(?:any|your|the))?(?:\s+(?:{_alternatives(GENERAL_OBJECTS)}))?"
+    rf"(?:\s+(?:{_alternatives(SELF_MARKERS)}))?\s*(?:[.,;:!?]|$)", re.IGNORECASE)
+
+
+def _states_draft_only(text: str) -> bool:
+    """The sentence says, without qualification, that the product does not act."""
+    if has_phrase(text, DRAFT_ONLY_PHRASES):
+        return True
+    text = normalise_quotes(text)
+    for action in _NEGATED_ACTION.finditer(text):
+        if set(words_before(text, action.start(), USER_SUBJECT_WINDOW)) & set(USER_SUBJECTS):
+            continue                                   # "you never send ..." is about the person
+        if _GENERAL_TAIL.match(text, action.end()):
             return True
     return False
 
@@ -144,7 +192,7 @@ def extract_can_execute(pages: list[Page], site: str | None = None) -> FieldResu
     acts: Evidence | None = None
     drafts: Evidence | None = None
     for page, snippet in _statements(pages):
-        if has_phrase(snippet.text, DRAFT_ONLY_PHRASES):
+        if _states_draft_only(snippet.text):
             drafts = drafts or Evidence(page.url, snippet.text, snippet.method)
         elif _states_execution(snippet.text):
             acts = acts or Evidence(page.url, snippet.text, snippet.method)
@@ -161,7 +209,7 @@ def extract_can_execute(pages: list[Page], site: str | None = None) -> FieldResu
 
 def extract_multi_agent(pages: list[Page]) -> FieldResult:
     for page, snippet in _statements(pages):
-        if has_phrase(snippet.text, MULTI_AGENT_PHRASES):
+        if not is_rhetorical(snippet.text) and has_phrase(snippet.text, MULTI_AGENT_PHRASES):
             return FieldResult(True, [Evidence(page.url, snippet.text, snippet.method)])
     return FieldResult()
 
@@ -191,30 +239,32 @@ def _plausible_name(name: str) -> bool:
 
 
 def _names_after_trigger(rest: str) -> list[str]:
-    """'Instagram, LinkedIn and Slack to keep ...' -> the capitalised names."""
+    """'Instagram, LinkedIn and Slack to keep ...' -> the product names.
+
+    A name outside the known list is only kept when the same list also names
+    a known product: "Works with Marketing Teams" lists no product at all.
+    """
     rest = re.split(r"[.;:!?(]\s|[.;:!?]$", rest, maxsplit=1)[0]
-    names = []
+    names: list[tuple[str, bool]] = []
     for token in re.split(r",|\band\b|&|\bor\b|\bplus\b", rest):
-        words = token.strip().strip(".").split()
         run: list[str] = []
-        for word in words:
+        for word in token.strip().strip(".").split():
             if (word[0].isupper() or word[0].isdigit()) and len(run) < 3:
                 run.append(word.rstrip(".,"))
             else:
                 break
+        full = " ".join(run)
         while run:
-            candidate = " ".join(run)
-            canonical = _KNOWN_LOOKUP.get(candidate.lower())
+            canonical = _KNOWN_LOOKUP.get(" ".join(run).lower())
             if canonical:
-                names.append(canonical)
-                break
-            if len(run) == len(words[:len(run)]) and _plausible_name(candidate) and len(run) <= 3:
-                names.append(candidate)
+                names.append((canonical, True))
                 break
             run.pop()
-        if not run and words and words[0][0].islower():
-            continue
-    return names
+        if not run and full and _plausible_name(full):
+            names.append((full, False))
+    if not any(known for _, known in names):
+        return []
+    return [name for name, _ in names]
 
 
 def _is_integration_page(page: Page) -> bool:
@@ -249,7 +299,7 @@ def extract_integrations(pages: list[Page], site_name: str | None, limit: int) -
                 if canonical:
                     add(canonical, page, link.text, "link")
         for snippet in page.snippets:
-            if snippet.zone in ("nav", "footer"):
+            if snippet.zone not in SPEAKING_ZONES:
                 continue
             if whole_page or snippet.in_integration_section:
                 cells = snippet.text.split(" | ") if snippet.method == "table" else [snippet.text]
@@ -303,6 +353,25 @@ def _offers(page: Page) -> Iterator[tuple[float, str, str]]:
                 yield float(raw), f"{str(raw).strip()} {currency}".strip(), quote
 
 
+_CLAUSE_END = re.compile(r"\s*(?:[.,;:!?)]|$)")
+_ONLY_A_PRICE = re.compile(r"\s*(?:free\W*)?" + PRICE.pattern + r"\W*$", re.IGNORECASE)
+
+
+def _denies_free_tier(text: str) -> bool:
+    """'There is no free plan.' yes; 'No free trial limits.' no: the clause must end there."""
+    text = normalise_quotes(text)
+    return any(_CLAUSE_END.match(text, match.end())
+               for phrase in NO_FREE_TIER_PHRASES for match in phrase_regex(phrase).finditer(text))
+
+
+def _zero_is_a_free_plan(snippet: Snippet) -> bool:
+    """A price of zero is a free plan in a pricing table row or standing alone
+    ("$0", "$0/month"), unless the row is about a fee ("Setup fee | $0")."""
+    if has_phrase(snippet.text, NOT_A_FREE_PLAN):
+        return False
+    return snippet.method == "table" or bool(_ONLY_A_PRICE.match(snippet.text))
+
+
 def extract_pricing(pages: list[Page]) -> FieldResult:
     prices: list[tuple[int, float, int, str, Evidence]] = []     # period rank, amount, order, text, evidence
     free: Evidence | None = None
@@ -310,9 +379,9 @@ def extract_pricing(pages: list[Page]) -> FieldResult:
     ordered = sorted(_readable(pages), key=lambda page: not _is_pricing_page(page))
     for page in ordered:
         pricing_page = _is_pricing_page(page)
-        for snippet in page.snippets:
+        for snippet in _spoken(page, ("heading", "sentence", "link", "table")):
             text = snippet.text
-            if has_phrase(text, NO_FREE_TIER_PHRASES):
+            if _denies_free_tier(text):
                 no_free = no_free or Evidence(page.url, text, snippet.method, item="free_tier")
             elif has_phrase(text, FREE_TIER_PHRASES):
                 free = free or Evidence(page.url, text, snippet.method, item="free_tier")
@@ -324,7 +393,7 @@ def extract_pricing(pages: list[Page]) -> FieldResult:
                 if _not_a_price(text, match):
                     continue
                 if amount == 0:
-                    if pricing_page:
+                    if pricing_page and _zero_is_a_free_plan(snippet):
                         free = free or Evidence(page.url, text, snippet.method, item="free_tier")
                     continue
                 if not pricing_page and not has_phrase(text, PRICE_CUES):
@@ -381,8 +450,12 @@ def _json_ld_place(address) -> tuple[str | None, str | None]:
         raw_country = raw_country.get("name") or raw_country.get("identifier")
     country = country_name(raw_country, allow_code=True) if isinstance(raw_country, str) else None
     region = address.get("addressRegion")
-    if country is None and isinstance(region, str) and us_state(region):
-        country = "United States"
+    postcode = address.get("postalCode")
+    if country is None and isinstance(region, str):
+        # a region code alone does not state the country; a US state with a ZIP code does
+        zip_code = f" {postcode.strip()}" if isinstance(postcode, str) else ""
+        if states_the_united_states(region + zip_code):
+            country = "United States"
     return city, country
 
 
@@ -392,7 +465,7 @@ def _place_after_cue(rest: str) -> tuple[str | None, str | None]:
     if not rest or rest.lower() in NOT_A_CITY:
         return None, None
     city, country = parse_place(rest)
-    if country:
+    if country or city:
         return city, country
     words = rest.split()
     if "," not in rest and 0 < len(words) <= 3 and all(word[0].isupper() for word in words) \
@@ -416,20 +489,24 @@ def extract_hq(pages: list[Page]) -> FieldResult:
     for page in readable:
         for address in page.addresses:
             city, country = parse_place(address)
-            if country:
+            if city or country:
                 return FieldResult(_place(city, country), [Evidence(page.url, address, "sentence")])
+    company_zones = (*SPEAKING_ZONES, "footer")      # a footer is where a company states its address
     for page in readable:
         candidates = [Snippet(page.meta["description"], "meta", "head")] if page.meta.get("description") else []
-        candidates += [s for s in page.snippets if s.method in ("sentence", "heading")]
+        candidates += [s for s in page.snippets if s.method in ("sentence", "heading") and s.zone in company_zones]
         for snippet in candidates:
             cue = find_phrase(snippet.text, HQ_CUES)
-            if cue:
-                place = _place(*_place_after_cue(snippet.text[cue.end():]))
-                if place:
-                    return FieldResult(place, [Evidence(page.url, snippet.text, snippet.method)])
+            if cue is None or has_phrase(snippet.text[:cue.start()], THIRD_PARTIES):
+                continue                                   # "our customer X, based in ..." is not us
+            place = _place(*_place_after_cue(snippet.text[cue.end():]))
+            if place:
+                return FieldResult(place, [Evidence(page.url, snippet.text, snippet.method)])
     for page in readable:
         for snippet in page.snippets:
-            if snippet.method != "sentence" or not (snippet.zone == "footer" or page.topic in ("about", "contact")):
+            if snippet.method != "sentence" or snippet.zone not in company_zones:
+                continue
+            if not (snippet.zone == "footer" or page.topic in ("about", "contact")):
                 continue
             if not any(ch.isdigit() for ch in snippet.text) or "," not in snippet.text:
                 continue
